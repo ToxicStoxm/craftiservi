@@ -1,0 +1,9 @@
+stats:
+  server:
+    times-started-reloaded: 0
+    registered-players: 0
+
+  #craftiservi
+  plugin:
+    installed-on: ""
+    version: 0.0

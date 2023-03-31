@@ -1,0 +1,32 @@
+name: Craftiservi
+version: '${project.version}'
+main: com.x_tornado10.craftiservi
+api-version: 1.19
+authors: [ x_Tornado10 ]
+website: https://www.spigotmc.org/resources/crafti-servi.108546/
+prefix: "Craftiservi"
+description: This Plugin provides a few useful tools alongside a basic server infrastructure
+commands:
+  firstjoin:
+    description: returns date when a player first joined
+    permission: craftiservi.command.firstjoin
+    aliases:
+      - fj
+      - firstJoin
+    usage: "Usage: /firstjoin <Player>"
+  xparea:
+    description: lets the user add/remove/configure xpsaveareas
+    permission: craftiservi.command.xparea
+    aliases:
+      - xparea
+      - xpsavearea
+      - xpzone
+      - xpsavezone
+    usage: "Usage: /xparea <add-remove-edit-help> <AreaName> <WorldName> <Location> <Location>"
+  invsave:
+    description: saves the players inventory for later review
+    permission: craftiservi.command.invsave
+    aliases:
+      - inventorysave
+      - invsavepoint
+    usage: "Usage: /invsave <new-remove-rename> <InvName> <NewInvName>"

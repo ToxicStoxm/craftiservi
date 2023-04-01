@@ -3,14 +3,18 @@ package com.x_tornado10.commands.inv_save_point;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class InventorySavePointCommand implements CommandExecutor {
@@ -44,11 +48,14 @@ public class InventorySavePointCommand implements CommandExecutor {
         UUID pid = p.getUniqueId();
 
         switch (args.length) {
+
             case 1 -> {
                 switch (args[0].toLowerCase()) {
                     case "new" -> plmsg.msg(p, "Please provide a name for this InventorySavePoint!");
                     case "remove" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to remove!");
                     case "rename" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to rename!");
+                    case "review" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to review!");
+                    default -> playerSendUsage(p);
                 }
             }
             case 2 -> {
@@ -78,6 +85,50 @@ public class InventorySavePointCommand implements CommandExecutor {
                             logger.info(p.getName() + " created new InventorySavePoint '" + args[1] + "'!");
 
                         }
+                    }
+                    case "view" -> {
+                        if (!inv_saves.containsKey(pid)) {
+
+                            plmsg.msg(p,"You have no InventorySavePoints to review!");
+                            return true;
+
+                        }
+                        HashMap<String, Inventory> p_invs = inv_saves.get(pid);
+                        if (p_invs.containsKey(args[1])) {
+
+                            Inventory inv = p_invs.get(args[1]);
+                            ItemStack[] slots = inv.getContents();
+
+                            Inventory saved_inv = Bukkit.createInventory(inv.getHolder(), inv.getSize(), Bukkit.getPlayer(pid).getName());
+                            saved_inv.setContents(slots);
+
+                            ItemStack restore = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
+                            ItemMeta restore_meta = restore.getItemMeta();
+                            restore_meta.setDisplayName("§aRestore Inventory");
+
+                            List<String> restore_lore = new ArrayList<>();
+                            restore_lore.add("§7Restors the saved Inventory and drops the items of your current inventory!");
+                            restore_meta.setLore(restore_lore);
+                            restore.setItemMeta(restore_meta);
+
+                            saved_inv.setItem(53, restore);
+
+                            p.openInventory(saved_inv);
+
+                        } else {
+
+                            if (p_invs.isEmpty()) {
+
+                                plmsg.msg(p, "You have no InventorySavePoints to review!");
+
+                            } else {
+
+                                plmsg.msg(p, "Error! Name '" + args[1] + "' was not found!");
+
+                            }
+
+                        }
+
                     }
                     case "remove" -> {
                         if (!inv_saves.containsKey(pid)) {
@@ -185,7 +236,43 @@ public class InventorySavePointCommand implements CommandExecutor {
 
     private Inventory inv_point(Player p) {
 
-        return p.getInventory();
+        Inventory temp = p.getInventory();
+
+        Inventory inv = Bukkit.createInventory(p, 54, p.getName());
+
+        ItemStack[] slots = temp.getContents();
+
+        inv.setContents(slots);
+
+        ItemStack info = new ItemStack(Material.PAPER);
+        ItemMeta info_meta = info.getItemMeta();
+        List<String> info_lore = new ArrayList<>();
+
+        Date date1 = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+        double x = p.getLocation().getX();
+        double y = p.getLocation().getY();
+        double z = p.getLocation().getZ();
+        double yaw = p.getLocation().getYaw();
+        double pitch = p.getLocation().getPitch();
+
+        DecimalFormat df = new DecimalFormat("#.##");
+
+
+        info_meta.setDisplayName("§9§lInventorySavePoint Info v1.0");
+        info_lore.add("§8§lCreation Date:§r§7 " + sdf.format(date1));
+        info_lore.add("§8§lLocation:§r§7 x[" + df.format(x) + "] y[" + df.format(y) + "] z[" + df.format(z) + "] yaw[" + df.format(yaw) + "] pitch[" + df.format(pitch) + "]");
+        info_lore.add("§8§lWorld:§r§7 " + p.getWorld().getName());
+        info_lore.add("§8§lXp-Level:§r§7 " + p.getLevel());
+        info_lore.add("§8§lHealth:§r§7 " + p.getHealth());
+        info_lore.add("§8§lGamemode:§r§7 " + p.getGameMode());
+        info_meta.setLore(info_lore);
+        info.setItemMeta(info_meta);
+
+        inv.setItem(45, info);
+
+        return inv;
 
     }
 

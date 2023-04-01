@@ -43,10 +43,12 @@ public class InventorySavePointTabCompletion implements TabCompleter {
                         invargs.add("rename");
 
                     }
+                    case "v","vi","vie" -> invargs.add("view");
                     case "" -> {
                         invargs.add("new");
                         invargs.add("remove");
                         invargs.add("rename");
+                        invargs.add("view");
                     }
 
                 }
@@ -54,7 +56,7 @@ public class InventorySavePointTabCompletion implements TabCompleter {
             case 2:
                 switch (args[0].toLowerCase()) {
                     case "new" -> invargs.add("<Name>");
-                    case "rename" -> {
+                    case "rename", "view" -> {
                         if (isPlayer && inv_saves.containsKey(p.getUniqueId())) {
 
 

@@ -29,4 +29,4 @@ commands:
     aliases:
       - inventorysave
       - invsavepoint
-    usage: "Usage: /invsave <new-remove-rename> <InvName> <NewInvName>"
+    usage: "Usage: /invsave <new-remove-rename-view> <InvName> <NewInvName>"

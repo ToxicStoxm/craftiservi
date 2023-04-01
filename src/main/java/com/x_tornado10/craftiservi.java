@@ -23,6 +23,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -756,7 +757,9 @@ public final class craftiservi extends JavaPlugin {
             // Write the size of the inventory
             dataOutput.writeInt(inventory.getSize());
 
-            dataOutput.writeObject(inventory.getType());
+            dataOutput.writeObject(inventory.getHolder());
+
+            //dataOutput.writeObject(inventory.getType());
 
             // Save every element in the list
             for (int i = 0; i < inventory.getSize(); i++) {
@@ -791,8 +794,9 @@ public final class craftiservi extends JavaPlugin {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
             int size = dataInput.readInt();
-            InventoryType type = (InventoryType) dataInput.readObject();
-            Inventory inventory = Bukkit.getServer().createInventory(null, type);
+            InventoryHolder holder = (InventoryHolder) dataInput.readObject();
+            //InventoryType type = (InventoryType) dataInput.readObject();
+            Inventory inventory = Bukkit.getServer().createInventory(holder, size);
 
             // Read the serialized inventory
             for (int i = 0; i < inventory.getSize(); i++) {

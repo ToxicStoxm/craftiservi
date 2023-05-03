@@ -1,0 +1,6 @@
+#Strings to block/filter from console and logs
+BlockedStrings:
+  - /msg
+  - /tell
+  - /tellraw
+  - /teammsg

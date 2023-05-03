@@ -9,6 +9,8 @@ public class PlayerMessages {
 
     private String prefix;
 
+    private String line = "§7---------------------------------------§r";
+
     public PlayerMessages (String prefix) {
 
         this.prefix = prefix;
@@ -25,9 +27,27 @@ public class PlayerMessages {
 
         for (Player player : players) {
 
-            player.sendMessage(prefix + "§7" + message + "§r");
+            msg(player ,prefix + "§7" + message + "§r");
 
         }
+
+    }
+
+    public void line(Player p) {
+
+        msg(p,line);
+
+    }
+
+    public String getLine() {
+        return line;
+    }
+
+    public void msg_inlines(Player p, String message) {
+
+        line(p);
+        msg(p,message);
+        line(p);
 
     }
 

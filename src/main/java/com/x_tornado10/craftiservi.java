@@ -1,13 +1,19 @@
 package com.x_tornado10;
 
+import com.x_tornado10.chat.filters.MsgFilter;
 import com.x_tornado10.commands.first_join_command.FirstJoinedCommand;
 import com.x_tornado10.commands.first_join_command.FirstJoinedCommandTabCompletion;
 import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
 import com.x_tornado10.commands.inv_save_point.InventorySavePointTabCompletion;
+import com.x_tornado10.commands.open_gui_command.OpenGUICommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommandTabCompletion;
 import com.x_tornado10.events.listeners.JoinListener;
 import com.x_tornado10.events.listeners.PlayerMoveListener;
+import com.x_tornado10.events.listeners.grapling_hook.GraplingHookListener;
+import com.x_tornado10.events.listeners.inventory.InventoryListener;
+import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
+import com.x_tornado10.events.listeners.jpads.JumpPads;
 import com.x_tornado10.files.FileLocations;
 import com.x_tornado10.handlers.ConfigHandler;
 import com.x_tornado10.handlers.DataHandler;
@@ -16,16 +22,15 @@ import com.x_tornado10.messages.PlayerMessages;
 import com.x_tornado10.utils.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -45,6 +50,7 @@ public final class craftiservi extends JavaPlugin {
     private String colorprefix;
     private ConfigHandler configHandler;
     private HashMap<UUID, String> playerlist;
+    private PluginManager pm;
 
     private DataHandler dataHandler;
 
@@ -58,6 +64,10 @@ public final class craftiservi extends JavaPlugin {
     private HashMap<UUID, List<Float>> playersinsavearea;
 
     private HashMap<UUID, HashMap<String, Inventory>> inv_saves;
+    private HashMap<Integer, Inventory> invs_review = new HashMap<>();
+    public static Map<UUID, Long> FLYING_TIMEOUT = new HashMap<UUID, Long>();
+
+    private List<String> blockedStrings;
 
     @Override
     public void onLoad() {
@@ -76,6 +86,8 @@ public final class craftiservi extends JavaPlugin {
         playersinsavearea = new HashMap<>();
         inv_saves = new HashMap<>();
         fl = new FileLocations();
+        pm = Bukkit.getPluginManager();
+        blockedStrings = new ArrayList<>();
 
         configHandler.updateConfig();
         saveConfig();
@@ -164,8 +176,12 @@ public final class craftiservi extends JavaPlugin {
         logger.info("§8------------Debug------------");
         logger.info("");
         logger.info("Registering classes...");
-        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), this);
+        pm.registerEvents(new JoinListener(), this);
+        pm.registerEvents(new PlayerMoveListener(), this);
+        pm.registerEvents(new InventoryOpenListener(), this);
+        pm.registerEvents(new InventoryListener(), this);
+        pm.registerEvents(new GraplingHookListener(), this);
+        pm.registerEvents(new JumpPads(), this);
         logger.info("Listeners..§adone");
         logger.info("");
 
@@ -181,6 +197,18 @@ public final class craftiservi extends JavaPlugin {
         Bukkit.getPluginCommand("invsave").setExecutor(new InventorySavePointCommand());
         Bukkit.getPluginCommand("invsave").setTabCompleter(new InventorySavePointTabCompletion());
         logger.info("invsave...§adone");
+
+        Bukkit.getPluginCommand("opengui").setExecutor(new OpenGUICommand());
+        logger.info("opengui...§adone");
+        logger.info("");
+        logger.info("Configuring filters...");
+        blockedStrings = configHandler.getBlockedStrings();
+        logger.info("MsgFilter...§adone");
+        logger.info("");
+        logger.info("Applying filters to logger...");
+        new MsgFilter().registerFilter();
+        logger.info("MsgFilter...§adone");
+
         logger.info("");
         logger.info("§8-----------------------------");
         logger.info("");
@@ -796,7 +824,7 @@ public final class craftiservi extends JavaPlugin {
             int size = dataInput.readInt();
             InventoryHolder holder = (InventoryHolder) dataInput.readObject();
             //InventoryType type = (InventoryType) dataInput.readObject();
-            Inventory inventory = Bukkit.getServer().createInventory(holder, size);
+            Inventory inventory = Bukkit.getServer().createInventory(null, size);
 
             // Read the serialized inventory
             for (int i = 0; i < inventory.getSize(); i++) {
@@ -899,5 +927,17 @@ public final class craftiservi extends JavaPlugin {
 
     public HashMap<UUID, HashMap<String, Inventory>> getInv_saves() {
         return inv_saves;
+    }
+
+    public HashMap<Integer, Inventory> getInvs_review() {
+        return invs_review;
+    }
+
+    public String getColorprefix() {
+        return colorprefix;
+    }
+
+    public List<String> getBlockedStrings() {
+        return blockedStrings;
     }
 }

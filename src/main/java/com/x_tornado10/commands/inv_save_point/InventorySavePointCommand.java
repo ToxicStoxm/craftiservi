@@ -107,7 +107,7 @@ public class InventorySavePointCommand implements CommandExecutor {
                             restore_meta.setDisplayName("§aRestore Inventory");
 
                             List<String> restore_lore = new ArrayList<>();
-                            restore_lore.add("§7Restors the saved Inventory and drops the items of your current inventory!");
+                            restore_lore.add("§7Restores the saved Inventory and drops the items of your current inventory!");
                             restore_meta.setLore(restore_lore);
                             restore.setItemMeta(restore_meta);
 

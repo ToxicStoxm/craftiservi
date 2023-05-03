@@ -4,7 +4,7 @@ main: com.x_tornado10.craftiservi
 api-version: 1.19
 authors: [ x_Tornado10 ]
 website: https://www.spigotmc.org/resources/crafti-servi.108546/
-prefix: "Craftiservi"
+prefix: "CS"
 description: This Plugin provides a few useful tools alongside a basic server infrastructure
 commands:
   firstjoin:
@@ -30,3 +30,7 @@ commands:
       - inventorysave
       - invsavepoint
     usage: "Usage: /invsave <new-remove-rename-view> <InvName> <NewInvName>"
+  opengui:
+    description: opens guis
+    permission: craftiservi.command.opengui
+    usage: "Usage: /opengui GUI_ID"

@@ -50,5 +50,10 @@ public class PlayerMessages {
         line(p);
 
     }
+    public void upDateValues(String prefix) {
+
+        this.prefix = prefix;
+
+    }
 
 }

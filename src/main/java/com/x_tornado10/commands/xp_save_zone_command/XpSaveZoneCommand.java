@@ -221,7 +221,7 @@ public class XpSaveZoneCommand implements CommandExecutor {
 
                             UUID pid = player.getUniqueId();
 
-                            if (locChecker(player.getUniqueId(), xpsaveareas.get(args[1]))) {
+                            if (locChecker(pid, xpsaveareas.get(args[1]))) {
 
                                 p.setExp(playersinsavearea.get(pid).get(0));
                                 p.setLevel(Math.round(playersinsavearea.get(pid).get(1)));

@@ -1,10 +1,7 @@
 package com.x_tornado10.events.listeners.jpads;
 
-import com.x_tornado10.events.listeners.PlayerMoveListener;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,7 +19,16 @@ public class JumpPads implements Listener {
 
     private HashMap<UUID, Long> cooldown = new HashMap<>();
 
+    private double Y_velocity;
+    private double velocity_multiplier;
     private final int flyingTimeout = 3;
+
+    public JumpPads(double Y_velocity, double velocity_multiplier) {
+
+        this.Y_velocity = Y_velocity;
+        this.velocity_multiplier = velocity_multiplier;
+
+    }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
@@ -36,7 +42,7 @@ public class JumpPads implements Listener {
 
                 cooldown.put(pid, System.currentTimeMillis());
 
-                Vector v = p.getLocation().getDirection().multiply(2.00).setY(1.2);
+                Vector v = p.getLocation().getDirection().multiply(velocity_multiplier).setY(Y_velocity);
                 p.setVelocity(v);
                 p.playSound(p.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2f, 1F);
 
@@ -50,7 +56,7 @@ public class JumpPads implements Listener {
 
                     cooldown.put(pid, System.currentTimeMillis());
 
-                    Vector v = p.getLocation().getDirection().multiply(2.00).setY(1.2);
+                    Vector v = p.getLocation().getDirection().multiply(velocity_multiplier).setY(Y_velocity);
                     p.setVelocity(v);
                     p.playSound(p.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2f, 1F);
 
@@ -66,12 +72,19 @@ public class JumpPads implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
+        if (event.getEntity() instanceof Player player) {
             if (FLYING_TIMEOUT.containsKey(player.getUniqueId())) {
                 if (FLYING_TIMEOUT.get(player.getUniqueId()) < System.currentTimeMillis()) return;
                 event.setCancelled(true);
             }
         }
     }
+
+    public void updateValues(double Y_velocity, double velocity_multiplier) {
+
+        this.Y_velocity = Y_velocity;
+        this.velocity_multiplier = velocity_multiplier;
+
+    }
+
 }

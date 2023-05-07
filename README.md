@@ -3,14 +3,18 @@ Useful AdminTools combined with a few neat Features that improve the game experi
 
 ### Plugin includes:
 *-useful tools for Server admins  
--ingame message system that does not display in console  
+-console/log filter you can configure in config.yml   
 -Xp saving for specific areas in world  
 -InventorySavePoints that can be reviewed and restored  
--tweaks for existing features  
+-gadgets like grappling-hook and jump-pads  
 -and much more*  
 
 ## Commands:
- 
+
+#### -/craftiservi
+###### *Usage: /craftiservi <help-reloadconfig-resetconfig>*
+  *Lets you reload/reset the config with a single command without restarting the server.*
+
 #### -/firstjoin  
 ###### *Usage: /firstjoin \<Player>*  
   *Returns the data the specified player first joined on the server.*   
@@ -21,8 +25,7 @@ Useful AdminTools combined with a few neat Features that improve the game experi
   
 #### -/invsave 
 ###### *Usage: /invsave <new-remove-rename-view> <InvName> <NewInvName>*  
-  *Lets you create, remove and rename InventorySavePoints. InventorySavePoints are copies of your inventory you can create using this command. You can review and restore these copies if you have the permission. You can also use these copies to track your progress over time.*  
-
+  *Lets you create, remove and rename InventorySavePoints. InventorySavePoints are copies of your inventory you can create using this command. You can review and restore these copies if you have the permission. You can also use these copies to track your progress over time.*
   
 ## Permissions:
   #### General:  
@@ -31,6 +34,7 @@ Useful AdminTools combined with a few neat Features that improve the game experi
     -craftiservi.command.firstjoin  
     -craftiservi.command.xparea  
     -craftiservi.command.invsave  
+    -craftiservi.command.main  
     
     
 ## Support  

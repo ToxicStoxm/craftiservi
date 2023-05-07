@@ -7,14 +7,20 @@ import org.apache.logging.log4j.core.Logger;
 
 import java.util.List;
 
-public final class MsgFilter extends CustomFilter {
+public class MsgFilter extends CustomFilter {
 
     private final craftiservi plugin = craftiservi.getInstance();
-    private final List<String> blockedStrings = plugin.getBlockedStrings();
+    private static List<String> blockedStrings;
 
     public void registerFilter() {
         Logger rootLogger = (Logger) LogManager.getRootLogger();
         rootLogger.addFilter(this);
+    }
+
+    public MsgFilter(List<String> blockedStrings) {
+
+        setBlockedStrings(blockedStrings);
+
     }
 
     @Override
@@ -35,5 +41,11 @@ public final class MsgFilter extends CustomFilter {
     @Override
     public String getName() {
         return null;
+    }
+
+    public void setBlockedStrings(List<String> blockedStrings) {
+
+        MsgFilter.blockedStrings = blockedStrings;
+
     }
 }

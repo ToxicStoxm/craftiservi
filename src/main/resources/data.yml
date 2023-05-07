@@ -5,5 +5,7 @@ stats:
 
   #craftiservi
   plugin:
+    #First installed on (does not reset when plugin is update)
     installed-on: ""
+    #current-version (does update when plugin is updated)
     version: 0.0

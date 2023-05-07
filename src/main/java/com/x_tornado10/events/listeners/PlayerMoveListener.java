@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -28,14 +29,11 @@ public class PlayerMoveListener implements Listener {
 
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerMove(PlayerMoveEvent e) {
 
         UUID pid = e.getPlayer().getUniqueId();
         Player p = e.getPlayer();
-
-
-        xpsaveareas = pl.getXpsaveareas();
 
         for (Map.Entry<String, List<Location>> entry : xpsaveareas.entrySet()) {
 
@@ -139,8 +137,15 @@ public class PlayerMoveListener implements Listener {
 
         if (playersinsavearea.containsKey(pid)) {
 
+            if (p.isDead()) {
+
+                p.spigot().respawn();
+
+            }
+
             p.setExp(playersinsavearea.get(pid).get(0));
             p.setLevel(Math.round(playersinsavearea.get(pid).get(1)));
+            playersinsavearea.remove(pid);
 
         }
 

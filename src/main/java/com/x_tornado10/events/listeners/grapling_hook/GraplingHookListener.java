@@ -30,6 +30,10 @@ public class GraplingHookListener implements Listener {
     private Logger logger = plugin.getCustomLogger();
     private final PlayerMessages plmsg = plugin.getPlayerMessages();
     private final int flyingTimeout = 5;
+    private double Y_velocity;
+    public GraplingHookListener(double Y_velocity) {
+        this.Y_velocity = Y_velocity;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onFish(PlayerFishEvent e) {
@@ -64,7 +68,7 @@ public class GraplingHookListener implements Listener {
                 Location loc1 = p.getLocation();
                 Location loc2 = e.getHook().getLocation();
 
-                Vector v = new Vector(loc2.getX() - loc1.getX(), 1, loc2.getZ() - loc1.getZ());
+                Vector v = new Vector(loc2.getX() - loc1.getX(), Y_velocity, loc2.getZ() - loc1.getZ());
                 p.setVelocity(v);
 
                 FLYING_TIMEOUT.put(p.getUniqueId(), System.currentTimeMillis() + (flyingTimeout * 1000L));
@@ -85,7 +89,7 @@ public class GraplingHookListener implements Listener {
                 Location loc1 = p.getLocation();
                 Location loc2 = e.getHook().getLocation();
 
-                Vector v = new Vector(loc2.getX() - loc1.getX(), 1, loc2.getZ() - loc1.getZ());
+                Vector v = new Vector(loc2.getX() - loc1.getX(), Y_velocity, loc2.getZ() - loc1.getZ());
                 p.setVelocity(v);
 
                 FLYING_TIMEOUT.put(p.getUniqueId(), System.currentTimeMillis() + (flyingTimeout * 1000L));
@@ -104,6 +108,10 @@ public class GraplingHookListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    public void updateValues(double Y_velocity) {
+        this.Y_velocity = Y_velocity;
     }
 
 }

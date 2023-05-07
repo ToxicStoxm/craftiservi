@@ -1,6 +1,65 @@
-#Strings to block/filter from console and logs
-BlockedStrings:
-  - /msg
-  - /tell
-  - /tellraw
-  - /teammsg
+#################################################################
+#                                                               #
+#                     Config by x_Tornado10                     #
+#                             v.1.0                             #
+#                                                               #
+#################################################################
+
+Craftiservi:
+  Plugin-Version: 0.0.0
+  #If the plugin prefix 'Craftiservi' should be shortened to 'CS'
+  #DEFAULT: true
+  short-Prefix: true
+  #If you would like to use your own prefix instead of the build-in prefix
+  #Warning: [Overwrites 'short-prefix' setting]
+  #DEFAULT: false
+  use-custom-Prefix: false
+  #Provide your custom prefix
+  #Note: For colors use '§'+ [ 0->black | 1->dark_blue | 2->dark_green | 3->dark_aqua | 4->dark_red | 5->dark_purple | 6->gold | 7->gray | 8->dark_gray | 9->blue ]
+  #                          [ a->green | b->aqua | c->red | d->light_purple | e->yellow | f->white | g->dark_yellow ]
+  #Note: For text-formatting use '§'+[ u->underline | l->bold | o->italic | m->strikethrough | k->obfuscated | r->reset-format/color ]
+  #Warning: [Colors and Text-Formatting only works in the ingame-chat. In console the plain prefix-text is displayed]
+  #IMPORTANT: [Please do not use '&'-prefix for color-codes or text-formatting-codes as it can cause errors with the logger!]
+  #Examples: "[MyPlugin] " | "§0§l[§aMyPlugin§0§l]§r " | "§k§a2§r§0§l[§a§u§1MyPlugin§0§l]§8>§r "
+  #DEFAULT: "[MyPlugin] "
+  custom-Prefix: "[MyPlugin] "
+
+#################################################################
+
+  Console/Log:
+    #if the console should display additional debug information
+    #DEFAULT: false
+    display-debug: false
+    #disbale the plugin logger
+    #Warning [Try setting this to false if you have trouble]
+    #Warning [This only disables the plugins custom logger, some information is still going to be displayed by the server itself]
+    #DEFAULT: false
+    disable-logger: false
+
+#################################################################
+
+  #Setting for the ingame chat
+  Chat:
+    Filter:
+      #Strings to block/filter from console and logs
+      BlockedStrings:
+        - /msg
+        - /tell
+        - /tellraw
+        - /teammsg
+
+#################################################################
+
+  #Ingame Gadgets like jump-pads and grappling-hook
+  Gadgets:
+    Movement:
+      Jump-Pads:
+        #DEFAULT: 2.0
+        velocity-multiplier: 2.0
+        #DEFAULT: 1.2
+        Y-velocity: 1.2
+      Grappling-hook:
+        #DEFAULT: 1.0
+        Y-velocity: 1.0
+
+#################################################################

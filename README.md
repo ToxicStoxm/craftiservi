@@ -1,3 +1,6 @@
+[![Github All Releases](https://img.shields.io/github/downloads/toxicstoxm/craftiservi/total.svg)]()
+
+
 # Crafti-Servi
 Useful AdminTools combined with a few neat Features that improve the game experience.
 

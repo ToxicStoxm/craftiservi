@@ -43,5 +43,4 @@ Useful AdminTools combined with a few neat Features that improve the game experi
 ## Support  
 #### Youtube: *https://www.youtube.com/@x_tornado10/*  
 #### Spigot: *https://www.spigotmc.org/resources/crafti-servi.108546/*
-#### Website:
-*https://www.crafti-servi.com/*
+#### Website: *https://www.crafti-servi.com/*

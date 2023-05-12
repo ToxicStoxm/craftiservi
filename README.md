@@ -20,7 +20,7 @@ Useful AdminTools combined with a few neat Features that improve the game experi
 
 #### -/firstjoin  
 ###### *Usage: /firstjoin \<Player>*  
-  *Returns the data the specified player first joined on the server.*   
+  *Returns the date the specified player first joined the server.*   
   
 #### -/xparea  
 ###### *Usage: /xparea add-remove-edit-help \<AreaName> \<WorldName> \<Location> \<Location>*  

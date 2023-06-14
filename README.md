@@ -1,3 +1,6 @@
+[![Github All Releases](https://img.shields.io/github/downloads/toxicstoxm/craftiservi/total.svg)]()
+
+
 # Crafti-Servi
 Useful AdminTools combined with a few neat Features that improve the game experience.
 
@@ -17,7 +20,7 @@ Useful AdminTools combined with a few neat Features that improve the game experi
 
 #### -/firstjoin  
 ###### *Usage: /firstjoin \<Player>*  
-  *Returns the data the specified player first joined on the server.*   
+  *Returns the date the specified player first joined the server.*   
   
 #### -/xparea  
 ###### *Usage: /xparea add-remove-edit-help \<AreaName> \<WorldName> \<Location> \<Location>*  
@@ -39,5 +42,5 @@ Useful AdminTools combined with a few neat Features that improve the game experi
     
 ## Support  
 #### Youtube: *https://www.youtube.com/@x_tornado10/*  
-#### Spigot *https://www.spigotmc.org/resources/crafti-servi.108546/*
-#### Website *https://www.crafti-servi.com/*
+#### Spigot: *https://www.spigotmc.org/resources/crafti-servi.108546/*
+#### Website: *https://www.crafti-servi.com/*

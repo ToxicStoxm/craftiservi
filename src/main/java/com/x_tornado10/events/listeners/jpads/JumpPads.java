@@ -22,6 +22,7 @@ public class JumpPads implements Listener {
     private double Y_velocity;
     private double velocity_multiplier;
     private final int flyingTimeout = 3;
+    public static boolean enabled;
 
     public JumpPads(double Y_velocity, double velocity_multiplier) {
 
@@ -32,6 +33,8 @@ public class JumpPads implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
+
+        if (!enabled) {return;}
 
         Player p = e.getPlayer();
         UUID pid = p.getUniqueId();
@@ -72,6 +75,7 @@ public class JumpPads implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageEvent event) {
+        if (!enabled) {return;}
         if (event.getEntity() instanceof Player player) {
             if (FLYING_TIMEOUT.containsKey(player.getUniqueId())) {
                 if (FLYING_TIMEOUT.get(player.getUniqueId()) < System.currentTimeMillis()) return;

@@ -26,8 +26,7 @@ public class PlayerMoveListener implements Listener {
     private HashMap<UUID, List<Float>> playersinsavearea = pl.getPlayersinsavearea();
     private PlayerMessages plmsg = pl.getPlayerMessages();
     private Logger logger = pl.getCustomLogger();
-
-
+    public static boolean enabled;
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerMove(PlayerMoveEvent e) {

@@ -28,6 +28,7 @@ public class InventorySavePointCommand implements CommandExecutor {
     private HashMap<UUID, HashMap<String, Inventory>> inv_saves;
 
     private PlayerMessages plmsg;
+    public static boolean enabled;
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -36,6 +37,20 @@ public class InventorySavePointCommand implements CommandExecutor {
         logger = plugin.getCustomLogger();
         plmsg = plugin.getPlayerMessages();
         inv_saves = plugin.getInv_saves();
+
+        if (!enabled) {
+
+            if (sender instanceof Player) {
+
+                plmsg.msg((Player) sender, "This command is disabled.");
+
+            } else {
+
+                logger.info("This command is disabled.");
+
+            }
+            return true;
+        }
 
         if (!(sender instanceof Player)) {
 

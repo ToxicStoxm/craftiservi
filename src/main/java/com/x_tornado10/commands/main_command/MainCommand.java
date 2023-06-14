@@ -1,8 +1,8 @@
 package com.x_tornado10.commands.main_command;
 
 import com.x_tornado10.craftiservi;
-import com.x_tornado10.files.FileLocations;
-import com.x_tornado10.handlers.ConfigHandler;
+import com.x_tornado10.utils.Paths;
+import com.x_tornado10.managers.ConfigManager;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
 import com.x_tornado10.utils.TextFormatting;
@@ -12,15 +12,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 public class MainCommand implements CommandExecutor {
 
     private craftiservi plugin;
-    private ConfigHandler configHandler;
-    private FileLocations fl;
+    private ConfigManager configManager;
+    private Paths paths;
     private Logger logger;
     private PlayerMessages plmsg;
     private TextFormatting tf;
@@ -46,11 +45,11 @@ public class MainCommand implements CommandExecutor {
                             §0##########################§r
                             """;
 
-    public MainCommand(craftiservi plugin, ConfigHandler configHandler, FileLocations fl, Logger logger, PlayerMessages plmsg) {
+    public MainCommand(craftiservi plugin, ConfigManager configManager, Paths paths, Logger logger, PlayerMessages plmsg) {
 
         this.plugin = plugin;
-        this.configHandler = configHandler;
-        this.fl = fl;
+        this.configManager = configManager;
+        this.paths = paths;
         this.logger = logger;
         this.plmsg = plmsg;
         tf = new TextFormatting();
@@ -86,7 +85,7 @@ public class MainCommand implements CommandExecutor {
 
                             plmsg.msg(p, "Reloading Config...");
 
-                            if (configHandler.reloadConfig(false)) {
+                            if (configManager.reloadConfig(false)) {
                                 plmsg.msg(p, "§cNote: Restart the server if any errors occur!§r");
                                 plmsg.msg(p, "Successfully reloaded config!");
                                 logger.info(p.getName() + " reloaded the config");
@@ -103,7 +102,7 @@ public class MainCommand implements CommandExecutor {
                             if (confirm_deletion.contains(pid)) {
 
                                 plmsg.msg(p, "Resetting...");
-                                if (configHandler.resetConfig()) {
+                                if (configManager.resetConfig()) {
 
                                    plmsg.msg(p, "Reset of 'config.yml' was successfully completed!");
                                    logger.info("Reset for file 'config.yml' was successfully completed!");
@@ -160,7 +159,7 @@ public class MainCommand implements CommandExecutor {
 
                             logger.info("Reloading Config...");
                             logger.info("§cNote: Stop the server if any errors/issues occur!§r");
-                            configHandler.reloadConfig(true);
+                            configManager.reloadConfig(true);
                             logger.info("Successfully reloaded config!");
 
                         }
@@ -168,7 +167,7 @@ public class MainCommand implements CommandExecutor {
 
                             logger.info("Resetting...");
 
-                            if (configHandler.resetConfig()) {
+                            if (configManager.resetConfig()) {
 
                                 logger.info("Reset of 'config.yml' was successfully completed!");
 

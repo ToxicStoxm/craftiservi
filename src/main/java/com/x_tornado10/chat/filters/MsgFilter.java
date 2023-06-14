@@ -11,6 +11,7 @@ public class MsgFilter extends CustomFilter {
 
     private final craftiservi plugin = craftiservi.getInstance();
     private static List<String> blockedStrings;
+    public static boolean enabled;
 
     public void registerFilter() {
         Logger rootLogger = (Logger) LogManager.getRootLogger();
@@ -25,6 +26,8 @@ public class MsgFilter extends CustomFilter {
 
     @Override
     protected Result logResult(String string) {
+
+        if (!enabled) {return Result.NEUTRAL;}
 
         for (String str : blockedStrings) {
 

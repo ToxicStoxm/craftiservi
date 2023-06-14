@@ -27,6 +27,7 @@ public class XpSaveZoneCommand implements CommandExecutor {
     private PlayerMessages plmsg = pl.getPlayerMessages();
 
     private HashMap<UUID, List<Float>> playersinsavearea = pl.getPlayersinsavearea();
+    public static boolean enabled;
 
     private final String helpmessage =
             """
@@ -51,6 +52,20 @@ public class XpSaveZoneCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        if (!enabled) {
+
+            if (sender instanceof Player) {
+
+                plmsg.msg((Player) sender, "This command is disabled.");
+
+            } else {
+
+                logger.info("This command is disabled.");
+
+            }
+            return true;
+        }
 
         if (!(sender instanceof Player)) {
 

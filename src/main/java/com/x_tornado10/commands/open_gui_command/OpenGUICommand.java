@@ -1,5 +1,6 @@
 package com.x_tornado10.commands.open_gui_command;
 
+import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
@@ -21,9 +22,25 @@ public class OpenGUICommand implements CommandExecutor {
     private final craftiservi plugin = craftiservi.getInstance();
     private final Logger logger = plugin.getCustomLogger();
     private final PlayerMessages plmsg = plugin.getPlayerMessages();
+    public static boolean enabled;
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        if (!enabled) {
+
+            if (sender instanceof Player) {
+
+                plmsg.msg((Player) sender, "This command is disabled.");
+
+            } else {
+
+                logger.info("This command is disabled.");
+
+            }
+            return true;
+        }
+
 
         if (!(sender instanceof Player)) {
 

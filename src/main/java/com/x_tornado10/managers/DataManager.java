@@ -1,8 +1,8 @@
-package com.x_tornado10.handlers;
+package com.x_tornado10.managers;
 
 
 import com.x_tornado10.craftiservi;
-import com.x_tornado10.files.FileLocations;
+import com.x_tornado10.utils.Paths;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-public class DataHandler {
+public class DataManager {
 
     private InputStream data;
 
@@ -21,15 +21,15 @@ public class DataHandler {
 
     private YamlConfiguration dataconfig;
 
-    private FileLocations fj;
+    private Paths fj;
 
-    public DataHandler(InputStream data, File datafile) {
+    public DataManager(InputStream data, File datafile) {
 
         this.data = data;
         this.datafile = datafile;
         plugin = craftiservi.getInstance();
         dataconfig = new YamlConfiguration();
-        fj = new FileLocations();
+        fj = new Paths();
 
     }
 

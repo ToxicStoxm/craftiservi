@@ -23,6 +23,7 @@ public class JoinListener implements Listener {
 
     private final craftiservi plugin = craftiservi.getInstance();
     private HashMap<UUID, String> playerlist = plugin.getPlayerlist();
+    public static boolean enabled;
 
     private boolean show = false;
 

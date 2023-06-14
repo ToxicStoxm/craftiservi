@@ -1,6 +1,7 @@
-package com.x_tornado10.files;
+package com.x_tornado10.managers;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.utils.Paths;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -10,9 +11,6 @@ import org.bukkit.inventory.Inventory;
 
 
 import java.io.*;
-import java.nio.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 import static com.x_tornado10.utils.ToFromBase64.fromBase64;
@@ -21,7 +19,7 @@ import static com.x_tornado10.utils.ToFromBase64.toBase64;
 public class FileManager {
 
     craftiservi plugin;
-    FileLocations fl;
+    Paths paths;
 
     private final File playerlist;
     private final File data;
@@ -33,26 +31,28 @@ public class FileManager {
     private final File player_inv_saves;
     private final File player_inv_saves_backup;
     private final File backup_config;
+    private final File afkPlayers;
 
     /**
      * @implNote Creates specified files. Should fail if the specified file already exists.
-     * @param fl
+     * @param paths
      */
-    public FileManager(craftiservi plugin, FileLocations fl) {
+    public FileManager(craftiservi plugin, Paths paths) {
 
         this.plugin = plugin;
-        this.fl = fl;
+        this.paths = paths;
 
-        playerlist = new File(fl.getPlayerlist());
-        data = new File(fl.getData());
-        xpsaveareas = new File(fl.getXpsaveareas());
-        xpsaveareasbackup = new File(fl.getXpsaveareasbackup());
-        backupdir = new File(fl.getBackupdir());
-        playersinsavearea = new File(fl.getPlayersinsavearea());
-        playersinsaveareabackup = new File(fl.getPlayersinsaveareabackup());
-        player_inv_saves = new File(fl.getPlayer_inv_saves());
-        player_inv_saves_backup = new File(fl.getPlayer_inv_saves_backup());
-        backup_config = new File(fl.getBackup_config());
+        playerlist = new File(paths.getPlayerlist());
+        data = new File(paths.getData());
+        xpsaveareas = new File(paths.getXpsaveareas());
+        xpsaveareasbackup = new File(paths.getXpsaveareasbackup());
+        backupdir = new File(paths.getBackupdir());
+        playersinsavearea = new File(paths.getPlayersinsavearea());
+        playersinsaveareabackup = new File(paths.getPlayersinsaveareabackup());
+        player_inv_saves = new File(paths.getPlayer_inv_saves());
+        player_inv_saves_backup = new File(paths.getPlayer_inv_saves_backup());
+        backup_config = new File(paths.getBackup_config());
+        afkPlayers = new File(paths.getAfk_players());
 
 
     }
@@ -70,6 +70,7 @@ public class FileManager {
         files.add(player_inv_saves);
         files.add(player_inv_saves_backup);
         files.add(backup_config);
+        files.add(afkPlayers);
 
         if (backupdir.mkdirs()) {
 
@@ -85,35 +86,26 @@ public class FileManager {
 
                     if(file.createNewFile()) {
                         plugin.earlyLog(file.getName() + " was successfully created!");
-                        return true;
-
                     }
                 } catch (IOException e) {
 
                     plugin.earlyLog("§cSomething went wrong while trying to create files! Please restart the server!§r");
                     return false;
-
                 }
-            } else {
-
-                return true;
-
             }
-
         }
-        return false;
+        return true;
     }
 
     public boolean deleteConfig() {
 
-        File config = new File(fl.getConfig());
+        File config = new File(paths.getConfig());
         return config.delete();
 
     }
-
     public HashMap<UUID, String> getPlayerListFromTextFile() {
 
-        File playerlist = new File(fl.getPlayerlist());
+        File playerlist = new File(paths.getPlayerlist());
         HashMap<UUID, String> mapFileContents = new HashMap<>();
         int registeredPlayers = plugin.getRegisteredPlayers();
 
@@ -157,10 +149,9 @@ public class FileManager {
 
         return mapFileContents;
     }
-
     public HashMap<UUID, List<Float>> getPlayersInSaveAreaFromTextFile() {
 
-        File playersinsavearea = new File(fl.getPlayersinsavearea());
+        File playersinsavearea = new File(paths.getPlayersinsavearea());
         HashMap<UUID, List<Float>> mapFileContents = new HashMap<>();
 
         BufferedReader br = null;
@@ -213,10 +204,9 @@ public class FileManager {
 
         return mapFileContents;
     }
-
     public HashMap<String, List<Location>> getXpSaveAreaFromTextFile() {
 
-        File xpsavearea = new File(fl.getXpsaveareas());
+        File xpsavearea = new File(paths.getXpsaveareas());
         HashMap<String, List<Location>> mapFileContents = new HashMap<>();
 
         BufferedReader br = null;
@@ -277,13 +267,12 @@ public class FileManager {
 
         return mapFileContents;
     }
-
     public void writePlayerInvSavesToTextFile(HashMap<UUID, HashMap<String, Inventory>> playerinvsaves) {
 
         FileConfiguration player_inv_saves = new YamlConfiguration();
 
-        File player_inv_saves_file = new File(fl.getPlayer_inv_saves());
-        File player_inv_saves_backup_file = new File(fl.getPlayer_inv_saves_backup());
+        File player_inv_saves_file = new File(paths.getPlayer_inv_saves());
+        File player_inv_saves_backup_file = new File(paths.getPlayer_inv_saves_backup());
 
         try {
 
@@ -312,7 +301,7 @@ public class FileManager {
 
             }
 
-            player_inv_saves.save(fl.getPlayer_inv_saves());
+            player_inv_saves.save(paths.getPlayer_inv_saves());
 
         } catch (Exception e) {
 
@@ -321,14 +310,13 @@ public class FileManager {
         }
 
     }
-
     public HashMap<UUID, HashMap<String, Inventory>> getPlayerInvSavePointsFromTextFile() {
 
         HashMap<UUID, HashMap<String, Inventory>> mapFileContetnts = new HashMap<>();
 
         FileConfiguration player_inv_saves = new YamlConfiguration();
 
-        File player_inv_saves_file = new File(fl.getPlayer_inv_saves());
+        File player_inv_saves_file = new File(paths.getPlayer_inv_saves());
 
         try {
 
@@ -372,11 +360,10 @@ public class FileManager {
 
         return mapFileContetnts;
     }
-
     public void writePlayersInSaveAreaToTextFile(HashMap<UUID, List<Float>> playersinsavearea) {
 
-        File playersinsaveareafile = new File(fl.getPlayersinsavearea());
-        File playersinsaveareafilebackup = new File(fl.getPlayersinsaveareabackup());
+        File playersinsaveareafile = new File(paths.getPlayersinsavearea());
+        File playersinsaveareafilebackup = new File(paths.getPlayersinsaveareabackup());
 
         try {
 
@@ -416,10 +403,9 @@ public class FileManager {
         }
 
     }
-
     public void writePlayerlistToTextFile(HashMap<UUID, String> playerlist) {
 
-        File playerlistfile = new File(fl.getPlayerlist());
+        File playerlistfile = new File(paths.getPlayerlist());
 
         try (BufferedWriter bf = new BufferedWriter(new FileWriter(playerlistfile))) {
 
@@ -439,11 +425,10 @@ public class FileManager {
 
         }
     }
-
     public void writeXpSaveAreasToTextFile(HashMap<String, List<Location>> xpsaveareas) {
 
-        File xpsaveareafile = new File(fl.getXpsaveareas());
-        File xpsaveareafilebackup = new File(fl.getXpsaveareasbackup());
+        File xpsaveareafile = new File(paths.getXpsaveareas());
+        File xpsaveareafilebackup = new File(paths.getXpsaveareasbackup());
 
         try {
 
@@ -488,20 +473,16 @@ public class FileManager {
         }
 
     }
-
     public static void copyFileToFile(final File src, final File dest) throws IOException
     {
         copyInputStreamToFile(new FileInputStream(src), dest);
         dest.setLastModified(src.lastModified());
     }
-
     public static void copyInputStreamToFile(final InputStream in, final File dest)
             throws IOException
     {
         copyInputStreamToOutputStream(in, new FileOutputStream(dest));
     }
-
-
     public static void copyInputStreamToOutputStream(final InputStream in, final OutputStream out) throws IOException
     {
         try (in) {
@@ -514,6 +495,81 @@ public class FileManager {
             }
         }
     }
+    public void writeAfkPlayersToTextFile(HashMap<UUID, Long> afkPlayers) {
+
+        File afkPlayersf = new File(paths.getAfk_players());
+
+        try (BufferedWriter bf = new BufferedWriter(new FileWriter(afkPlayersf))) {
+
+            new FileWriter(afkPlayersf, false).close();
+
+            for (Map.Entry<UUID, Long> entry : afkPlayers.entrySet()) {
+
+                UUID key = entry.getKey();
+                long value = entry.getValue();
+
+                String separate = "|";
+
+                bf.write(key + separate + value);
+                bf.newLine();
+
+            }
+
+            bf.flush();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+    public HashMap<UUID, Long> getAfkPlayersFromTextFile() {
+
+        HashMap<UUID, Long> mapFileContents = new HashMap<>();
+
+        File afkPlayersf = new File(paths.getAfk_players());
 
 
+        BufferedReader br = null;
+        try {
+
+            br = new BufferedReader(new FileReader(afkPlayersf));
+
+            String line;
+
+            while ((line = br.readLine()) != null) {
+
+                String[] parts = line.split("\\|");
+
+                UUID key = UUID.fromString(parts[0].trim());
+                long value = Long.parseLong(parts[1].trim());
+
+                mapFileContents.put(key, value);
+
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            if (br != null) {
+
+                try {
+
+                    br.close();
+
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+
+                }
+            }
+
+        }
+
+        return mapFileContents;
+    }
 }

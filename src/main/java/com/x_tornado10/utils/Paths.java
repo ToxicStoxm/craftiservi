@@ -1,10 +1,10 @@
-package com.x_tornado10.files;
+package com.x_tornado10.utils;
 
 import com.x_tornado10.craftiservi;
 
 import java.io.InputStream;
 
-public class FileLocations {
+public class Paths {
 
     private final craftiservi plugin = craftiservi.getInstance();
 
@@ -26,6 +26,7 @@ public class FileLocations {
     private final String backupdir = plpath + "/backups";
     private final String config = plpath + "/config.yml";
     private final String backup_config = plpath + "/backups/Backup_config.yml";
+    private final String afk_players = plpath + "/afkPlayers.yml";
 
     //YML Paths
     private final String ymlInstalledOn = "stats.plugin.installed-on";
@@ -44,6 +45,21 @@ public class FileLocations {
     private final String short_prefix = "Craftiservi.short-Prefix";
     private final String use_custom_Prefix = "Craftiservi.use-custom-Prefix";
     private final String custom_Prefix = "Craftiservi.custom-Prefix";
+    private final String custom_dc_Prefix = "Craftiservi.custom-discord-Prefix";
+    private final String chat_filter_enabled = "Craftiservi.Chat.Filter.Enabled";
+    private final String jump_pads_enabled = "Craftiservi.Gadgets.Movement.Jump-Pads.Enabled";
+    private final String grappling_hook_enabled = "Craftiservi.Gadgets.Movement.Grappling-hook.Enabled";
+    private final String commands_invsave_enabled = "Craftiservi.Commands.InvSave.Enabled";
+    private final String commands_xparea_enabled = "Craftiservi.Commands.XpArea.Enabled";
+    private final String commands_firstjoin_enabled = "Craftiservi.Commands.FirstJoin.Enabled";
+    private final String afk_checker_enabled = "Craftiservi.Afk-Checker.Enabled";
+    private final String afk_checker_afk_time = "Craftiservi.Afk-Checker.Afk-Time";
+    private final String afk_checker_allow_afk_chat = "Craftiservi.Afk-Checker.allow-afk-chat";
+    private final String afk_checker_exclude = "Craftiservi.Afk-Checker.Exclude";
+    private final String afk_checker_exclude_enabled = "Craftiservi.Afk-Checker.enable-exclude";
+    private final String afk_checker_broadcastAFK_enabled = "Craftiservi.Afk-Checker.BroadcastAFK";
+    private final String afk_checker_broadcastTime_enabled = "Craftiservi.Afk-Checker.BroadcastAFK-Time";
+    private final String afk_checker_personal_time_enabled = "Craftiservi.Afk-Checker.Display-Personal-Time";
 
 
 
@@ -122,10 +138,58 @@ public class FileLocations {
     public String getCustom_Prefix() {
         return custom_Prefix;
     }
+    public String getCustom_dc_Prefix() {
+        return custom_dc_Prefix;
+    }
     public String getConfig() {
         return config;
     }
     public String getBackup_config() {
         return backup_config;
+    }
+    public String getChat_filter_enabled() {
+        return chat_filter_enabled;
+    }
+    public String getJump_pads_enabled() {
+        return jump_pads_enabled;
+    }
+    public String getGrappling_hook_enabled() {
+        return grappling_hook_enabled;
+    }
+    public String getCommands_invsave_enabled() {
+        return commands_invsave_enabled;
+    }
+    public String getCommands_xparea_enabled() {
+        return commands_xparea_enabled;
+    }
+    public String getCommands_firstjoin_enabled() {
+        return commands_firstjoin_enabled;
+    }
+    public String getAfk_checker_enabled() {
+        return afk_checker_enabled;
+    }
+    public String getAfk_checker_afk_time() {
+        return afk_checker_afk_time;
+    }
+    public String getAfk_checker_allow_afk_chat() {
+        return afk_checker_allow_afk_chat;
+    }
+    public String getAfk_checker_exclude() {
+        return afk_checker_exclude;
+    }
+    public String getAfk_checker_exclude_enabled() {
+        return afk_checker_exclude_enabled;
+    }
+    public String getAfk_checker_broadcastAFK_enabled() {
+        return afk_checker_broadcastAFK_enabled;
+    }
+    public String getAfk_checker_broadcastTime_enabled() {
+        return afk_checker_broadcastTime_enabled;
+    }
+    public String getAfk_checker_personal_time_enabled() {
+        return afk_checker_personal_time_enabled;
+    }
+    public String getAfk_players() {
+        return afk_players;
     }
 }

@@ -31,12 +31,15 @@ public class GraplingHookListener implements Listener {
     private final PlayerMessages plmsg = plugin.getPlayerMessages();
     private final int flyingTimeout = 5;
     private double Y_velocity;
+    public static boolean enabled;
     public GraplingHookListener(double Y_velocity) {
         this.Y_velocity = Y_velocity;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onFish(PlayerFishEvent e) {
+
+        if (!enabled) {return;}
 
         Player p = e.getPlayer();
         ItemStack current = p.getItemInHand();
@@ -101,6 +104,7 @@ public class GraplingHookListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageEvent event) {
+        if (!enabled) {return;}
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             if (FLYING_TIMEOUT.containsKey(player.getUniqueId())) {

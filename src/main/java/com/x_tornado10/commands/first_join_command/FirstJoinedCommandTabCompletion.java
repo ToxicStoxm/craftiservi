@@ -13,8 +13,12 @@ public class FirstJoinedCommandTabCompletion implements TabCompleter {
     craftiservi plugin = craftiservi.getInstance();
     HashMap<UUID, String> playerlist = plugin.getPlayerlist();
 
+    public static boolean enabled;
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+
+        if (!enabled) {return null;}
 
         ArrayList<String> fjargs = new ArrayList<>();
 

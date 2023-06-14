@@ -23,7 +23,7 @@ public class FirstJoinedCommand implements CommandExecutor {
     private HashMap<UUID, String> playerlist;
 
     private PlayerMessages plmsg;
-
+    public static boolean enabled;
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -32,6 +32,21 @@ public class FirstJoinedCommand implements CommandExecutor {
         logger = plugin.getCustomLogger();
         plmsg = plugin.getPlayerMessages();
         playerlist = plugin.getPlayerlist();
+
+        if (!enabled) {
+
+            if (sender instanceof Player) {
+
+                plmsg.msg((Player) sender, "This command is disabled.");
+
+            } else {
+
+                logger.info("This command is disabled.");
+
+            }
+            return true;
+        }
+
 
         if (!(sender instanceof Player)) {
 

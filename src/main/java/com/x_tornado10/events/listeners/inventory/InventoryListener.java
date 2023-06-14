@@ -1,5 +1,6 @@
 package com.x_tornado10.events.listeners.inventory;
 
+import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
@@ -35,9 +36,12 @@ public class InventoryListener implements Listener {
 
     private final HashMap<Integer, Inventory> invs_review = plugin.getInvs_review();
     private HashMap<UUID, Integer> penidng_request = new HashMap<>();
+    public static boolean enabled;
 
     @EventHandler
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent e) {
+
+        if (!enabled) {return;}
 
         if (isSavedInv(e.getSource()) || isSavedInv(e.getDestination())) {
 
@@ -49,6 +53,8 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onInventoryClickEvent(InventoryClickEvent e) {
+
+        if (!enabled) {return;}
 
         boolean isSaveInv = false;
 
@@ -242,6 +248,8 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onDisconnect(PlayerQuitEvent e) {
+
+        if (!enabled) {return;}
 
         Player p = e.getPlayer();
 

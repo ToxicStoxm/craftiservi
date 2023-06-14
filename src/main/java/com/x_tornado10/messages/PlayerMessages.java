@@ -1,9 +1,8 @@
 package com.x_tornado10.messages;
 
 import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
-import java.util.UUID;
+import java.util.Collection;
 
 public class PlayerMessages {
 
@@ -27,7 +26,17 @@ public class PlayerMessages {
 
         for (Player player : players) {
 
-            msg(player ,prefix + "§7" + message + "§r");
+            msg(player ,"§7" + message + "§r");
+
+        }
+
+    }
+
+    public void msg(Collection<? extends Player> players, String message) {
+
+        for (Player player : players) {
+
+            msg(player , "§7" + message + "§r");
 
         }
 
@@ -50,6 +59,7 @@ public class PlayerMessages {
         line(p);
 
     }
+
     public void upDateValues(String prefix) {
 
         this.prefix = prefix;

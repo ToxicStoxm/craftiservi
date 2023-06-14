@@ -1,5 +1,7 @@
 package com.x_tornado10.utils;
 
+import java.util.concurrent.TimeUnit;
+
 public class TextFormatting {
 
     public String stripColorCodes(String s) {
@@ -31,6 +33,40 @@ public class TextFormatting {
     }
     public String stripColorAndFormattingCodes(String s) {
         return stripFormattingCodes(stripColorCodes(s));
+    }
+
+    public String getDurationBreakdown(long millis) {
+        if(millis < 0) {
+            throw new IllegalArgumentException("Duration must be greater than zero!");
+        }
+
+        long days = TimeUnit.MILLISECONDS.toDays(millis);
+        millis -= TimeUnit.DAYS.toMillis(days);
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        millis -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+        millis -= TimeUnit.MINUTES.toMillis(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
+
+        StringBuilder sb = new StringBuilder(64);
+        if (days > 0) {
+            sb.append(days);
+            sb.append("d ");
+        }
+        if (hours > 0) {
+            sb.append(hours);
+            sb.append("h ");
+        }
+        if (minutes > 0) {
+            sb.append(minutes);
+            sb.append("min ");
+        }
+        if (seconds > 0) {
+            sb.append(seconds);
+            sb.append("s");
+        }
+
+        return(sb.toString());
     }
 
 }

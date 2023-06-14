@@ -1,5 +1,6 @@
 package com.x_tornado10.commands.xp_save_zone_command;
 
+import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
 import com.x_tornado10.craftiservi;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,9 +17,12 @@ public class XpSaveZoneCommandTabCompletion implements TabCompleter {
 
     private final craftiservi pl = craftiservi.getInstance();
     private final HashMap<String, List<Location>> xpsavearea = pl.getXpsaveareas();
+    public static boolean enabled;
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+
+        if (!enabled) {return null;}
 
         List<String> areaargs = new ArrayList<>();
 

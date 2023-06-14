@@ -6,25 +6,24 @@ import com.x_tornado10.commands.main_command.MainCommandTabCompletion;
 import com.x_tornado10.commands.first_join_command.FirstJoinedCommand;
 import com.x_tornado10.commands.first_join_command.FirstJoinedCommandTabCompletion;
 import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
-import com.x_tornado10.commands.inv_save_point.InventorySavePointTabCompletion;
+import com.x_tornado10.commands.inv_save_point.InventorySavePointCommandTabCompletion;
 import com.x_tornado10.commands.open_gui_command.OpenGUICommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommandTabCompletion;
 import com.x_tornado10.events.listeners.JoinListener;
 import com.x_tornado10.events.listeners.PlayerMoveListener;
+import com.x_tornado10.events.listeners.afkprot.AFKListener;
 import com.x_tornado10.events.listeners.grapling_hook.GraplingHookListener;
 import com.x_tornado10.events.listeners.inventory.InventoryListener;
 import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
 import com.x_tornado10.events.listeners.jpads.JumpPads;
-import com.x_tornado10.files.FileLocations;
-import com.x_tornado10.files.FileManager;
-import com.x_tornado10.handlers.ConfigHandler;
-import com.x_tornado10.handlers.DataHandler;
+import com.x_tornado10.features.afk_protection.AFKChecker;
+import com.x_tornado10.utils.*;
+import com.x_tornado10.managers.FileManager;
+import com.x_tornado10.managers.ConfigManager;
+import com.x_tornado10.managers.DataManager;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
-import com.x_tornado10.utils.TextFormatting;
-import com.x_tornado10.utils.ToFromBase64;
-import com.x_tornado10.utils.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
@@ -46,21 +45,25 @@ public final class craftiservi extends JavaPlugin {
     private Logger logger;
     private PlayerMessages plmsg;
     private String prefix;
+    private String dc_prefix;
     private String colorprefix;
-    private ConfigHandler configHandler;
+    private ConfigManager configManager;
     private HashMap<UUID, String> playerlist;
     private PluginManager pm;
-    private DataHandler dataHandler;
+    private DataManager dataManager;
     private FileManager fm;
     private ToFromBase64 toFromBase64;
     private TextFormatting txtformatting;
+    private HashMapCompare HMC;
+    private static HashMap<UUID, Long> afkList;
+    private static HashMap<UUID, Long> afkPlayers;
 
     private Boolean firstrun = false;
 
     private int timesstartedreloaded;
 
     private HashMap<String, List<Location>> xpsaveareas;
-    private FileLocations fl;
+    private Paths paths;
     private int registeredPlayers;
     private HashMap<UUID, List<Float>> playersinsavearea;
 
@@ -70,6 +73,7 @@ public final class craftiservi extends JavaPlugin {
     private InventoryListener inventoryListener;
     private GraplingHookListener graplingHookListener;
     private JumpPads jumpPads;
+    private AFKListener afkListener;
 
     private HashMap<UUID, HashMap<String, Inventory>> inv_saves;
     private HashMap<Integer, Inventory> invs_review = new HashMap<>();
@@ -79,6 +83,7 @@ public final class craftiservi extends JavaPlugin {
     private MsgFilter msgFilter;
     private FileConfiguration config;
     private FileConfiguration backup_config;
+    private AFKChecker afkChecker;
 
     @Override
     public void onLoad() {
@@ -87,34 +92,37 @@ public final class craftiservi extends JavaPlugin {
         start = System.currentTimeMillis();
         reloadConfig();
         config = getConfig();
-        fl = new FileLocations();
-        fm = new FileManager(getInstance(), fl);
-        configHandler = new ConfigHandler(config, fl, fm);
+        paths = new Paths();
+        fm = new FileManager(getInstance(), paths);
+        configManager = new ConfigManager(config, paths, fm);
         txtformatting = new TextFormatting();
+        HMC = new HashMapCompare();
 
-        setPrefix(configHandler, txtformatting);
+        setPrefix(configManager, txtformatting);
 
-        logger = new Logger(prefix, true, true);
+        logger = new Logger(prefix, dc_prefix, true, true);
         plmsg = new PlayerMessages(colorprefix);
         playerlist = new HashMap<>();
         xpsaveareas = new HashMap<>();
         playersinsavearea = new HashMap<>();
+        afkList = new HashMap<>();
         inv_saves = new HashMap<>();
+        afkPlayers = new HashMap<>();
         pm = Bukkit.getPluginManager();
         blockedStrings = new ArrayList<>();
         toFromBase64 = new ToFromBase64();
-        msgFilter = new MsgFilter(configHandler.getBlockedStrings());
+        msgFilter = new MsgFilter(configManager.getBlockedStrings());
         backup_config = new YamlConfiguration();
 
-        configHandler.updateConfig();
-        configHandler.setVersion(getDescription().getVersion());
-        Logger.setDebug(configHandler.getDisplay_debug());
-        Logger.setEnabled(configHandler.getDisable_logger());
+        configManager.updateConfig();
+        configManager.setVersion(getDescription().getVersion());
+        Logger.setDebug(configManager.getDisplay_debug());
+        Logger.setEnabled(configManager.getDisable_logger());
 
         saveConfig();
         reloadConfig();
 
-        File data = new File(fl.getData());
+        File data = new File(paths.getData());
 
         if (!data.exists()) {firstrun = true;}
 
@@ -126,19 +134,20 @@ public final class craftiservi extends JavaPlugin {
 
         }
 
-        dataHandler = new DataHandler(fl.getDataf(), data);
+        dataManager = new DataManager(paths.getDataf(), data);
 
         logger.info("Loading data from files...");
         playerlist = fm.getPlayerListFromTextFile();
         xpsaveareas = fm.getXpSaveAreaFromTextFile();
         playersinsavearea = fm.getPlayersInSaveAreaFromTextFile();
         inv_saves = fm.getPlayerInvSavePointsFromTextFile();
+        afkPlayers = fm.getAfkPlayersFromTextFile();
 
         if (firstrun) {
 
             try {
 
-                dataHandler.configure();
+                dataManager.configure();
 
             } catch (IOException e) {
 
@@ -155,7 +164,7 @@ public final class craftiservi extends JavaPlugin {
 
         try {
 
-            dataHandler.setData();
+            dataManager.setData();
 
         } catch (IOException e) {
 
@@ -166,8 +175,8 @@ public final class craftiservi extends JavaPlugin {
 
             try {
 
-                dataHandler.configure();
-                dataHandler.setData();
+                dataManager.configure();
+                dataManager.setData();
                 logger.severe("§4Something went wrong while loading/setting values for 'data.yml'! All values were reset automatically!§r");
                 logger.severe("§4All Values were reset successfully with 0 Errors remaining§r");
 
@@ -178,8 +187,6 @@ public final class craftiservi extends JavaPlugin {
                 getPluginLoader().disablePlugin(this);
 
             }
-
-
         }
 
         logger.info("Current version: " + getDescription().getName().toLowerCase() + "-" + getDescription().getVersion() + " by " + getDescription().getAuthors().get(0));
@@ -205,8 +212,10 @@ public final class craftiservi extends JavaPlugin {
         playerMoveListener = new PlayerMoveListener();
         inventoryOpenListener = new InventoryOpenListener();
         inventoryListener = new InventoryListener();
-        graplingHookListener = new GraplingHookListener(configHandler.getY_velocity_g());
-        jumpPads = new JumpPads(configHandler.getY_velocity(), configHandler.getVelocity_multiplier());
+        graplingHookListener = new GraplingHookListener(configManager.getY_velocity_g());
+        jumpPads = new JumpPads(configManager.getY_velocity(), configManager.getVelocity_multiplier());
+        afkListener = new AFKListener();
+        afkChecker = new AFKChecker();
 
         pm.registerEvents(joinListener, this);
         pm.registerEvents(playerMoveListener, this);
@@ -214,32 +223,52 @@ public final class craftiservi extends JavaPlugin {
         pm.registerEvents(inventoryOpenListener, this);
         pm.registerEvents(graplingHookListener, this);
         pm.registerEvents(jumpPads, this);
+        pm.registerEvents(afkListener, this);
         logger.debug("Listeners..§adone");
         logger.debug("");
 
         logger.debug("Getting commands...");
         Bukkit.getPluginCommand("firstjoin").setExecutor(new FirstJoinedCommand());
         Bukkit.getPluginCommand("firstjoin").setTabCompleter(new FirstJoinedCommandTabCompletion());
-        logger.debug("firstjoin...§adone");
+        if (configManager.getCommands_firstjoin_enabled()) {
+            logger.debug("firstjoin...§adone");
+        } else {
+            logger.debug("firstjoin...§disabled");
+        }
 
         Bukkit.getPluginCommand("xparea").setExecutor(new XpSaveZoneCommand());
         Bukkit.getPluginCommand("xparea").setTabCompleter(new XpSaveZoneCommandTabCompletion());
-        logger.debug("xparea...§adone");
+        if (configManager.getCommands_xparea_enabled()) {
+            logger.debug("xparea...§adone");
+        } else {
+
+            logger.debug("xparea...§disabled");
+
+        }
 
         Bukkit.getPluginCommand("invsave").setExecutor(new InventorySavePointCommand());
-        Bukkit.getPluginCommand("invsave").setTabCompleter(new InventorySavePointTabCompletion());
-        logger.debug("invsave...§adone");
+        Bukkit.getPluginCommand("invsave").setTabCompleter(new InventorySavePointCommandTabCompletion());
 
         Bukkit.getPluginCommand("opengui").setExecutor(new OpenGUICommand());
-        logger.debug("opengui...§adone");
+        if (configManager.getCommands_invsave_enabled()) {
 
-        Bukkit.getPluginCommand("craftiservi").setExecutor(new MainCommand(getInstance(), configHandler, fl, logger, plmsg));
+            logger.debug("invsave...§adone");
+            logger.debug("opengui...§adone");
+
+        } else {
+
+            logger.debug("invsave...§disabled");
+            logger.debug("opengui...§disabled");
+
+        }
+
+        Bukkit.getPluginCommand("craftiservi").setExecutor(new MainCommand(getInstance(), configManager, paths, logger, plmsg));
         Bukkit.getPluginCommand("craftiservi").setTabCompleter(new MainCommandTabCompletion());
         logger.debug("config...§adone");
 
         logger.debug("");
         logger.debug("Configuring filters...");
-        blockedStrings = configHandler.getBlockedStrings();
+        blockedStrings = configManager.getBlockedStrings();
         logger.debug("MsgFilter...§adone");
         logger.debug("");
         logger.debug("Applying filters to logger...");
@@ -249,6 +278,19 @@ public final class craftiservi extends JavaPlugin {
         logger.debug("");
         logger.debug("§8-----------------------------");
         logger.debug("");
+
+        logger.debug("Reloading Config...");
+
+        if (configManager.reloadConfig(true)) {
+
+            logger.debug("Successfully reloaded config!");
+
+        } else {
+
+            logger.severe("Couldn't reload config. Please restart the server!");
+
+        }
+
 
         finish = System.currentTimeMillis();
         if (finish-start>20000) {
@@ -270,42 +312,53 @@ public final class craftiservi extends JavaPlugin {
         logger.debug("§8------------Debug------------");
         logger.debug("");
         logger.debug("Saving data to files...");
-        if (!playerlist.isEmpty() && new File(fl.getPlayerlist()).exists()) {
+        if (!playerlist.isEmpty() && new File(paths.getPlayerlist()).exists()) {
 
             fm.writePlayerlistToTextFile(playerlist);
 
         }
         logger.debug("Playerlist...§adone");
 
-        if (new File(fl.getPlayerlist()).exists() && !inv_saves.isEmpty()) {
+        if (new File(paths.getPlayerlist()).exists() && !inv_saves.isEmpty()) {
 
             fm.writePlayerInvSavesToTextFile(inv_saves);
 
         }
         logger.debug("InventorySavePoints...§adone");
 
-        if (new File(fl.getXpsaveareas()).exists()) {
+        if (new File(paths.getXpsaveareas()).exists()) {
 
             fm.writeXpSaveAreasToTextFile(xpsaveareas);
 
         }
         logger.debug("XpSaveAreas...§adone");
 
-        if (new File(fl.getPlayersinsavearea()).exists()) {
+        if (new File(paths.getPlayersinsavearea()).exists()) {
 
             fm.writePlayersInSaveAreaToTextFile(playersinsavearea);
 
         }
         logger.debug("PlayersInSaveArea...§adone");
+
+        if (new File(paths.getAfk_players()).exists()) {
+
+            fm.writeAfkPlayersToTextFile(afkPlayers);
+
+        }
+        logger.debug("AfkPlayers...§adone");
         logger.debug("");
         logger.debug("§8-----------------------------");
         logger.debug("");
 
-        if (configHandler.backupConfig()) {
+        if (configManager.backupConfig()) {
 
             logger.debug("Successfully created backup of config.yml");
 
         }
+
+        AFKChecker.enabled = false;
+        JumpPads.enabled = false;
+        GraplingHookListener.enabled = false;
 
         logger.info("Everything was saved successfully!");
         logger.info("Successfully disabled!");
@@ -349,27 +402,30 @@ public final class craftiservi extends JavaPlugin {
     public String getColorprefix() {
         return colorprefix;
     }
-    public void setPrefix(ConfigHandler configHandler, TextFormatting txtformatting) {
+    public void setPrefix(ConfigManager configManager, TextFormatting txtformatting) {
 
-        if (configHandler.getUse_custom_Prefix()) {
+        if (configManager.getUse_custom_Prefix()) {
 
-            prefix = txtformatting.stripColorAndFormattingCodes(configHandler.getCustom_Prefix());
-            colorprefix = configHandler.getCustom_Prefix();
+            prefix = txtformatting.stripColorAndFormattingCodes(configManager.getCustom_Prefix());
+            dc_prefix = txtformatting.stripColorAndFormattingCodes(configManager.getCustom_dc_Prefix());
+            colorprefix = configManager.getCustom_Prefix();
 
         } else {
 
-            if (configHandler.getShort_prefix()) {
+            if (configManager.getShort_prefix()) {
 
                 String short_prefix;
                 short_prefix = "CS";
                 prefix = "[" + short_prefix + "] ";
+                dc_prefix = "[" + short_prefix + "-DC] ";
                 colorprefix = "§1§l[§9§l" + short_prefix + "§1]§l:§r ";
 
             } else {
 
                 String long_prefix;
-                long_prefix= getDescription().getPrefix();
+                long_prefix = getDescription().getPrefix();
                 prefix = "[" + long_prefix + "] ";
+                dc_prefix = "[" + long_prefix + "-Discord] ";
                 colorprefix = "§1§l[§9§l" + long_prefix + "§1]§l:§r ";
 
             }
@@ -392,8 +448,20 @@ public final class craftiservi extends JavaPlugin {
 
         ConsoleCommandSender commandSender = Bukkit.getConsoleSender();
 
-        commandSender.sendMessage("[" + getDescription().getPrefix() + "]" + message);
+        commandSender.sendMessage("[" + getDescription().getPrefix() + "] " + message);
 
     }
-
+    public HashMap<UUID, Long> getAfkList() {
+        return afkList;
+    }
+    public HashMap<UUID, Long> getAfkPlayers() {return afkPlayers;}
+    public AFKChecker getAfkChecker() {
+        return afkChecker;
+    }
+    public HashMapCompare getHMC() {
+        return HMC;
+    }
+    public TextFormatting getTxtformatting() {
+        return txtformatting;
+    }
 }

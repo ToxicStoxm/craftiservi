@@ -10,12 +10,12 @@ Craftiservi:
   #If the plugin prefix 'Craftiservi' should be shortened to 'CS'
   #DEFAULT: true
   short-Prefix: true
-  #If you would like to use your own prefix instead of the build-in prefix
+  #If you would like to use your own prefix instead of the built-in prefix
   #Warning: [Overwrites 'short-prefix' setting]
   #DEFAULT: false
   use-custom-Prefix: false
   #Provide your custom prefix
-  #Note: For colors use '§'+ [ 0->black | 1->dark_blue | 2->dark_green | 3->dark_aqua | 4->dark_red | 5->dark_purple | 6->gold | 7->gray | 8->dark_gray | 9->blue ]
+  #Note: For colors, use '§'+ [ 0->black | 1->dark_blue | 2->dark_green | 3->dark_aqua | 4->dark_red | 5->dark_purple | 6->gold | 7->gray | 8->dark_gray | 9->blue ]
   #                          [ a->green | b->aqua | c->red | d->light_purple | e->yellow | f->white | g->dark_yellow ]
   #Note: For text-formatting use '§'+[ u->underline | l->bold | o->italic | m->strikethrough | k->obfuscated | r->reset-format/color ]
   #Warning: [Colors and Text-Formatting only works in the ingame-chat. In console the plain prefix-text is displayed]
@@ -23,6 +23,9 @@ Craftiservi:
   #Examples: "[MyPlugin] " | "§0§l[§aMyPlugin§0§l]§r " | "§k§a2§r§0§l[§a§u§1MyPlugin§0§l]§8>§r "
   #DEFAULT: "[MyPlugin] "
   custom-Prefix: "[MyPlugin] "
+  #INFO: Only if discord extension for crafti-servi is installed!
+  #DEFAULT: "[MyPlugin-Discord] "
+  custom-discord-Prefix: "[MyPlugin-Discord] "
 
 #################################################################
 
@@ -38,9 +41,11 @@ Craftiservi:
 
 #################################################################
 
-  #Setting for the ingame chat
+  #Settings for the ingame chat
   Chat:
     Filter:
+      #DEFAULT: true
+      Enabled: true
       #Strings to block/filter from console and logs
       BlockedStrings:
         - /msg
@@ -54,12 +59,139 @@ Craftiservi:
   Gadgets:
     Movement:
       Jump-Pads:
+        #DEFAULT: true
+        Enabled: true
         #DEFAULT: 2.0
         velocity-multiplier: 2.0
         #DEFAULT: 1.2
         Y-velocity: 1.2
       Grappling-hook:
+        #DEFAULT: true
+        Enabled: true
         #DEFAULT: 1.0
         Y-velocity: 1.0
+
+#################################################################
+
+  #Ingame Commands / Features
+  Commands:
+    InvSave:
+      #DEFAULT: true
+      Enabled: true
+    XpArea:
+      #DEFAULT: true
+      Enabled: true
+    FirstJoin:
+      #DEFAULT: true
+      Enabled: true
+
+#################################################################
+
+  Afk-Checker:
+    #DEFAULT: true
+    Enabled: true
+    #Time before a player is marked as afk after his last activity
+    #Value in Seconds
+    #DEFAULT: 180
+    Afk-Time: 180
+    #If a player should remain marked as afk when they write something in chat
+    #DEFAULT: true
+    allow-afk-chat: true
+    # If the exclude list should be used
+    #DEFAULT: false
+    enable-exclude: false
+    #List of players who won't be marked as afk at all
+    #NOTE: Player names might change, so use UUID'S instead
+    Exclude:
+      - 37c807ea-c060-4547-b28a-fa59e1359207
+      - x_Tornado10
+    #If AFK messages should be sent as global message
+    #DEFAULT: true
+    BroadcastAFK: true
+    #If global AFK messages should contain the AFK time (Ignored when 'BroadcastAFK' is false)
+    #DEFAULT: false
+    BroadcastAFK-Time: false
+    #If the message sent to the AFK player should contain his AFK time (Does NOT overwrite BroadcastAFK-Time!)
+    #DEFAULT: true
+    Display-Personal-Time: true
+    #Effects that are applied to AFK players
+    Afk-Effects:
+      #DEFAULT: true
+      Enabled: true
+      Effects:
+        #Players are completely invincible and can't take any damage
+        Invincible:
+          #DEFAULT: false
+          Enabled: false
+        #Players are invincible to any 'natural' Damage such as monsters, but can still be damaged by players
+        Invincible-2:
+          #DEFAULT: true
+          Enabled: true
+        Invincible-Custom:
+          #DEFAULT: false
+          Enabled: false
+          #INFO: DAMAGE-TYPES with Description [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html]
+          Damage-types:
+            - BLOCK_EXPLOSION
+            - CONTACT
+            - CRAMMING
+            - CUSTOM
+            - DRAGON_BREATH
+            - DROWNING
+            - ENTITY_ATTACK
+            - ENTITY_EXPLOSION
+            - ENTITY_SWEEP_ATTACK
+            - FALL
+            - FALLING_BLOCK
+            - FIRE
+            - FIRE_TICK
+            - FLY_INTO_WALL
+            - FREEZE
+            - HOT_FLOOR
+            - KILL
+            - LAVA
+            - LIGHTNING
+            - MAGIC
+            - POISON
+            - PROJECTILE
+            - SONIC_BOOM
+            - STARVATION
+            - SUFFOCATION
+            - SUICIDE
+            - THORNS
+            - VOID
+            - WITHER
+            - WORLD_BORDER
+        #Players are invisible to other Players
+        Invisible:
+          #DEFAULT: false
+          Enabled: false
+        #Players have no collision, so they can't be pushed around by other players
+        No-Collision:
+          #DEFAULT: true
+          Enabled: true
+        #Players have a Gray Name-Tag in the Tab-List
+        Gray-Name-Tag:
+          #DEFAULT: true
+          Enabled: true
+        #Players have an AFK prefix in the Tab-List and Chat
+        Afk-Prefix:
+          #DEFAULT: true
+          Enabled: true
+          #DEFAULT: "[AFK] "
+          Prefix: "[AFK] "
+
+#################################################################
+
+Config:
+  Credits:
+
+#################################################################
+
+    x_Tornado10:
+      GitHub: https://github.com/ToxicStoxm
+      YouTube: https://www.youtube.com/@x_tornado10/
+      Website: https://www.crafti-servi.com/
+      Reddit: https://www.reddit.com/user/x_Tornado10
 
 #################################################################

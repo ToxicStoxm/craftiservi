@@ -1,9 +1,10 @@
 package com.x_tornado10.features.afk_protection;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.features.invis_players.InvisPlayers;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
-import com.x_tornado10.utils.HashMapCompare;
+import com.x_tornado10.utils.ObjectCompare;
 import com.x_tornado10.utils.TextFormatting;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -19,6 +20,16 @@ public class AFKChecker {
     private static boolean broadcastAFK;
     private static boolean broadcastTime;
     private static boolean displayPersonalTime;
+    private static boolean AFKeffects;
+    private static boolean effects_invincible;
+    private static boolean effects_invincible2;
+    private static boolean effects_invincibleCustom;
+    private static boolean effects_invisible;
+    private static boolean effects_noCollision;
+    private static boolean effects_grayNameTag;
+    private static boolean effects_AfkPrefix;
+    private static List<String> damageTypes;
+    private static String AFKprefix;
     private static List<String> exclude;
     private int seconds;
     private HashMap<UUID, Long> afkList;
@@ -27,8 +38,9 @@ public class AFKChecker {
     private Logger logger = plugin.getCustomLogger();
     private BukkitTask run;
     private BukkitTask run2;
-    private HashMapCompare HMC = plugin.getHMC();
+    private ObjectCompare OC = plugin.getOC();
     private TextFormatting textFormatting = plugin.getTxtformatting();
+    private InvisPlayers invisPlayers = plugin.getInvisPlayers();
 
     public AFKChecker() {
 
@@ -120,12 +132,38 @@ public class AFKChecker {
 
     }
 
-    public void updateValues(int seconds, List<String> exclude, boolean broadcastAFK, boolean broadcastTime, boolean displayPersonalTime) {
+    public void updateValues(int seconds,
+                             List<String> exclude,
+                             boolean broadcastAFK,
+                             boolean broadcastTime,
+                             boolean displayPersonalTime,
+                             boolean afkEffects,
+                             boolean invincible,
+                             boolean invincible2,
+                             boolean invincibleCustom,
+                             boolean invisible,
+                             boolean noCollision,
+                             boolean grayNameTag,
+                             boolean afkPrefix,
+                             String afkPrefix_prefix,
+                             List<String> damageTypes)
+    {
         this.seconds = seconds;
         AFKChecker.broadcastAFK = broadcastAFK;
         AFKChecker.broadcastTime = broadcastTime;
         AFKChecker.displayPersonalTime = displayPersonalTime;
         AFKChecker.exclude = exclude;
+        AFKChecker.AFKeffects = afkEffects;
+        AFKChecker.effects_invincible = invincible;
+        AFKChecker.effects_invincible2 = invincible2;
+        AFKChecker.effects_invincibleCustom = invincibleCustom;
+        AFKChecker.effects_invisible = invisible;
+        AFKChecker.effects_noCollision = noCollision;
+        AFKChecker.effects_grayNameTag = grayNameTag;
+        AFKChecker.effects_AfkPrefix = afkPrefix;
+        AFKChecker.AFKprefix = afkPrefix_prefix;
+        AFKChecker.damageTypes = damageTypes;
+
 
         for (Map.Entry<UUID, Long> entry : afkPlayers.entrySet()) {
 
@@ -155,7 +193,7 @@ public class AFKChecker {
                     cancel();
                 }
 
-                HashMap<String, HashMap<UUID, Long>> result = HMC.compare(temp, afkPlayers);
+                HashMap<String, HashMap<UUID, Long>> result = OC.compare(temp, afkPlayers);
                 HashMap<UUID, Long> added = result.get("added");
                 HashMap<UUID, Long> removed = result.get("removed");
 
@@ -182,14 +220,37 @@ public class AFKChecker {
 
         for (UUID target : uuids_added) {
 
-            Player p = Bukkit.getPlayer(target);
-            String name = p.getName();
-            if (broadcastAFK) {
-                logger.broadcast(name + " is now AFK!", false, new ArrayList<>(Collections.singleton(target)));
+            Player p;
+            String name;
+
+            try {
+                p = Bukkit.getPlayer(target);
+                name = p.getName();
+            } catch (NullPointerException e) {
+                afkPlayers.remove(target);
+                afkList.remove(target);
+                return;
             }
-            plmsg.msg(p, "You are now AFK!");
+
+            if (broadcastAFK) {
+                logger.broadcast(name + " is now §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(target)));
+            }
+
+            plmsg.msg(p, "You are now §2§l§oAFK§7");
+
+            p.setCollidable(!effects_noCollision);
+            p.setInvulnerable(!effects_invincible);
+
+
+            if (effects_invisible) {
+                invisPlayers.add(target);
+            } else {
+                invisPlayers.remove(target);
+            }
+
 
         }
+
 
         for (UUID target : uuids_removed) {
 
@@ -198,6 +259,7 @@ public class AFKChecker {
 
             try {
                 p = Bukkit.getPlayer(target);
+                assert p != null;
                 name = p.getName();
             } catch (NullPointerException e) {
                 return;
@@ -205,15 +267,15 @@ public class AFKChecker {
 
             if (broadcastAFK) {
                 if (broadcastTime) {
-                    logger.broadcast(name + " is no longer AFK! (AFK time: " + textFormatting.getDurationBreakdown(System.currentTimeMillis() - players_removed.get(target))  + ")", false, new ArrayList<>(Collections.singleton(target)));
+                    logger.broadcast(name + " is no longer §2§l§oAFK§7 (AFK time: " + textFormatting.getDurationBreakdown(System.currentTimeMillis() - players_removed.get(target))  + ")", false, new ArrayList<>(Collections.singleton(target)));
                 } else {
-                    logger.broadcast(name + " is no longer AFK!", false, new ArrayList<>(Collections.singleton(target)));
+                    logger.broadcast(name + " is no longer §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(target)));
                 }
             }
             if (displayPersonalTime) {
-                plmsg.msg(p, "You are no longer AFK! (AFK time: " + textFormatting.getDurationBreakdown(System.currentTimeMillis() - players_removed.get(target)) + ")");
+                plmsg.msg(p, "You are no longer §2§l§oAFK§7 (AFK time: " + textFormatting.getDurationBreakdown(System.currentTimeMillis() - players_removed.get(target)) + ")");
             } else {
-                plmsg.msg(p, "You are no longer AFK!");
+                plmsg.msg(p, "You are no longer §2§l§oAFK§7");
             }
 
         }

@@ -166,7 +166,7 @@ Craftiservi:
         Invisible:
           #DEFAULT: false
           Enabled: false
-        #Players have no collision, so they can't be pushed around by other players
+        #Players have no collision, so they can't be pushed around by other players or entities
         No-Collision:
           #DEFAULT: true
           Enabled: true

@@ -95,9 +95,18 @@ public class InventorySavePointCommand implements CommandExecutor {
 
                         } else {
 
-                            p_invs.put(args[1], inv_point(p));
-                            plmsg.msg(p, "Successfully created new InventorySavePoint '" + args[1] + "'!");
-                            logger.info(p.getName() + " created new InventorySavePoint '" + args[1] + "'!");
+                            if(checkName(args[1])) {
+
+                                p_invs.put(args[1], inv_point(p));
+                                plmsg.msg(p, "Successfully created new InventorySavePoint '" + args[1] + "'!");
+                                logger.info(p.getName() + " created new InventorySavePoint '" + args[1] + "'!");
+
+                            } else {
+
+                                plmsg.msg(p, "Illegal symbol/s detected! Name can't contain: . | \" | \\");
+                                return true;
+
+                            }
 
                         }
                     }
@@ -218,12 +227,19 @@ public class InventorySavePointCommand implements CommandExecutor {
 
                     if (p_invs2.containsKey(args[1])) {
 
+                        if (checkName(args[2])) {
 
-                        Inventory temp = p_invs2.get(args[1]);
-                        p_invs2.remove(args[1]);
-                        p_invs2.put(args[2], temp);
-                        plmsg.msg(p, "Successfully renamed '" + args[1] + "' to '" + args[2] + "'!");
-                        logger.info(p.getName() + " renamed InventorySavePoint '" + args[1] + "' to '" + args[2] + "'!");
+                            Inventory temp = p_invs2.get(args[1]);
+                            p_invs2.remove(args[1]);
+                            p_invs2.put(args[2], temp);
+                            plmsg.msg(p, "Successfully renamed '" + args[1] + "' to '" + args[2] + "'!");
+                            logger.info(p.getName() + " renamed InventorySavePoint '" + args[1] + "' to '" + args[2] + "'!");
+                        } else {
+
+                            plmsg.msg(p, "Illegal symbol/s detected! Name can't contain: . | \" | \\");
+                            return true;
+
+                        }
 
                     } else {
 
@@ -289,6 +305,26 @@ public class InventorySavePointCommand implements CommandExecutor {
 
         return inv;
 
+    }
+
+    private boolean checkName(String name) {
+
+        List<String> illegalSymbols = new ArrayList<>();
+        illegalSymbols.add("\\");
+        illegalSymbols.add("\"");
+        illegalSymbols.add(".");
+
+        for (String s : illegalSymbols) {
+
+            if (name.contains(s)) {
+
+                return false;
+
+            }
+
+        }
+
+        return true;
     }
 
 }

@@ -18,12 +18,22 @@ import com.x_tornado10.events.listeners.inventory.InventoryListener;
 import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
 import com.x_tornado10.events.listeners.jpads.JumpPads;
 import com.x_tornado10.features.afk_protection.AFKChecker;
+import com.x_tornado10.features.invis_players.InvisPlayers;
 import com.x_tornado10.utils.*;
 import com.x_tornado10.managers.FileManager;
 import com.x_tornado10.managers.ConfigManager;
 import com.x_tornado10.managers.DataManager;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.model.data.DataMutateResult;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
+import net.luckperms.api.node.NodeBuilder;
+import net.luckperms.api.node.types.PermissionNode;
+import net.luckperms.api.node.types.PrefixNode;
+import net.luckperms.api.node.types.WeightNode;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
@@ -32,9 +42,12 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
+import java.security.Permission;
+import java.security.Provider;
 import java.util.*;
 
 public final class craftiservi extends JavaPlugin {
@@ -54,10 +67,9 @@ public final class craftiservi extends JavaPlugin {
     private FileManager fm;
     private ToFromBase64 toFromBase64;
     private TextFormatting txtformatting;
-    private HashMapCompare HMC;
+    private ObjectCompare HMC;
     private static HashMap<UUID, Long> afkList;
     private static HashMap<UUID, Long> afkPlayers;
-
     private Boolean firstrun = false;
 
     private int timesstartedreloaded;
@@ -84,6 +96,7 @@ public final class craftiservi extends JavaPlugin {
     private FileConfiguration config;
     private FileConfiguration backup_config;
     private AFKChecker afkChecker;
+    private InvisPlayers invisPlayers;
 
     @Override
     public void onLoad() {
@@ -96,7 +109,7 @@ public final class craftiservi extends JavaPlugin {
         fm = new FileManager(getInstance(), paths);
         configManager = new ConfigManager(config, paths, fm);
         txtformatting = new TextFormatting();
-        HMC = new HashMapCompare();
+        HMC = new ObjectCompare();
 
         setPrefix(configManager, txtformatting);
 
@@ -204,6 +217,28 @@ public final class craftiservi extends JavaPlugin {
             }
         });
 
+
+        LuckPerms api = null;
+        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if (provider != null) {
+            api = provider.getProvider();
+
+        }
+
+        if (api == null) {return;}
+
+        if (firstrun) {
+
+            PermissionNode node = PermissionNode.builder("craftiservi.afk").build();
+            PrefixNode node1 = PrefixNode.builder("§7[AFK]", 100).build();
+            WeightNode node2 = WeightNode.builder(1000000).build();
+
+            Group group = api.getGroupManager().getGroup("AFK");
+
+
+        }
+
+
         logger.debug("");
         logger.debug("§8------------Debug------------");
         logger.debug("");
@@ -214,6 +249,7 @@ public final class craftiservi extends JavaPlugin {
         inventoryListener = new InventoryListener();
         graplingHookListener = new GraplingHookListener(configManager.getY_velocity_g());
         jumpPads = new JumpPads(configManager.getY_velocity(), configManager.getVelocity_multiplier());
+        invisPlayers = new InvisPlayers();
         afkListener = new AFKListener();
         afkChecker = new AFKChecker();
 
@@ -458,10 +494,13 @@ public final class craftiservi extends JavaPlugin {
     public AFKChecker getAfkChecker() {
         return afkChecker;
     }
-    public HashMapCompare getHMC() {
+    public ObjectCompare getOC() {
         return HMC;
     }
     public TextFormatting getTxtformatting() {
         return txtformatting;
+    }
+    public InvisPlayers getInvisPlayers() {
+        return invisPlayers;
     }
 }

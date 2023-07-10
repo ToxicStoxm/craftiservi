@@ -1,10 +1,8 @@
 package com.x_tornado10.utils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class HashMapCompare {
+public class ObjectCompare {
 
     public HashMap<String, HashMap<UUID, Long>> compare(HashMap<UUID, Long> one, HashMap<UUID, Long> two) {
 
@@ -18,6 +16,25 @@ public class HashMapCompare {
 
         for (Map.Entry<UUID, Long> entry : two.entrySet()) {
             removed.remove(entry.getKey());
+        }
+
+        result.put("added", added);
+        result.put("removed", removed);
+        return result;
+    }
+
+    public HashMap<String, List<UUID>> compare(List<UUID> one, List<UUID> two) {
+
+        List<UUID> added = new ArrayList<>(two);
+        List<UUID> removed = new ArrayList<>(one);
+        HashMap<String, List<UUID>> result = new HashMap<>();
+
+        for (UUID uuid : one) {
+            added.remove(uuid);
+        }
+
+        for (UUID uuid : two) {
+            removed.remove(uuid);
         }
 
         result.put("added", added);

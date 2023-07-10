@@ -60,8 +60,16 @@ public class Paths {
     private final String afk_checker_broadcastAFK_enabled = "Craftiservi.Afk-Checker.BroadcastAFK";
     private final String afk_checker_broadcastTime_enabled = "Craftiservi.Afk-Checker.BroadcastAFK-Time";
     private final String afk_checker_personal_time_enabled = "Craftiservi.Afk-Checker.Display-Personal-Time";
-
-
+    private final String afk_checker_afkEffects_enabled = "Craftiservi.Afk-Checker.Afk-Effects.Enabled";
+    private final String afk_checker_effects_invincible = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible.Enabled";
+    private final String afk_checker_effects_invincible_2 = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible-2.Enabled";
+    private final String afk_checker_effects_invincible_custom = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible-Custom.Enabled";
+    private final String afk_checker_effects_invincibleC_dTypes = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible-Custom.Damage-types";
+    private final String afk_checker_effects_invisible = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invisible.Enabled";
+    private final String afk_checker_effects_noCollision = "Craftiservi.Afk-Checker.Afk-Effects.Effects.No-Collision.Enabled";
+    private final String afk_checker_effects_grayNameTag = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Gray-Name-Tag.Enabled";
+    private final String afk_checker_effects_AfkPrefix = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-Prefix.Enabled";
+    private final String afk_checker_effects_AfkPrefix_prefix = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-Prefix.Prefix";
 
     public String getPlpath() {
         return plpath;
@@ -191,5 +199,35 @@ public class Paths {
     }
     public String getAfk_players() {
         return afk_players;
+    }
+    public String getAfk_checker_afkEffects_enabled() {
+        return afk_checker_afkEffects_enabled;
+    }
+    public String getAfk_checker_effects_invincible() {
+        return afk_checker_effects_invincible;
+    }
+    public String getAfk_checker_effects_invincible_2() {
+        return afk_checker_effects_invincible_2;
+    }
+    public String getAfk_checker_effects_invincible_custom() {
+        return afk_checker_effects_invincible_custom;
+    }
+    public String getAfk_checker_effects_invincibleC_dTypes() {
+        return afk_checker_effects_invincibleC_dTypes;
+    }
+    public String getAfk_checker_effects_invisible() {
+        return afk_checker_effects_invisible;
+    }
+    public String getAfk_checker_effects_noCollision() {
+        return afk_checker_effects_noCollision;
+    }
+    public String getAfk_checker_effects_grayNameTag() {
+        return afk_checker_effects_grayNameTag;
+    }
+    public String getAfk_checker_effects_AfkPrefix() {
+        return afk_checker_effects_AfkPrefix;
+    }
+    public String getAfk_checker_effects_AfkPrefix_prefix() {
+        return afk_checker_effects_AfkPrefix_prefix;
     }
 }

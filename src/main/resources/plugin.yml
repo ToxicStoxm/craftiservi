@@ -8,6 +8,9 @@ prefix: "Craftiservi"
 description: This Plugin provides a few useful tools alongside a basic server infrastructure
 loadbefore:
   - craftiservi-discord
+  - Server-Restart
+depend:
+  - LuckPerms
 commands:
   firstjoin:
     description: returns date when a player first joined

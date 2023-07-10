@@ -5,6 +5,7 @@ import com.x_tornado10.commands.first_join_command.FirstJoinedCommand;
 import com.x_tornado10.commands.first_join_command.FirstJoinedCommandTabCompletion;
 import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
 import com.x_tornado10.commands.inv_save_point.InventorySavePointCommandTabCompletion;
+import com.x_tornado10.commands.open_gui_command.OpenGUICommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommandTabCompletion;
 import com.x_tornado10.craftiservi;
@@ -102,6 +103,16 @@ public class ConfigManager {
     public boolean getAFKChecker_broadcastAFK() {return config.getBoolean(paths.getAfk_checker_broadcastAFK_enabled());}
     public boolean getAFKChecker_broadcastTime() {return  config.getBoolean(paths.getAfk_checker_broadcastTime_enabled());}
     public boolean getAFKChecker_display_personalTime() {return config.getBoolean(paths.getAfk_checker_personal_time_enabled());}
+    public boolean getAFKChecker_effects_enabled() {return config.getBoolean(paths.getAfk_checker_afkEffects_enabled());}
+    public boolean getAFKChecker_effects_invincible_enabled() {return config.getBoolean(paths.getAfk_checker_effects_invincible());}
+    public boolean getAFKChecker_effects_invincible2_enabled() {return config.getBoolean(paths.getAfk_checker_effects_invincible_2());}
+    public boolean getAFKChecker_effects_invincibleCustom_enabled() {return config.getBoolean(paths.getAfk_checker_effects_invincible_custom());}
+    public List<String> getAFKChecker_effects_invincibleC_DTypes() {return config.getStringList(paths.getAfk_checker_effects_invincibleC_dTypes());}
+    public boolean getAFKChecker_effects_invisible_enabled() {return config.getBoolean(paths.getAfk_checker_effects_invisible());}
+    public boolean getAFKChecker_effects_noCollision_enabled() {return config.getBoolean(paths.getAfk_checker_effects_noCollision());}
+    public boolean getAFKChecker_effects_grayNameTag_enabled() {return config.getBoolean(paths.getAfk_checker_effects_grayNameTag());}
+    public boolean getAFKChecker_effects_AfkPrefix_enabled() {return config.getBoolean(paths.getAfk_checker_effects_AfkPrefix());}
+    public String getAFKChecker_effects_AfkPrefix_prefix() {return config.getString(paths.getAfk_checker_effects_AfkPrefix_prefix());}
     public void updateConfig() {
 
         config.options().copyDefaults(true);
@@ -135,7 +146,22 @@ public class ConfigManager {
             AFKChecker.enabled = getAfkChecker_enabled();
             AFKListener.enabled = getAfkChecker_enabled();
             AFKListener.allowChat = getAfkChecker_allow_afk_chat();
-            p.getAfkChecker().updateValues(getAfkChecker_afk_time(), getAfkChecker_exclude(), getAFKChecker_broadcastAFK(), getAFKChecker_broadcastTime(), getAFKChecker_display_personalTime());
+            p.getAfkChecker().updateValues(getAfkChecker_afk_time(),
+                    getAfkChecker_exclude(),
+                    getAFKChecker_broadcastAFK(),
+                    getAFKChecker_broadcastTime(),
+                    getAFKChecker_display_personalTime(),
+                    getAFKChecker_effects_enabled(),
+                    getAFKChecker_effects_invincible_enabled(),
+                    getAFKChecker_effects_invincible2_enabled(),
+                    getAFKChecker_effects_invincibleCustom_enabled(),
+                    getAFKChecker_effects_invisible_enabled(),
+                    getAFKChecker_effects_noCollision_enabled(),
+                    getAFKChecker_effects_grayNameTag_enabled(),
+                    getAFKChecker_effects_AfkPrefix_enabled(),
+                    getAFKChecker_effects_AfkPrefix_prefix(),
+                    getAFKChecker_effects_invincibleC_DTypes()
+                    );
             if (!p.getAfkChecker().startCheck()) {if (!p.getAfkChecker().startCheck()) {err = true;}}
             if (!updateCommands()) {if (!updateCommands()){err = true;}}
 
@@ -176,6 +202,7 @@ public class ConfigManager {
             InventorySavePointCommandTabCompletion.enabled = invs_enabled;
             InventoryListener.enabled = invs_enabled;
             InventoryOpenListener.enabled = invs_enabled;
+            OpenGUICommand.enabled = invs_enabled;
             //
             XpSaveZoneCommand.enabled = xps_enabled;
             XpSaveZoneCommandTabCompletion.enabled = xps_enabled;

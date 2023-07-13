@@ -1,5 +1,4 @@
 [![Github All Releases](https://img.shields.io/github/downloads/toxicstoxm/craftiservi/total.svg)]()  
-[![Github All Releases](https://bstats.org/signatures/bukkit/craftiservi.svg)]()
 
 # Crafti-Servi
 Useful AdminTools combined with a few neat Features that improve the game experience.
@@ -38,7 +37,8 @@ Useful AdminTools combined with a few neat Features that improve the game experi
     -craftiservi.command.xparea  
     -craftiservi.command.invsave  
     -craftiservi.command.main  
-    
+
+[![Github All Releases](https://bstats.org/signatures/bukkit/craftiservi.svg)]()
     
 ## Support  
 #### Youtube: *https://www.youtube.com/@x_tornado10/*  

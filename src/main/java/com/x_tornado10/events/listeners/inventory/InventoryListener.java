@@ -295,9 +295,9 @@ public class InventoryListener implements Listener {
         if (inv.getSize() != 54) {return false;}
 
         ItemStack item = inv.getItem(45);
-        assert item != null;
+        if (item == null) {return false;}
         ItemMeta item_meta = item.getItemMeta();
-        assert item_meta != null;
+        if (item_meta == null) {return false;}
         String item_displayname = item_meta.getDisplayName();
 
         return item_displayname.equals(display_name);

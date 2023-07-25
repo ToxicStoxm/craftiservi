@@ -84,8 +84,9 @@ public class InventoryListener implements Listener {
 
         int slot = e.getSlot();
         ItemStack item = e.getClickedInventory().getItem(slot);
-
+        if (item == null) {return;}
         ItemMeta item_meta = item.getItemMeta();
+        if (item_meta == null) {return;}
         String item_displayname = item_meta.getDisplayName();
 
         String displayname = "§aRestore Inventory";

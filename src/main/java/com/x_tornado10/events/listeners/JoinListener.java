@@ -39,7 +39,6 @@ public class JoinListener implements Listener {
         UUID pid = p.getUniqueId();
         player = p;
         pid2 = pid;
-        e.setJoinMessage("");
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         logger = plugin.getCustomLogger();

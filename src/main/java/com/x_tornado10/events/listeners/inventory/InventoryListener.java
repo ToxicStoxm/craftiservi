@@ -1,6 +1,5 @@
 package com.x_tornado10.events.listeners.inventory;
 
-import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
@@ -10,7 +9,6 @@ import net.kyori.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -26,11 +26,7 @@ import com.x_tornado10.managers.DataManager;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
 import net.luckperms.api.LuckPerms;
-import net.luckperms.api.model.data.DataMutateResult;
 import net.luckperms.api.model.group.Group;
-import net.luckperms.api.model.user.User;
-import net.luckperms.api.node.Node;
-import net.luckperms.api.node.NodeBuilder;
 import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.node.types.PrefixNode;
 import net.luckperms.api.node.types.WeightNode;
@@ -46,8 +42,6 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
-import java.security.Permission;
-import java.security.Provider;
 import java.util.*;
 
 public final class craftiservi extends JavaPlugin {
@@ -97,6 +91,10 @@ public final class craftiservi extends JavaPlugin {
     private FileConfiguration backup_config;
     private AFKChecker afkChecker;
     private InvisPlayers invisPlayers;
+
+    public static craftiservi getInstance() {
+        return instance;
+    }
 
     @Override
     public void onLoad() {
@@ -174,7 +172,8 @@ public final class craftiservi extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-
+        int pluginId = 19084; // <-- Replace with the id of your plugin!
+        Metrics metrics = new Metrics(this, pluginId);
         try {
 
             dataManager.setData();
@@ -336,7 +335,6 @@ public final class craftiservi extends JavaPlugin {
         } else {
             logger.info("Successfully enabled! (took §a" + (finish - start) + "ms§r)");
         }
-
     }
 
     @Override
@@ -399,10 +397,6 @@ public final class craftiservi extends JavaPlugin {
         logger.info("Everything was saved successfully!");
         logger.info("Successfully disabled!");
 
-    }
-
-    public static craftiservi getInstance() {
-        return instance;
     }
     public HashMap<UUID, String> getPlayerlist() {
 

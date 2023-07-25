@@ -1,6 +1,5 @@
 package com.x_tornado10.events.listeners.inventory;
 
-import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
@@ -32,9 +31,9 @@ public class InventoryOpenListener implements Listener {
         if (i.getSize() != 54) {return;}
 
         ItemStack item = i.getItem(45);
-        assert item != null;
+        if (item == null) {return;}
         ItemMeta item_meta = item.getItemMeta();
-        assert item_meta != null;
+        if (item_meta == null) {return;}
         String item_displayname = item_meta.getDisplayName();
 
         if (item_displayname.equals(display_name)) {

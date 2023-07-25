@@ -89,7 +89,7 @@ Craftiservi:
 
   Afk-Checker:
     #DEFAULT: true
-    Enabled: true
+    Enabled: false
     #Time before a player is marked as afk after his last activity
     #Value in Seconds
     #DEFAULT: 180

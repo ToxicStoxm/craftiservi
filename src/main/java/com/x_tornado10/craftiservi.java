@@ -30,6 +30,7 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.node.types.PrefixNode;
 import net.luckperms.api.node.types.WeightNode;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;

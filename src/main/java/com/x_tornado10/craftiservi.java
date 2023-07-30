@@ -25,11 +25,6 @@ import com.x_tornado10.managers.ConfigManager;
 import com.x_tornado10.managers.DataManager;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.model.group.Group;
-import net.luckperms.api.node.types.PermissionNode;
-import net.luckperms.api.node.types.PrefixNode;
-import net.luckperms.api.node.types.WeightNode;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,7 +34,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
@@ -216,27 +210,6 @@ public final class craftiservi extends JavaPlugin {
 
             }
         });
-
-        LuckPerms api = null;
-        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-        if (provider != null) {
-            api = provider.getProvider();
-
-        }
-
-        if (api == null) {return;}
-
-        if (firstrun) {
-
-            PermissionNode node = PermissionNode.builder("craftiservi.afk").build();
-            PrefixNode node1 = PrefixNode.builder("§7[AFK]", 100).build();
-            WeightNode node2 = WeightNode.builder(1000000).build();
-
-            Group group = api.getGroupManager().getGroup("AFK");
-
-
-        }
-
 
         logger.debug("");
         logger.debug("§8------------Debug------------");

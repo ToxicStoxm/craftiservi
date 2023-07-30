@@ -217,7 +217,6 @@ public final class craftiservi extends JavaPlugin {
             }
         });
 
-
         LuckPerms api = null;
         RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
         if (provider != null) {

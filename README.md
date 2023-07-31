@@ -1,5 +1,7 @@
 [![Github All Releases](https://img.shields.io/github/downloads/toxicstoxm/craftiservi/total.svg)]()  
 
+# The plugin is currently undergoing a complete rework. You can follow the progress on the "rework" branch. During this period, the main branch will remain unchanged until the rework is completed. 
+
 # Crafti-Servi
 Useful AdminTools combined with a few neat Features that improve the game experience.
 

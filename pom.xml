@@ -45,7 +45,7 @@
                     <execution>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>E:\Minecraft-Test-Servers\PVP-Server\plugins\${project.artifactId}-Bukkit-${project.version}.jar</outputFile>
+                            <outputFile>E:\Minecraft-Test-Servers\PVP-Server\plugins\${project.artifactId}-Bukkit-${project.version}-rework.jar</outputFile>
                         </configuration>
                         <phase>package</phase>
                         <goals>

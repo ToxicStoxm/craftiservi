@@ -104,14 +104,14 @@ public class MainCommand implements CommandExecutor {
                                 plmsg.msg(p, "Resetting...");
                                 if (configManager.resetConfig()) {
 
-                                   plmsg.msg(p, "Reset of 'config.yml' was successfully completed!");
-                                   logger.info("Reset for file 'config.yml' was successfully completed!");
+                                   plmsg.msg(p, "Reset of 'config_old.yml' was successfully completed!");
+                                   logger.info("Reset for file 'config_old.yml' was successfully completed!");
 
                                 } else {
 
-                                    plmsg.msg(p, "§cAn error occurred trying to reset 'config.yml'!");
-                                    plmsg.msg(p, "§cPlease restart the server and/or delete 'config.yml' manually!");
-                                    logger.severe("Reset for file 'config.yml' was not successfully completed!");
+                                    plmsg.msg(p, "§cAn error occurred trying to reset 'config_old.yml'!");
+                                    plmsg.msg(p, "§cPlease restart the server and/or delete 'config_old.yml' manually!");
+                                    logger.severe("Reset for file 'config_old.yml' was not successfully completed!");
                                     logger.warning("Please restart the server to avoid any issues!");
                                 }
 
@@ -121,7 +121,7 @@ public class MainCommand implements CommandExecutor {
                             } else {
 
                                 confirm_deletion.add(pid);
-                                plmsg.msg(p, "Are you sure you want to §creset§r§7 'config.yml' to default?");
+                                plmsg.msg(p, "Are you sure you want to §creset§r§7 'config_old.yml' to default?");
                                 plmsg.msg(p, "Please execute the command again to confirm!");
 
                             }
@@ -169,11 +169,11 @@ public class MainCommand implements CommandExecutor {
 
                             if (configManager.resetConfig()) {
 
-                                logger.info("Reset of 'config.yml' was successfully completed!");
+                                logger.info("Reset of 'config_old.yml' was successfully completed!");
 
                             } else {
 
-                                logger.severe("Reset for file 'config.yml' was not successfully completed!");
+                                logger.severe("Reset for file 'config_old.yml' was not successfully completed!");
                                 logger.warning("Please restart the server to avoid any issues!");
                             }
 

@@ -24,7 +24,7 @@ public class Paths {
     private final String player_inv_saves = plpath + "/player_inv_saves.yml";
     private final String player_inv_saves_backup = plpath + "/backups/player_inv_saves_backup.yml";
     private final String backupdir = plpath + "/backups";
-    private final String config = plpath + "/config.yml";
+    private final String config = plpath + "/config_old.yml";
     private final String backup_config = plpath + "/backups/Backup_config.yml";
     private final String afk_players = plpath + "/afkPlayers.yml";
 

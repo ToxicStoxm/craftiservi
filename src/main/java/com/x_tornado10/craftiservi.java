@@ -1,5 +1,6 @@
 package com.x_tornado10;
 
+import com.tchristofferson.configupdater.ConfigUpdater;
 import com.x_tornado10.chat.filters.MsgFilter;
 import com.x_tornado10.commands.main_command.MainCommand;
 import com.x_tornado10.commands.main_command.MainCommandTabCompletion;
@@ -96,7 +97,17 @@ public final class craftiservi extends JavaPlugin {
 
         instance = this;
         start = System.currentTimeMillis();
+        saveDefaultConfig();
+        File configFile = new File(getDataFolder(), "config.yml");
+
+        try {
+            ConfigUpdater.update(this, "config.yml", configFile, new ArrayList<>());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         reloadConfig();
+
         config = getConfig();
         paths = new Paths();
         fm = new FileManager(getInstance(), paths);
@@ -359,7 +370,7 @@ public final class craftiservi extends JavaPlugin {
 
         if (configManager.backupConfig()) {
 
-            logger.debug("Successfully created backup of config.yml");
+            logger.debug("Successfully created backup of config_old.yml");
 
         }
 

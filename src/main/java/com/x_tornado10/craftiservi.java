@@ -26,6 +26,7 @@ import com.x_tornado10.managers.ConfigManager;
 import com.x_tornado10.managers.DataManager;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
+import net.milkbowl.vault.permission.Permission;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,6 +36,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
@@ -87,6 +89,19 @@ public final class craftiservi extends JavaPlugin {
     private FileConfiguration backup_config;
     private AFKChecker afkChecker;
     private InvisPlayers invisPlayers;
+    private static Permission perms = null;
+
+    private boolean setupPermissions() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+        if (rsp == null) {
+            return false;
+        }
+        perms = rsp.getProvider();
+        return perms != null;
+    }
 
     public static craftiservi getInstance() {
         return instance;
@@ -180,6 +195,12 @@ public final class craftiservi extends JavaPlugin {
         // Plugin startup logic
         int pluginId = 19084; // <-- Replace with the id of your plugin!
         Metrics metrics = new Metrics(this, pluginId);
+
+        if (!setupPermissions() ) {
+            logger.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         try {
 
             dataManager.setData();
@@ -235,6 +256,7 @@ public final class craftiservi extends JavaPlugin {
         invisPlayers = new InvisPlayers();
         afkListener = new AFKListener();
         afkChecker = new AFKChecker();
+        test test = new test();
 
         pm.registerEvents(joinListener, this);
         pm.registerEvents(playerMoveListener, this);
@@ -243,6 +265,7 @@ public final class craftiservi extends JavaPlugin {
         pm.registerEvents(graplingHookListener, this);
         pm.registerEvents(jumpPads, this);
         pm.registerEvents(afkListener, this);
+        pm.registerEvents(test, this);
         logger.debug("Listeners..§adone");
         logger.debug("");
 
@@ -480,5 +503,9 @@ public final class craftiservi extends JavaPlugin {
     }
     public InvisPlayers getInvisPlayers() {
         return invisPlayers;
+    }
+
+    public static Permission getPerms() {
+        return perms;
     }
 }

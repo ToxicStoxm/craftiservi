@@ -80,6 +80,7 @@ public class JumpPads implements Listener {
             if (FLYING_TIMEOUT.containsKey(player.getUniqueId())) {
                 if (FLYING_TIMEOUT.get(player.getUniqueId()) < System.currentTimeMillis()) return;
                 event.setCancelled(true);
+                player.sendMessage("FallDamage Cancelled!");
             }
         }
     }

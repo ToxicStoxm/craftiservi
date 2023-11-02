@@ -9,9 +9,6 @@ description: This Plugin provides a few useful tools alongside a basic server in
 loadbefore:
   - craftiservi-discord
   - Server-Restart
-softdepend:
-  - LuckPerms
-  - Vault
 commands:
   firstjoin:
     description: returns date when a player first joined

@@ -64,12 +64,6 @@ public class PlayerMessages implements Listener {
 
     }
 
-    public void upDateValues(String prefix) {
-
-        this.prefix = prefix;
-
-    }
-
     @EventHandler
     public void onReload(ReloadEvent e) {
 

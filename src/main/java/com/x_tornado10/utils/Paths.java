@@ -22,15 +22,9 @@ public class Paths {
     private final String player_inv_saves = plpath + "/player_inv_saves.yml";
     private final String player_inv_saves_backup = plpath + "/backups/player_inv_saves_backup.yml";
     private final String backupdir = plpath + "/backups";
-    private final String config = plpath + "/config_old.yml";
+    private final String config = plpath + "/config.yml";
     private final String backup_config = plpath + "/backups/Backup_config.yml";
     private final String afk_players = plpath + "/afkPlayers.yml";
-
-    //YML Paths
-    private final String ymlInstalledOn = "stats.plugin.installed-on";
-    private final String ymlVersion = "stats.plugin.version";
-    private final String ymlTimesStartedReloaded = "stats.server.times-started-reloaded";
-    private final String ymlRegisteredPlayers = "stats.server.registered-players";
 
     //config paths
     private final String BlockedStrings = "Craftiservi.Chat.Filter.BlockedStrings";
@@ -74,18 +68,6 @@ public class Paths {
     }
     public String getPlayerlist() {
         return playerlist;
-    }
-    public String getYmlInstalledOn() {
-        return ymlInstalledOn;
-    }
-    public String getYmlVersion() {
-        return ymlVersion;
-    }
-    public String getYmlTimesStartedReloaded() {
-        return ymlTimesStartedReloaded;
-    }
-    public String getYmlRegisteredPlayers() {
-        return ymlRegisteredPlayers;
     }
     public String getXpsaveareas() {
         return xpsaveareas;

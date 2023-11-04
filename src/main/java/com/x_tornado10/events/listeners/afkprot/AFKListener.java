@@ -1,6 +1,8 @@
 package com.x_tornado10.events.listeners.afkprot;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.events.custom.ReloadEvent;
+import com.x_tornado10.utils.CustomData;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -13,6 +15,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class AFKListener implements Listener {
@@ -113,6 +117,16 @@ public class AFKListener implements Listener {
 
         afkList.put(pid, System.currentTimeMillis());
         afkPlayers.remove(pid);
+
+    }
+
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+        CustomData afkData = e.getData(6);
+        List<Boolean> b = afkData.getB();
+
+        enabled = b.get(0);
+        allowChat = b.get(1);
 
     }
 

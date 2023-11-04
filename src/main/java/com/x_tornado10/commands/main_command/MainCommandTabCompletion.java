@@ -20,10 +20,16 @@ public class MainCommandTabCompletion implements TabCompleter {
                 case "", "r", "re" -> {
                     tabComplete.add("reloadconfig");
                     tabComplete.add("resetconfig");
+                    tabComplete.add("restoreconfig");
                     tabComplete.add("help");
                 }
+                case "res" -> {
+                    tabComplete.add("resetconfig");
+                    tabComplete.add("restoreconfig");
+                }
                 case "rel", "relo", "reloa", "reload", "reloadc", "reloadco", "reloadcon", "reloadconf", "reloadconfi" -> tabComplete.add("reloadconfig");
-                case "res", "rese", "reset", "resetc", "resetco", "resetconf", "resetconfi" -> tabComplete.add("resetconfig");
+                case "rese", "reset", "resetc", "resetco", "resetconf", "resetconfi" -> tabComplete.add("resetconfig");
+                case "rest", "resto", "restor", "restore", "restorec", "restoreco", "restorecon", "restoreconf", "restoreconfi" -> tabComplete.add("restoreconfig");
                 case "h", "he", "hel" -> tabComplete.add("help");
             }
 

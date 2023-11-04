@@ -1,5 +1,7 @@
 package com.x_tornado10.events.listeners.jpads;
 
+import com.x_tornado10.events.custom.ReloadEvent;
+import com.x_tornado10.utils.CustomData;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -11,6 +13,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import static com.x_tornado10.craftiservi.FLYING_TIMEOUT;
@@ -85,10 +88,13 @@ public class JumpPads implements Listener {
         }
     }
 
-    public void updateValues(double Y_velocity, double velocity_multiplier) {
-
-        this.Y_velocity = Y_velocity;
-        this.velocity_multiplier = velocity_multiplier;
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+        CustomData JpData = e.getData(3);
+        List<Double> d = JpData.getD();
+        enabled = JpData.getB(0);
+        Y_velocity = d.get(0);
+        velocity_multiplier = d.get(1);
 
     }
 

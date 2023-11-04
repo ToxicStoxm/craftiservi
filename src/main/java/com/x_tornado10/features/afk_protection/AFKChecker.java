@@ -136,38 +136,6 @@ public class AFKChecker implements Listener {
 
     }
 
-    @EventHandler
-    public void onReload(ReloadEvent e) {
-        CustomData afkData = e.getData(2);
-        List<Boolean> b = afkData.getB();
-        List<List<String>> lS = afkData.getlS();
-
-        exclude = lS.get(0);
-        broadcastAFK = b.get(0);
-        broadcastTime = b.get(1);
-        displayPersonalTime = b.get(2);
-        AFKeffects = b.get(3);
-        effects_invincible = b.get(4);
-        effects_invincible2 = b.get(5);
-        effects_invincibleCustom = b.get(6);
-        effects_invisible = b.get(7);
-        effects_noCollision = b.get(8);
-        effects_grayNameTag = b.get(9);
-        effects_AfkPrefix = b.get(10);
-        AFKprefix = afkData.getS(0);
-        damageTypes = lS.get(1);
-
-        for (Map.Entry<UUID, Long> entry : afkPlayers.entrySet()) {
-
-            long timeElapsed = System.currentTimeMillis() - entry.getValue();
-
-            if (!(timeElapsed > seconds * 1000L)) {
-                afkPlayers.remove(entry.getKey());
-            }
-
-        }
-    }
-
     private void new_afk_player(UUID uuid, long start_time) {
         if (!afkPlayers.containsKey(uuid)) {afkPlayers.put(uuid, start_time);}
     }
@@ -272,6 +240,39 @@ public class AFKChecker implements Listener {
         }
 
 
+    }
+
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+        CustomData afkData = e.getData(2);
+        List<Boolean> b = afkData.getB();
+        List<List<String>> lS = afkData.getlS();
+        exclude = lS.get(0);
+        broadcastAFK = b.get(1);
+        broadcastTime = b.get(2);
+        displayPersonalTime = b.get(3);
+        AFKeffects = b.get(4);
+        effects_invincible = b.get(5);
+        effects_invincible2 = b.get(6);
+        effects_invisible = b.get(7);
+        effects_noCollision = b.get(8);
+        effects_grayNameTag = b.get(9);
+        effects_AfkPrefix = b.get(10);
+        enabled = b.get(11);
+        AFKprefix = afkData.getS(0);
+        damageTypes = lS.get(1);
+        seconds = afkData.getI(0);
+
+
+        for (Map.Entry<UUID, Long> entry : afkPlayers.entrySet()) {
+
+            long timeElapsed = System.currentTimeMillis() - entry.getValue();
+
+            if (!(timeElapsed > seconds * 1000L)) {
+                afkPlayers.remove(entry.getKey());
+            }
+
+        }
     }
 
 }

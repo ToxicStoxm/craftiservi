@@ -1,8 +1,10 @@
 package com.x_tornado10.events.listeners.grapling_hook;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
+import com.x_tornado10.utils.CustomData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -114,8 +116,12 @@ public class GraplingHookListener implements Listener {
         }
     }
 
-    public void updateValues(double Y_velocity) {
-        this.Y_velocity = Y_velocity;
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+        CustomData GhData = e.getData(4);
+
+        enabled = GhData.getB(0);
+        Y_velocity = GhData.getD(0);
     }
 
 }

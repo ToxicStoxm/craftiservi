@@ -24,6 +24,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,6 @@ public class ConfigManager {
         return new ArrayList<>(config.getStringList(paths.getBlockedStrings()));
 
     }
-
     public double getVelocity_multiplier() {
         return config.getDouble(paths.getVelocity_multiplier());
     }
@@ -58,7 +58,6 @@ public class ConfigManager {
     public double getY_velocity_g() {
         return config.getDouble(paths.getY_velocity_g());
     }
-
     public boolean getDisplay_debug() {return config.getBoolean(paths.getDisplay_debug());}
     public boolean getShort_prefix() {return config.getBoolean(paths.getShort_prefix());}
     public boolean getDisable_logger() {return !config.getBoolean(paths.getDisable_logger());}
@@ -114,11 +113,6 @@ public class ConfigManager {
     public boolean getAFKChecker_effects_grayNameTag() {return config.getBoolean(paths.getAfk_checker_effects_grayNameTag());}
     public boolean getAFKChecker_effects_AfkPrefix() {return config.getBoolean(paths.getAfk_checker_effects_AfkPrefix());}
     public String getAFKChecker_effects_AfkPrefix_prefix() {return config.getString(paths.getAfk_checker_effects_AfkPrefix_prefix());}
-    public void updateConfig() {
-
-        config.options().copyDefaults(true);
-
-    }
 
     public boolean reloadConfig(boolean force) {
 
@@ -136,17 +130,6 @@ public class ConfigManager {
 
             p.reload(constructWrapper());
 
-            p.getMsgFilter().setBlockedStrings(getBlockedStrings());
-            p.getMsgFilter().registerFilter();
-            MsgFilter.enabled = getChatFilterEnabled();
-            p.getJumpPads().updateValues(getY_velocity(), getVelocity_multiplier());
-            JumpPads.enabled = getJump_pads_enabled();
-            p.getGraplingHookListener().updateValues(getY_velocity_g());
-            GraplingHookListener.enabled = getGrappling_hook_enabled();
-            p.getPlayerMessages().upDateValues(p.getColorprefix());
-            AFKChecker.enabled = getAfkChecker_enabled();
-            AFKListener.enabled = getAfkChecker_enabled();
-            AFKListener.allowChat = getAfkChecker_allow_afk_chat();
             if (!p.getAfkChecker().startCheck()) {if (!p.getAfkChecker().startCheck()) {err = true;}}
             if (!updateCommands()) {if (!updateCommands()){err = true;}}
 
@@ -166,6 +149,10 @@ public class ConfigManager {
         customDataList.add(constructLoggerData());
         customDataList.add(constructPlmsgData());
         customDataList.add(constructAfkCData());
+        customDataList.add(constructJpData());
+        customDataList.add(constructGhData());
+        customDataList.add(constructCFilterData());
+        customDataList.add(constructAFKLData());
 
         return new CustomDataWrapper(customDataList);
     }
@@ -187,14 +174,6 @@ public class ConfigManager {
 
      */
 
-    private CustomData constructPlmsgData() {
-        List<String> s = new ArrayList<>();
-
-        s.add(p.getColorprefix());
-
-        return new CustomData(s, null, null, null, null);
-    }
-
     private CustomData constructLoggerData() {
         List<String> s = new ArrayList<>();
         List<Boolean> b = new ArrayList<>();
@@ -205,13 +184,18 @@ public class ConfigManager {
 
         return new CustomData(s, b, null, null, null);
     }
+    private CustomData constructPlmsgData() {
+        List<String> s = new ArrayList<>();
 
+        s.add(p.getColorprefix());
+
+        return new CustomData(s, null, null, null, null);
+    }
     private CustomData constructAfkCData() {
         List<String> s = new ArrayList<>();
         List<Boolean> b = new ArrayList<>();
-        List<Integer> i = new ArrayList<>();
-        List<Double> d = new ArrayList<>();
         List<List<String>> lS = new ArrayList<>();
+        List<Integer> i = new ArrayList<>();
 
         lS.add(getAfkChecker_exclude());
         b.add(getAFKChecker_broadcastAFK());
@@ -225,10 +209,48 @@ public class ConfigManager {
         b.add(getAFKChecker_effects_noCollision());
         b.add(getAFKChecker_effects_grayNameTag());
         b.add(getAFKChecker_effects_AfkPrefix());
+        b.add(getAfkChecker_enabled());
         s.add(getAFKChecker_effects_AfkPrefix_prefix());
         lS.add(getAFKChecker_effects_DTypes());
+        i.add(getAfkChecker_afk_time());
 
-        return new CustomData(s, b, i, d, lS);
+        return new CustomData(s, b, i, null, lS);
+    }
+    private CustomData constructJpData() {
+        List<Double> d = new ArrayList<>();
+        List<Boolean> b = new ArrayList<>();
+
+        b.add(getJump_pads_enabled());
+        d.add(getY_velocity());
+        d.add(getVelocity_multiplier());
+
+        return new CustomData(null, b, null, d, null);
+    }
+    private CustomData constructGhData() {
+        List<Boolean> b = new ArrayList<>();
+        List<Double> d = new ArrayList<>();
+
+        b.add(getGrappling_hook_enabled());
+        d.add(getY_velocity_g());
+
+        return new CustomData(null, b, null, d, null);
+    }
+    private CustomData constructCFilterData() {
+        List<Boolean> b = new ArrayList<>();
+        List<List<String>> lS = new ArrayList<>();
+
+        b.add(getChatFilterEnabled());
+        lS.add(getBlockedStrings());
+
+        return new CustomData(null, b, null, null, lS);
+    }
+    private CustomData constructAFKLData() {
+        List<Boolean> b = new ArrayList<>();
+
+        b.add(getAfkChecker_enabled());
+        b.add(getAfkChecker_allow_afk_chat());
+
+        return new CustomData(null, b, null, null, null);
     }
 
     public boolean resetConfig() {
@@ -276,7 +298,6 @@ public class ConfigManager {
     public boolean backupConfig() {
 
         FileConfiguration backup_config = new YamlConfiguration();
-
         try {
             backup_config.load(paths.getConfig());
             backup_config.save(paths.getBackup_config());
@@ -285,6 +306,26 @@ public class ConfigManager {
             return false;
         }
 
+    }
+
+    public boolean BackupConfigExists() {
+        File file = new File(paths.getBackup_config());
+        return file.exists();
+    }
+
+    public boolean restoreConfig() {
+        FileConfiguration backup_config = new YamlConfiguration();
+        FileConfiguration config = new YamlConfiguration();
+        try {
+            backup_config.load(paths.getBackup_config());
+            config.load(paths.getConfig());
+            backup_config.save(paths.getConfig());
+            config.save(paths.getBackup_config());
+            reloadConfig(true);
+            return true;
+        } catch (IOException | InvalidConfigurationException e) {
+            return false;
+        }
     }
 
 }

@@ -158,14 +158,24 @@ public final class craftiservi extends JavaPlugin {
 
         saveData();
 
-        HandlerList handlerList = ReloadEvent.getHandlerList();
-        handlerList.unregister(logger);
-        handlerList.unregister(plmsg);
-        handlerList.unregister(afkChecker);
+        unregisterHandlers();
 
         logger.info("Everything was saved successfully!");
         logger.info("Successfully disabled!");
 
+    }
+
+    private void unregisterHandlers() {
+        HandlerList handlerList = ReloadEvent.getHandlerList();
+        handlerList.unregister(logger);
+        handlerList.unregister(plmsg);
+        handlerList.unregister(afkChecker);
+        handlerList.unregister(jumpPads);
+        handlerList.unregister(inventoryListener);
+        handlerList.unregister(inventoryOpenListener);
+        handlerList.unregister(graplingHookListener);
+        handlerList.unregister(msgFilter);
+        handlerList.unregister(afkListener);
     }
 
     private void setup() {
@@ -189,10 +199,9 @@ public final class craftiservi extends JavaPlugin {
         pm = Bukkit.getPluginManager();
         blockedStrings = new ArrayList<>();
         toFromBase64 = new ToFromBase64();
-        msgFilter = new MsgFilter(configManager.getBlockedStrings());
+        msgFilter = new MsgFilter();
         backup_config = new YamlConfiguration();
 
-        configManager.updateConfig();
         configManager.setVersion(getDescription().getVersion());
         Logger.setDebug(configManager.getDisplay_debug());
         Logger.setEnabled(configManager.getDisable_logger());
@@ -234,6 +243,7 @@ public final class craftiservi extends JavaPlugin {
         pm.registerEvents(logger, this);
         pm.registerEvents(plmsg, this);
         pm.registerEvents(afkChecker, this);
+        pm.registerEvents(msgFilter, this);
         logger.debug("Listeners..§adone");
         logger.debug("");
 

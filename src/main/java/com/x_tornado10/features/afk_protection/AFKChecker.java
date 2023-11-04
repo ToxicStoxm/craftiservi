@@ -1,19 +1,23 @@
 package com.x_tornado10.features.afk_protection;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.features.invis_players.InvisPlayers;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
+import com.x_tornado10.utils.CustomData;
 import com.x_tornado10.utils.ObjectCompare;
 import com.x_tornado10.utils.TextFormatting;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
-public class AFKChecker {
+public class AFKChecker implements Listener {
 
     private craftiservi plugin = craftiservi.getInstance();
     public static boolean enabled;
@@ -132,38 +136,26 @@ public class AFKChecker {
 
     }
 
-    public void updateValues(int seconds,
-                             List<String> exclude,
-                             boolean broadcastAFK,
-                             boolean broadcastTime,
-                             boolean displayPersonalTime,
-                             boolean afkEffects,
-                             boolean invincible,
-                             boolean invincible2,
-                             boolean invincibleCustom,
-                             boolean invisible,
-                             boolean noCollision,
-                             boolean grayNameTag,
-                             boolean afkPrefix,
-                             String afkPrefix_prefix,
-                             List<String> damageTypes)
-    {
-        this.seconds = seconds;
-        AFKChecker.broadcastAFK = broadcastAFK;
-        AFKChecker.broadcastTime = broadcastTime;
-        AFKChecker.displayPersonalTime = displayPersonalTime;
-        AFKChecker.exclude = exclude;
-        AFKChecker.AFKeffects = afkEffects;
-        AFKChecker.effects_invincible = invincible;
-        AFKChecker.effects_invincible2 = invincible2;
-        AFKChecker.effects_invincibleCustom = invincibleCustom;
-        AFKChecker.effects_invisible = invisible;
-        AFKChecker.effects_noCollision = noCollision;
-        AFKChecker.effects_grayNameTag = grayNameTag;
-        AFKChecker.effects_AfkPrefix = afkPrefix;
-        AFKChecker.AFKprefix = afkPrefix_prefix;
-        AFKChecker.damageTypes = damageTypes;
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+        CustomData afkData = e.getData(2);
+        List<Boolean> b = afkData.getB();
+        List<List<String>> lS = afkData.getlS();
 
+        exclude = lS.get(0);
+        broadcastAFK = b.get(0);
+        broadcastTime = b.get(1);
+        displayPersonalTime = b.get(2);
+        AFKeffects = b.get(3);
+        effects_invincible = b.get(4);
+        effects_invincible2 = b.get(5);
+        effects_invincibleCustom = b.get(6);
+        effects_invisible = b.get(7);
+        effects_noCollision = b.get(8);
+        effects_grayNameTag = b.get(9);
+        effects_AfkPrefix = b.get(10);
+        AFKprefix = afkData.getS(0);
+        damageTypes = lS.get(1);
 
         for (Map.Entry<UUID, Long> entry : afkPlayers.entrySet()) {
 
@@ -175,7 +167,6 @@ public class AFKChecker {
 
         }
     }
-
 
     private void new_afk_player(UUID uuid, long start_time) {
         if (!afkPlayers.containsKey(uuid)) {afkPlayers.put(uuid, start_time);}

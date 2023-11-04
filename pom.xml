@@ -37,7 +37,7 @@
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>com.x_tornado10.utils</shadedPattern>
+                            <shadedPattern>com.x_tornado10.shaded</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -45,7 +45,7 @@
                     <execution>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>E:\Minecraft-Test-Servers\PVP-Server\plugins\${project.artifactId}-Bukkit-${project.version}-rework.jar</outputFile>
+                            <outputFile>E:\Minecraft-Test-Servers\1.20 test-server\plugins\${project.artifactId}-Bukkit-${project.version}-rework.jar</outputFile>
                         </configuration>
                         <phase>package</phase>
                         <goals>

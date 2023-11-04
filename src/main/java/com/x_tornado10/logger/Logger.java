@@ -1,38 +1,35 @@
 package com.x_tornado10.logger;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.events.custom.ReloadEvent;
+import com.x_tornado10.utils.CustomData;
 import com.x_tornado10.utils.TextFormatting;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginLogger;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-public class Logger {
+public class Logger implements Listener {
 
-    private String prefix;
-    private String dc_prefix;
+    private static String prefix;
     private craftiservi plugin;
     private ConsoleCommandSender commandSender;
-    private PluginLogger logger;
     private TextFormatting textFormatting;
-    private static boolean debug;
-    private static boolean enabled;
+    private static boolean debug = false;
+    private static boolean enabled = true;
 
-    public Logger(String prefix, String dc_prefix, boolean debug, boolean enabled) {
+    public Logger() {
 
-        this.prefix = prefix;
-        this.dc_prefix = dc_prefix;
-        setDebug(debug);
-        setEnabled(enabled);
         plugin = craftiservi.getInstance();
-        logger = new PluginLogger(plugin);
         commandSender = Bukkit.getConsoleSender();
         textFormatting = plugin.getTxtformatting();
+        prefix = plugin.getPrefix();
 
     }
 
@@ -68,37 +65,6 @@ public class Logger {
 
     }
 
-    public void dc_info(String message) {
-
-        if (enabled) {
-            //logger.info(prefix + message);
-            commandSender.sendMessage(dc_prefix + message);
-        }
-
-    }
-
-    public void dc_warning(String message) {
-
-        if (enabled) {
-
-            //logger.warning(prefix + "§6" + message + "§r");
-            commandSender.sendMessage(dc_prefix + "§6" + message + "§r");
-
-        }
-
-    }
-
-    public void dc_severe(String message) {
-
-        if (enabled) {
-
-            //logger.severe(prefix + "§4" + message + "§r");
-            commandSender.sendMessage(dc_prefix + "§4" + message + "§r");
-
-        }
-
-    }
-
     public void broadcast(String message, boolean color) {
 
         info(color ? message : textFormatting.stripColorAndFormattingCodes(message));
@@ -128,25 +94,21 @@ public class Logger {
         }
 
     }
-    public void nodebug(String message) {
 
-        if (!debug && enabled) {
-
-            info(message);
-
-        }
-
-    }
     public static void setDebug(boolean debug) {
         Logger.debug = debug;
     }
+
     public static void setEnabled(boolean enabled) {
         Logger.enabled = enabled;
     }
-    public void upDateValues(String prefix) {
 
-        this.prefix = prefix;
-
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+        CustomData loggerData = e.getData(0);
+        prefix = loggerData.getS(0);
+        setEnabled(loggerData.getB(0));
+        setDebug(loggerData.getB(1));
     }
 
 }

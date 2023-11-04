@@ -14,9 +14,7 @@ public class Paths {
 
 
     //File Paths
-    private final String data = plpath + "/data.yml";
     private final String playerlist = plpath + "/playerlist.yml";
-    private final InputStream dataf = plugin.getResource("data.yml");
     private final String xpsaveareas = plpath + "/xp_save_areas.yml";
     private final String xpsaveareasbackup = plpath + "/backups/xp_save_areas_backup.yml";
     private final String playersinsavearea = plpath + "/players_in_save_area.yml";
@@ -74,14 +72,8 @@ public class Paths {
     public String getPlpath() {
         return plpath;
     }
-    public String getData() {
-        return data;
-    }
     public String getPlayerlist() {
         return playerlist;
-    }
-    public InputStream getDataf() {
-        return dataf;
     }
     public String getYmlInstalledOn() {
         return ymlInstalledOn;

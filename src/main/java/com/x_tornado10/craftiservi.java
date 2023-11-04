@@ -11,6 +11,7 @@ import com.x_tornado10.commands.inv_save_point.InventorySavePointCommandTabCompl
 import com.x_tornado10.commands.open_gui_command.OpenGUICommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommandTabCompletion;
+import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.events.listeners.JoinListener;
 import com.x_tornado10.events.listeners.PlayerMoveListener;
 import com.x_tornado10.events.listeners.afkprot.AFKListener;
@@ -23,20 +24,19 @@ import com.x_tornado10.features.invis_players.InvisPlayers;
 import com.x_tornado10.utils.*;
 import com.x_tornado10.managers.FileManager;
 import com.x_tornado10.managers.ConfigManager;
-import com.x_tornado10.managers.DataManager;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.C;
 
 import java.io.*;
 import java.util.*;
@@ -54,20 +54,14 @@ public final class craftiservi extends JavaPlugin {
     private ConfigManager configManager;
     private HashMap<UUID, String> playerlist;
     private PluginManager pm;
-    private DataManager dataManager;
     private FileManager fm;
     private ToFromBase64 toFromBase64;
     private TextFormatting txtformatting;
     private ObjectCompare HMC;
     private static HashMap<UUID, Long> afkList;
     private static HashMap<UUID, Long> afkPlayers;
-    private Boolean firstrun = false;
-
-    private int timesstartedreloaded;
-
     private HashMap<String, List<Location>> xpsaveareas;
     private Paths paths;
-    private int registeredPlayers;
     private HashMap<UUID, List<Float>> playersinsavearea;
 
     private JoinListener joinListener;
@@ -80,7 +74,7 @@ public final class craftiservi extends JavaPlugin {
 
     private HashMap<UUID, HashMap<String, Inventory>> inv_saves;
     private HashMap<Integer, Inventory> invs_review = new HashMap<>();
-    public static Map<UUID, Long> FLYING_TIMEOUT = new HashMap<UUID, Long>();
+    public static Map<UUID, Long> FLYING_TIMEOUT = new HashMap<>();
 
     private List<String> blockedStrings;
     private MsgFilter msgFilter;
@@ -88,6 +82,7 @@ public final class craftiservi extends JavaPlugin {
     private FileConfiguration backup_config;
     private AFKChecker afkChecker;
     private InvisPlayers invisPlayers;
+    private java.util.logging.Logger setupLogger;
 
     public static craftiservi getInstance() {
         return instance;
@@ -98,27 +93,92 @@ public final class craftiservi extends JavaPlugin {
 
         instance = this;
         start = System.currentTimeMillis();
+        setupLogger = getLogger();
         saveDefaultConfig();
         File configFile = new File(getDataFolder(), "config.yml");
 
         try {
             ConfigUpdater.update(this, "config.yml", configFile, new ArrayList<>());
         } catch (IOException e) {
-            e.printStackTrace();
+            setupLogger.severe("Error while trying to update config.yml!");
+            setupLogger.severe("If this error persists after restarting the server please file a bug report!");
         }
 
         reloadConfig();
 
+        setup();
+
+    }
+
+
+    @Override
+    public void onEnable() {
+        // Plugin startup logic
+        logger.info("Current version: " + getDescription().getName().toLowerCase() + "-" + getDescription().getVersion() + " by " + getDescription().getAuthors().get(0));
+        logger.info("Checking for updates...");
+
+        new UpdateChecker(this, 108546).getVersion(version -> {
+            if (isVersionHigher(version, getDescription().getVersion())) {
+                logger.info("There is a new version available on: " + getDescription().getWebsite());
+            } else {
+                logger.info("No update was found! You are running the latest version!");
+            }
+            displayVersionDifference(getDescription().getVersion(), version, logger);
+        });
+
+        Metrics metrics = new Metrics(this, 19084);
+        logger.info("Assigning metrics...");
+        logger.info("Check out 'plugins/bStats/config.yml' if you want to opt out!");
+
+        logger.debug("");
+        logger.debug("§8------------Debug------------");
+        logger.debug("");
+        logger.debug("Registering classes...");
+
+        finalizeSetup();
+
+        finish = System.currentTimeMillis();
+        if (finish-start>20000) {
+
+            logger.info("Successfully enabled! (took §c" + (finish - start) + "ms§r)");
+
+        } else {
+            logger.info("Successfully enabled! (took §a" + (finish - start) + "ms§r)");
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+        logger.info("Initializing shutdown...");
+        logger.debug("");
+        logger.debug("§8------------Debug------------");
+        logger.debug("");
+        logger.info("Saving data...");
+
+        saveData();
+
+        HandlerList handlerList = ReloadEvent.getHandlerList();
+        handlerList.unregister(logger);
+        handlerList.unregister(plmsg);
+        handlerList.unregister(afkChecker);
+
+        logger.info("Everything was saved successfully!");
+        logger.info("Successfully disabled!");
+
+    }
+
+    private void setup() {
         config = getConfig();
         paths = new Paths();
-        fm = new FileManager(getInstance(), paths);
+        fm = new FileManager(getInstance(), paths, setupLogger);
         configManager = new ConfigManager(config, paths, fm);
         txtformatting = new TextFormatting();
         HMC = new ObjectCompare();
 
         setPrefix(configManager, txtformatting);
 
-        logger = new Logger(prefix, dc_prefix, true, true);
+        logger = new Logger();
         plmsg = new PlayerMessages(colorprefix);
         playerlist = new HashMap<>();
         xpsaveareas = new HashMap<>();
@@ -140,19 +200,11 @@ public final class craftiservi extends JavaPlugin {
         saveConfig();
         reloadConfig();
 
-        File data = new File(paths.getData());
-
-        if (!data.exists()) {firstrun = true;}
-
-        timesstartedreloaded = timesstartedreloaded + 1;
-
         if (fm.createFiles()) {
 
             logger.debug("§aSuccessfully created all files with 0 Errors/Exceptions!");
 
         }
-
-        dataManager = new DataManager(paths.getDataf(), data);
 
         logger.info("Loading data from files...");
         playerlist = fm.getPlayerListFromTextFile();
@@ -160,74 +212,8 @@ public final class craftiservi extends JavaPlugin {
         playersinsavearea = fm.getPlayersInSaveAreaFromTextFile();
         inv_saves = fm.getPlayerInvSavePointsFromTextFile();
         afkPlayers = fm.getAfkPlayersFromTextFile();
-
-        if (firstrun) {
-
-            try {
-
-                dataManager.configure();
-
-            } catch (IOException e) {
-
-                logger.severe("Something went wrong during file setup! Please restart the server to avoid any issues!");
-
-            }
-        }
-
     }
-
-    @Override
-    public void onEnable() {
-        // Plugin startup logic
-        int pluginId = 19084; // <-- Replace with the id of your plugin!
-        Metrics metrics = new Metrics(this, pluginId);
-
-        try {
-
-            dataManager.setData();
-
-        } catch (IOException e) {
-
-            logger.severe("Something went wrong while setting the values in 'data.yml'! Please restart the server to avoid any further issues!");
-            getPluginLoader().disablePlugin(this);
-
-        } catch (InvalidConfigurationException ex) {
-
-            try {
-
-                dataManager.configure();
-                dataManager.setData();
-                logger.severe("§4Something went wrong while loading/setting values for 'data.yml'! All values were reset automatically!§r");
-                logger.severe("§4All Values were reset successfully with 0 Errors remaining§r");
-
-            } catch (Exception e) {
-
-                logger.severe("§4Something went wrong while setting the values in 'data.yml'! Please restart the server to avoid any further issues!§r");
-                logger.severe("§4Please reinstall the plugin if this keeps happening!§r");
-                getPluginLoader().disablePlugin(this);
-
-            }
-        }
-
-        logger.info("Current version: " + getDescription().getName().toLowerCase() + "-" + getDescription().getVersion() + " by " + getDescription().getAuthors().get(0));
-        logger.info("Checking for updates...");
-        new UpdateChecker(this, 108546).getVersion(version -> {
-
-            if (getDescription().getVersion().equals(version)) {
-
-                logger.info("No update was found! You are running the latest version!");
-
-            } else {
-
-                logger.info("There is a new version available on: " + getDescription().getWebsite());
-
-            }
-        });
-
-        logger.debug("");
-        logger.debug("§8------------Debug------------");
-        logger.debug("");
-        logger.debug("Registering classes...");
+    private void finalizeSetup() {
         joinListener = new JoinListener();
         playerMoveListener = new PlayerMoveListener();
         inventoryOpenListener = new InventoryOpenListener();
@@ -245,6 +231,9 @@ public final class craftiservi extends JavaPlugin {
         pm.registerEvents(graplingHookListener, this);
         pm.registerEvents(jumpPads, this);
         pm.registerEvents(afkListener, this);
+        pm.registerEvents(logger, this);
+        pm.registerEvents(plmsg, this);
+        pm.registerEvents(afkChecker, this);
         logger.debug("Listeners..§adone");
         logger.debug("");
 
@@ -254,7 +243,7 @@ public final class craftiservi extends JavaPlugin {
         if (configManager.getCommands_firstjoin_enabled()) {
             logger.debug("firstjoin...§adone");
         } else {
-            logger.debug("firstjoin...§disabled");
+            logger.debug("firstjoin...§cdisabled");
         }
 
         Bukkit.getPluginCommand("xparea").setExecutor(new XpSaveZoneCommand());
@@ -263,7 +252,7 @@ public final class craftiservi extends JavaPlugin {
             logger.debug("xparea...§adone");
         } else {
 
-            logger.debug("xparea...§disabled");
+            logger.debug("xparea...§cdisabled");
 
         }
 
@@ -278,8 +267,8 @@ public final class craftiservi extends JavaPlugin {
 
         } else {
 
-            logger.debug("invsave...§disabled");
-            logger.debug("opengui...§disabled");
+            logger.debug("invsave...§cdisabled");
+            logger.debug("opengui...§cdisabled");
 
         }
 
@@ -313,25 +302,9 @@ public final class craftiservi extends JavaPlugin {
         }
 
 
-        finish = System.currentTimeMillis();
-        if (finish-start>20000) {
-
-            logger.info("Successfully enabled! (took §c" + (finish - start) + "ms§r)");
-
-        } else {
-            logger.info("Successfully enabled! (took §a" + (finish - start) + "ms§r)");
-        }
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-        logger.info("Initializing shutdown...");
-        logger.nodebug("Saving data...");
-        logger.debug("");
-        logger.debug("§8------------Debug------------");
-        logger.debug("");
-        logger.debug("Saving data to files...");
+    private void saveData() {
         if (!playerlist.isEmpty() && new File(paths.getPlayerlist()).exists()) {
 
             fm.writePlayerlistToTextFile(playerlist);
@@ -372,18 +345,11 @@ public final class craftiservi extends JavaPlugin {
 
         if (configManager.backupConfig()) {
 
-            logger.debug("Successfully created backup of config_old.yml");
+            logger.debug("Successfully created backup of config.yml");
 
         }
-
-        AFKChecker.enabled = false;
-        JumpPads.enabled = false;
-        GraplingHookListener.enabled = false;
-
-        logger.info("Everything was saved successfully!");
-        logger.info("Successfully disabled!");
-
     }
+
     public HashMap<UUID, String> getPlayerlist() {
 
         return playerlist;
@@ -396,12 +362,6 @@ public final class craftiservi extends JavaPlugin {
 
         return plmsg;
 
-    }
-    public int getTimesstartedreloaded() {
-        return timesstartedreloaded;
-    }
-    public int getRegisteredPlayers() {
-        return registeredPlayers;
     }
     public HashMap<String, List<Location>> getXpsaveareas() {
         return xpsaveareas;
@@ -460,13 +420,6 @@ public final class craftiservi extends JavaPlugin {
     public String getPrefix() {
         return prefix;
     }
-    public void earlyLog(String message) {
-
-        ConsoleCommandSender commandSender = Bukkit.getConsoleSender();
-
-        commandSender.sendMessage("[" + getDescription().getPrefix() + "] " + message);
-
-    }
     public HashMap<UUID, Long> getAfkList() {
         return afkList;
     }
@@ -482,5 +435,55 @@ public final class craftiservi extends JavaPlugin {
     }
     public InvisPlayers getInvisPlayers() {
         return invisPlayers;
+    }
+    public static boolean isVersionHigher(String version1, String version2) {
+        String[] parts1 = version1.split("\\.");
+        String[] parts2 = version2.split("\\.");
+
+        for (int i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+            int part1 = (i < parts1.length) ? Integer.parseInt(parts1[i]) : 0;
+            int part2 = (i < parts2.length) ? Integer.parseInt(parts2[i]) : 0;
+
+            if (part1 > part2) {
+                return true;
+            } else if (part1 < part2) {
+                return false;
+            }
+        }
+        return false; // Both versions are equal
+    }
+    public static void displayVersionDifference(String currentVersion, String newestVersion, Logger logger) {
+        String[] currentParts = currentVersion.split("\\.");
+        String[] newestParts = newestVersion.split("\\.");
+
+        int currentMajor = Integer.parseInt(currentParts[0]);
+        int newestMajor = Integer.parseInt(newestParts[0]);
+        int currentMinor = Integer.parseInt(currentParts[1]);
+        int newestMinor = Integer.parseInt(newestParts[1]);
+
+        int majorVersionsDifference = newestMajor - currentMajor;
+        int minorVersionsDifference = newestMinor - currentMinor;
+
+        if (majorVersionsDifference == 0 && minorVersionsDifference == 0) {return;}
+
+        StringBuilder message = new StringBuilder("You are ");
+
+        if (majorVersionsDifference > 0) {
+            message.append(majorVersionsDifference).append(" major version").append(majorVersionsDifference > 1 ? "s" : "").append(" ");
+        } else if (majorVersionsDifference < 0) {
+            message.append(Math.abs(majorVersionsDifference)).append(" major version").append(majorVersionsDifference < -1 ? "s" : "").append(" ahead ");
+        }
+
+        if (minorVersionsDifference != 0) {
+            message.append("and ").append(Math.abs(minorVersionsDifference)).append(" minor version").append(minorVersionsDifference != 1 ? "s" : "").append(minorVersionsDifference > 0 ? " behind" : " ahead");
+        }
+
+        message.append("!");
+
+        logger.info(message.toString());
+    }
+    public void reload(CustomDataWrapper customDataWrapper) {
+        ReloadEvent reload = new ReloadEvent(customDataWrapper);
+        Bukkit.getServer().getPluginManager().callEvent(reload);
     }
 }

@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 import static com.x_tornado10.utils.ToFromBase64.fromBase64;
 import static com.x_tornado10.utils.ToFromBase64.toBase64;
@@ -20,9 +21,8 @@ public class FileManager {
 
     craftiservi plugin;
     Paths paths;
-
+    Logger setupLogger;
     private final File playerlist;
-    private final File data;
     private final File xpsaveareas;
     private final File xpsaveareasbackup;
     private final File backupdir;
@@ -37,13 +37,13 @@ public class FileManager {
      * @implNote Creates specified files. Should fail if the specified file already exists.
      * @param paths
      */
-    public FileManager(craftiservi plugin, Paths paths) {
+    public FileManager(craftiservi plugin, Paths paths, Logger setupLogger) {
 
         this.plugin = plugin;
         this.paths = paths;
+        this.setupLogger = setupLogger;
 
         playerlist = new File(paths.getPlayerlist());
-        data = new File(paths.getData());
         xpsaveareas = new File(paths.getXpsaveareas());
         xpsaveareasbackup = new File(paths.getXpsaveareasbackup());
         backupdir = new File(paths.getBackupdir());
@@ -62,7 +62,6 @@ public class FileManager {
         ArrayList<File> files = new ArrayList<>();
 
         files.add(playerlist);
-        files.add(data);
         files.add(xpsaveareas);
         files.add(xpsaveareasbackup);
         files.add(playersinsavearea);
@@ -74,7 +73,7 @@ public class FileManager {
 
         if (backupdir.mkdirs()) {
 
-            plugin.earlyLog(backupdir.getName() + " was successfully created!");
+            setupLogger.info(backupdir.getName() + " was successfully created!");
 
         }
 
@@ -85,11 +84,11 @@ public class FileManager {
                 try {
 
                     if(file.createNewFile()) {
-                        plugin.earlyLog(file.getName() + " was successfully created!");
+                        setupLogger.info(file.getName() + " was successfully created!");
                     }
                 } catch (IOException e) {
 
-                    plugin.earlyLog("§cSomething went wrong while trying to create files! Please restart the server!§r");
+                    setupLogger.info("§cSomething went wrong while trying to create files! Please restart the server!§r");
                     return false;
                 }
             }
@@ -107,7 +106,6 @@ public class FileManager {
 
         File playerlist = new File(paths.getPlayerlist());
         HashMap<UUID, String> mapFileContents = new HashMap<>();
-        int registeredPlayers = plugin.getRegisteredPlayers();
 
         BufferedReader br = null;
         try {
@@ -123,10 +121,9 @@ public class FileManager {
                 String date = parts[1].trim();
                 UUID UUID = java.util.UUID.fromString(parts[0].trim());
 
-                if (!date.equals("") && !UUID.toString().equals("")) {
+                if (!date.isEmpty() && !UUID.toString().isEmpty()) {
 
                     mapFileContents.put(UUID, date);
-                    registeredPlayers ++;
 
                 }
 

@@ -15,8 +15,9 @@ import com.x_tornado10.events.listeners.inventory.InventoryListener;
 import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
 import com.x_tornado10.events.listeners.jpads.JumpPads;
 import com.x_tornado10.features.afk_protection.AFKChecker;
+import com.x_tornado10.utils.CustomData;
+import com.x_tornado10.utils.CustomDataWrapper;
 import com.x_tornado10.utils.Paths;
-import com.x_tornado10.logger.Logger;
 import com.x_tornado10.utils.TextFormatting;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -104,14 +105,14 @@ public class ConfigManager {
     public boolean getAFKChecker_broadcastTime() {return  config.getBoolean(paths.getAfk_checker_broadcastTime_enabled());}
     public boolean getAFKChecker_display_personalTime() {return config.getBoolean(paths.getAfk_checker_personal_time_enabled());}
     public boolean getAFKChecker_effects_enabled() {return config.getBoolean(paths.getAfk_checker_afkEffects_enabled());}
-    public boolean getAFKChecker_effects_invincible_enabled() {return config.getBoolean(paths.getAfk_checker_effects_invincible());}
-    public boolean getAFKChecker_effects_invincible2_enabled() {return config.getBoolean(paths.getAfk_checker_effects_invincible_2());}
-    public boolean getAFKChecker_effects_invincibleCustom_enabled() {return config.getBoolean(paths.getAfk_checker_effects_invincible_custom());}
-    public List<String> getAFKChecker_effects_invincibleC_DTypes() {return config.getStringList(paths.getAfk_checker_effects_invincibleC_dTypes());}
-    public boolean getAFKChecker_effects_invisible_enabled() {return config.getBoolean(paths.getAfk_checker_effects_invisible());}
-    public boolean getAFKChecker_effects_noCollision_enabled() {return config.getBoolean(paths.getAfk_checker_effects_noCollision());}
-    public boolean getAFKChecker_effects_grayNameTag_enabled() {return config.getBoolean(paths.getAfk_checker_effects_grayNameTag());}
-    public boolean getAFKChecker_effects_AfkPrefix_enabled() {return config.getBoolean(paths.getAfk_checker_effects_AfkPrefix());}
+    public boolean getAFKChecker_effects_invincible() {return config.getBoolean(paths.getAfk_checker_effects_invincible());}
+    public boolean getAFKChecker_effects_invincible2() {return config.getBoolean(paths.getAfk_checker_effects_invincible_2());}
+    public boolean getAFKChecker_effects_invincibleCustom() {return config.getBoolean(paths.getAfk_checker_effects_invincible_custom());}
+    public List<String> getAFKChecker_effects_DTypes() {return config.getStringList(paths.getAfk_checker_effects_invincibleC_dTypes());}
+    public boolean getAFKChecker_effects_invisible() {return config.getBoolean(paths.getAfk_checker_effects_invisible());}
+    public boolean getAFKChecker_effects_noCollision() {return config.getBoolean(paths.getAfk_checker_effects_noCollision());}
+    public boolean getAFKChecker_effects_grayNameTag() {return config.getBoolean(paths.getAfk_checker_effects_grayNameTag());}
+    public boolean getAFKChecker_effects_AfkPrefix() {return config.getBoolean(paths.getAfk_checker_effects_AfkPrefix());}
     public String getAFKChecker_effects_AfkPrefix_prefix() {return config.getString(paths.getAfk_checker_effects_AfkPrefix_prefix());}
     public void updateConfig() {
 
@@ -132,8 +133,9 @@ public class ConfigManager {
 
             setVersion(p.getDescription().getVersion());
             p.setPrefix(this, new TextFormatting());
-            Logger.setDebug(getDisplay_debug());
-            Logger.setEnabled(getDisable_logger());
+
+            p.reload(constructWrapper());
+
             p.getMsgFilter().setBlockedStrings(getBlockedStrings());
             p.getMsgFilter().registerFilter();
             MsgFilter.enabled = getChatFilterEnabled();
@@ -141,27 +143,10 @@ public class ConfigManager {
             JumpPads.enabled = getJump_pads_enabled();
             p.getGraplingHookListener().updateValues(getY_velocity_g());
             GraplingHookListener.enabled = getGrappling_hook_enabled();
-            p.getCustomLogger().upDateValues(p.getPrefix());
             p.getPlayerMessages().upDateValues(p.getColorprefix());
             AFKChecker.enabled = getAfkChecker_enabled();
             AFKListener.enabled = getAfkChecker_enabled();
             AFKListener.allowChat = getAfkChecker_allow_afk_chat();
-            p.getAfkChecker().updateValues(getAfkChecker_afk_time(),
-                    getAfkChecker_exclude(),
-                    getAFKChecker_broadcastAFK(),
-                    getAFKChecker_broadcastTime(),
-                    getAFKChecker_display_personalTime(),
-                    getAFKChecker_effects_enabled(),
-                    getAFKChecker_effects_invincible_enabled(),
-                    getAFKChecker_effects_invincible2_enabled(),
-                    getAFKChecker_effects_invincibleCustom_enabled(),
-                    getAFKChecker_effects_invisible_enabled(),
-                    getAFKChecker_effects_noCollision_enabled(),
-                    getAFKChecker_effects_grayNameTag_enabled(),
-                    getAFKChecker_effects_AfkPrefix_enabled(),
-                    getAFKChecker_effects_AfkPrefix_prefix(),
-                    getAFKChecker_effects_invincibleC_DTypes()
-                    );
             if (!p.getAfkChecker().startCheck()) {if (!p.getAfkChecker().startCheck()) {err = true;}}
             if (!updateCommands()) {if (!updateCommands()){err = true;}}
 
@@ -173,6 +158,77 @@ public class ConfigManager {
             return false;
         }
 
+    }
+
+    private CustomDataWrapper constructWrapper() {
+        List<CustomData> customDataList = new ArrayList<>();
+
+        customDataList.add(constructLoggerData());
+        customDataList.add(constructPlmsgData());
+        customDataList.add(constructAfkCData());
+
+        return new CustomDataWrapper(customDataList);
+    }
+
+    /*
+    private CustomData construct_____Data() {
+        List<String> s = new ArrayList<>();
+        List<Boolean> b = new ArrayList<>();
+        List<Integer> i = new ArrayList<>();
+        List<Double> d = new ArrayList<>();
+        List<List<String>> lS = new ArrayList<>();
+
+        s.add(p.getPrefix());
+        b.add(getDisable_logger());
+        b.add(getDisplay_debug());
+
+        return new CustomData(s, b, i, d, lS);
+    }
+
+     */
+
+    private CustomData constructPlmsgData() {
+        List<String> s = new ArrayList<>();
+
+        s.add(p.getColorprefix());
+
+        return new CustomData(s, null, null, null, null);
+    }
+
+    private CustomData constructLoggerData() {
+        List<String> s = new ArrayList<>();
+        List<Boolean> b = new ArrayList<>();
+
+        s.add(p.getPrefix());
+        b.add(getDisable_logger());
+        b.add(getDisplay_debug());
+
+        return new CustomData(s, b, null, null, null);
+    }
+
+    private CustomData constructAfkCData() {
+        List<String> s = new ArrayList<>();
+        List<Boolean> b = new ArrayList<>();
+        List<Integer> i = new ArrayList<>();
+        List<Double> d = new ArrayList<>();
+        List<List<String>> lS = new ArrayList<>();
+
+        lS.add(getAfkChecker_exclude());
+        b.add(getAFKChecker_broadcastAFK());
+        b.add(getAFKChecker_broadcastTime());
+        b.add(getAFKChecker_display_personalTime());
+        b.add(getAFKChecker_effects_enabled());
+        b.add(getAFKChecker_effects_invincible());
+        b.add(getAFKChecker_effects_invincible2());
+        b.add(getAFKChecker_effects_invincibleCustom());
+        b.add(getAFKChecker_effects_invisible());
+        b.add(getAFKChecker_effects_noCollision());
+        b.add(getAFKChecker_effects_grayNameTag());
+        b.add(getAFKChecker_effects_AfkPrefix());
+        s.add(getAFKChecker_effects_AfkPrefix_prefix());
+        lS.add(getAFKChecker_effects_DTypes());
+
+        return new CustomData(s, b, i, d, lS);
     }
 
     public boolean resetConfig() {

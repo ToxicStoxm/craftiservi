@@ -1,10 +1,14 @@
 package com.x_tornado10.messages;
 
+import com.x_tornado10.events.custom.ReloadEvent;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PlayerMessages {
+public class PlayerMessages implements Listener {
 
     private String prefix;
 
@@ -63,6 +67,13 @@ public class PlayerMessages {
     public void upDateValues(String prefix) {
 
         this.prefix = prefix;
+
+    }
+
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+
+        prefix = e.getData(1).getS(0);
 
     }
 

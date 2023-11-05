@@ -66,6 +66,21 @@ public class AFKListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+
+        if (!enabled) {return;}
+
+        UUID pid = e.getPlayer().getUniqueId();
+        if (afkPlayers.containsKey(pid)) {
+            checker.removeAFK(pid);
+        }
+        if (playersToCheck.containsKey(pid)) {
+            playersToCheck.put(pid,System.currentTimeMillis());
+        }
+
+    }
+
+    @EventHandler
     public void onReload(ReloadEvent e) {
         CustomData afkData = e.getData(6);
         List<Boolean> b = afkData.getB();

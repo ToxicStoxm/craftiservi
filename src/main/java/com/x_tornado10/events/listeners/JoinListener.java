@@ -30,7 +30,10 @@ public class JoinListener implements Listener {
     private Logger logger;
     private Player player;
     private UUID pid2;
-    private int timesrun = 0;
+
+    public JoinListener() {
+        logger = plugin.getCustomLogger();
+    }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
@@ -41,7 +44,6 @@ public class JoinListener implements Listener {
         pid2 = pid;
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
-        logger = plugin.getCustomLogger();
 
         if (!playerlist.containsKey(pid)) {
 
@@ -58,20 +60,22 @@ public class JoinListener implements Listener {
 
     private void show() {
 
+        final int[] timesrun = {0};
+
         new BukkitRunnable() {
             @Override
             public void run() {
 
-                if (timesrun>=5) {
+                if (timesrun[0] >=5) {
 
                     cancel();
-                    timesrun = 0;
+                    timesrun[0] = 0;
 
                 }
 
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§l§6§k2" + ChatColor.DARK_RED + (ChatColor.BOLD + "Welcome back ") + Bukkit.getPlayer(pid2).getName() + "§l§6§k2"));
 
-                timesrun++;
+                timesrun[0]++;
 
             }
         }.runTaskTimer(craftiservi.getInstance(), 0, 20); //in mc ticks

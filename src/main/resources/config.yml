@@ -73,11 +73,21 @@ Craftiservi:
         velocity-multiplier: 2.0
         #DEFAULT: 1.2
         Y-velocity: 1.2
+        #DEFAULT: 5
+        #Value in seconds
+        cooldown: 5.0
+        #DEFAULT: true
+        prevent-fall-damage: true
       Grappling-hook:
         #DEFAULT: true
         Enabled: true
         #DEFAULT: 1.0
         Y-velocity: 1.0
+        #DEFAULT: 5
+        #Value in seconds
+        cooldown: 5.0
+        #DEFAULT: false
+        prevent-fall-damage: false
 
   #################################################################
 

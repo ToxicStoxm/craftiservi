@@ -24,8 +24,10 @@ public class JumpPads implements Listener {
 
     private double Y_velocity;
     private double velocity_multiplier;
+    private double cooldown_value = 500;
     private final int flyingTimeout = 3;
     public static boolean enabled;
+    private boolean prevent_falldmg;
 
     public JumpPads(double Y_velocity, double velocity_multiplier) {
 
@@ -52,13 +54,15 @@ public class JumpPads implements Listener {
                 p.setVelocity(v);
                 p.playSound(p.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2f, 1F);
 
-                FLYING_TIMEOUT.put(p.getUniqueId(), System.currentTimeMillis() + (flyingTimeout * 1000L));
+                if (prevent_falldmg) {
+                    FLYING_TIMEOUT.put(p.getUniqueId(), System.currentTimeMillis() + (flyingTimeout * 1000L));
+                }
 
             } else {
 
                 long timeElapsed = System.currentTimeMillis() - cooldown.get(pid);
 
-                if (timeElapsed >= 500) {
+                if (timeElapsed >= cooldown_value) {
 
                     cooldown.put(pid, System.currentTimeMillis());
 
@@ -66,7 +70,9 @@ public class JumpPads implements Listener {
                     p.setVelocity(v);
                     p.playSound(p.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2f, 1F);
 
-                    FLYING_TIMEOUT.put(p.getUniqueId(), System.currentTimeMillis() + (flyingTimeout * 1000L));
+                    if (prevent_falldmg) {
+                        FLYING_TIMEOUT.put(p.getUniqueId(), System.currentTimeMillis() + (flyingTimeout * 1000L));
+                    }
 
                 }
 
@@ -78,12 +84,11 @@ public class JumpPads implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageEvent event) {
-        if (!enabled) {return;}
+        if (!enabled || !prevent_falldmg) {return;}
         if (event.getEntity() instanceof Player player) {
             if (FLYING_TIMEOUT.containsKey(player.getUniqueId())) {
                 if (FLYING_TIMEOUT.get(player.getUniqueId()) < System.currentTimeMillis()) return;
                 event.setCancelled(true);
-                player.sendMessage("FallDamage Cancelled!");
             }
         }
     }
@@ -92,9 +97,12 @@ public class JumpPads implements Listener {
     public void onReload(ReloadEvent e) {
         CustomData JpData = e.getData(3);
         List<Double> d = JpData.getD();
-        enabled = JpData.getB(0);
+        List<Boolean> b = JpData.getB();
+        enabled = b.get(0);
+        prevent_falldmg = b.get(1);
         Y_velocity = d.get(0);
         velocity_multiplier = d.get(1);
+        cooldown_value = d.get(2);
 
     }
 

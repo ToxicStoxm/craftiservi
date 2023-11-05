@@ -60,10 +60,10 @@ public final class craftiservi extends JavaPlugin {
     private ObjectCompare HMC;
     private static HashMap<UUID, Long> afkList;
     private static HashMap<UUID, Long> afkPlayers;
+    private static HashMap<UUID, Long> playersToCheck;
     private HashMap<String, List<Location>> xpsaveareas;
     private Paths paths;
     private HashMap<UUID, List<Float>> playersinsavearea;
-
     private JoinListener joinListener;
     private PlayerMoveListener playerMoveListener;
     private InventoryOpenListener inventoryOpenListener;
@@ -71,7 +71,6 @@ public final class craftiservi extends JavaPlugin {
     private GraplingHookListener graplingHookListener;
     private JumpPads jumpPads;
     private AFKListener afkListener;
-
     private HashMap<UUID, HashMap<String, Inventory>> inv_saves;
     private HashMap<Integer, Inventory> invs_review = new HashMap<>();
     public static Map<UUID, Long> FLYING_TIMEOUT = new HashMap<>();
@@ -342,13 +341,15 @@ public final class craftiservi extends JavaPlugin {
 
         }
         logger.debug("PlayersInSaveArea...§adone");
-
+        /*
         if (new File(paths.getAfk_players()).exists()) {
 
             fm.writeAfkPlayersToTextFile(afkPlayers);
 
         }
         logger.debug("AfkPlayers...§adone");
+
+         */
         logger.debug("");
         logger.debug("§8-----------------------------");
         logger.debug("");
@@ -430,9 +431,8 @@ public final class craftiservi extends JavaPlugin {
     public String getPrefix() {
         return prefix;
     }
-    public HashMap<UUID, Long> getAfkList() {
-        return afkList;
-    }
+
+    public HashMap<UUID, Long> getAfkList() {return afkList;}
     public HashMap<UUID, Long> getAfkPlayers() {return afkPlayers;}
     public AFKChecker getAfkChecker() {
         return afkChecker;
@@ -492,6 +492,11 @@ public final class craftiservi extends JavaPlugin {
 
         logger.info(message.toString());
     }
+
+    public HashMap<UUID, Long> getPlayersToCheck() {
+        return playersToCheck;
+    }
+
     public void reload(CustomDataWrapper customDataWrapper) {
         ReloadEvent reload = new ReloadEvent(customDataWrapper);
         Bukkit.getServer().getPluginManager().callEvent(reload);

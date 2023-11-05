@@ -1,6 +1,5 @@
 package com.x_tornado10.managers;
 
-import com.x_tornado10.chat.filters.MsgFilter;
 import com.x_tornado10.commands.first_join_command.FirstJoinedCommand;
 import com.x_tornado10.commands.first_join_command.FirstJoinedCommandTabCompletion;
 import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
@@ -10,10 +9,8 @@ import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommandTabCompletion;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.listeners.afkprot.AFKListener;
-import com.x_tornado10.events.listeners.grapling_hook.GraplingHookListener;
 import com.x_tornado10.events.listeners.inventory.InventoryListener;
 import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
-import com.x_tornado10.events.listeners.jpads.JumpPads;
 import com.x_tornado10.features.afk_protection.AFKChecker;
 import com.x_tornado10.utils.CustomData;
 import com.x_tornado10.utils.CustomDataWrapper;
@@ -113,6 +110,12 @@ public class ConfigManager {
     public boolean getAFKChecker_effects_grayNameTag() {return config.getBoolean(paths.getAfk_checker_effects_grayNameTag());}
     public boolean getAFKChecker_effects_AfkPrefix() {return config.getBoolean(paths.getAfk_checker_effects_AfkPrefix());}
     public String getAFKChecker_effects_AfkPrefix_prefix() {return config.getString(paths.getAfk_checker_effects_AfkPrefix_prefix());}
+    public double getGrappling_hook_cooldown() {return config.getDouble(paths.getGrappling_hook_cooldown()) * 1000;}
+    public boolean getGrappling_hook_prevent_falldmg() {return config.getBoolean(paths.getGrappling_hook_prevent_falldmg());}
+    public double getJPads_cooldown() {return config.getDouble(paths.getJPads_cooldown()) * 1000;}
+    public boolean getJPads_prevent_falldmg() {return config.getBoolean(paths.getJPads_prevent_falldmg());}
+
+
 
     public boolean reloadConfig(boolean force) {
 
@@ -130,7 +133,7 @@ public class ConfigManager {
 
             p.reload(constructWrapper());
 
-            if (!p.getAfkChecker().startCheck()) {if (!p.getAfkChecker().startCheck()) {err = true;}}
+            //if (!p.getAfkChecker().startCheck()) {if (!p.getAfkChecker().startCheck()) {err = true;}}
             if (!updateCommands()) {if (!updateCommands()){err = true;}}
 
             p.saveConfig();
@@ -221,8 +224,10 @@ public class ConfigManager {
         List<Boolean> b = new ArrayList<>();
 
         b.add(getJump_pads_enabled());
+        b.add(getJPads_prevent_falldmg());
         d.add(getY_velocity());
         d.add(getVelocity_multiplier());
+        d.add(getJPads_cooldown());
 
         return new CustomData(null, b, null, d, null);
     }
@@ -231,7 +236,9 @@ public class ConfigManager {
         List<Double> d = new ArrayList<>();
 
         b.add(getGrappling_hook_enabled());
+        b.add(getGrappling_hook_prevent_falldmg());
         d.add(getY_velocity_g());
+        d.add(getGrappling_hook_cooldown());
 
         return new CustomData(null, b, null, d, null);
     }

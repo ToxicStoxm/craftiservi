@@ -2,8 +2,6 @@ package com.x_tornado10.utils;
 
 import com.x_tornado10.craftiservi;
 
-import java.io.InputStream;
-
 public class Paths {
 
     private final craftiservi plugin = craftiservi.getInstance();
@@ -41,6 +39,10 @@ public class Paths {
     private final String chat_filter_enabled = "Craftiservi.Chat.Filter.Enabled";
     private final String jump_pads_enabled = "Craftiservi.Gadgets.Movement.Jump-Pads.Enabled";
     private final String grappling_hook_enabled = "Craftiservi.Gadgets.Movement.Grappling-hook.Enabled";
+    private final String grappling_hook_cooldown = "Craftiservi.Gadgets.Movement.Grappling-hook.cooldown";
+    private final String grappling_hook_prevent_falldmg = "Craftiservi.Gadgets.Movement.Grappling-hook.prevent-fall-damage";
+    private final String jPads_cooldown = "Craftiservi.Gadgets.Movement.Jump-Pads.cooldown";
+    private final String jPads_prevent_falldmg = "Craftiservi.Gadgets.Movement.Jump-Pads.prevent-fall-damage";
     private final String commands_invsave_enabled = "Craftiservi.Commands.InvSave.Enabled";
     private final String commands_xparea_enabled = "Craftiservi.Commands.XpArea.Enabled";
     private final String commands_firstjoin_enabled = "Craftiservi.Commands.FirstJoin.Enabled";
@@ -203,5 +205,17 @@ public class Paths {
     }
     public String getAfk_checker_effects_AfkPrefix_prefix() {
         return afk_checker_effects_AfkPrefix_prefix;
+    }
+    public String getGrappling_hook_cooldown() {
+        return grappling_hook_cooldown;
+    }
+    public String getGrappling_hook_prevent_falldmg() {
+        return grappling_hook_prevent_falldmg;
+    }
+    public String getJPads_cooldown() {
+        return jPads_cooldown;
+    }
+    public String getJPads_prevent_falldmg() {
+        return jPads_prevent_falldmg;
     }
 }

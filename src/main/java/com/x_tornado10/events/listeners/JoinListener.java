@@ -60,13 +60,15 @@ public class JoinListener implements Listener {
 
     private void show() {
 
+        if (player.isDead()) {return;}
+
         final int[] timesrun = {0};
 
         new BukkitRunnable() {
             @Override
             public void run() {
 
-                if (timesrun[0] >=5) {
+                if (timesrun[0] >= 5) {
 
                     cancel();
                     timesrun[0] = 0;
@@ -74,6 +76,7 @@ public class JoinListener implements Listener {
                 }
 
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§l§6§k2" + ChatColor.DARK_RED + (ChatColor.BOLD + "Welcome back ") + Bukkit.getPlayer(pid2).getName() + "§l§6§k2"));
+
 
                 timesrun[0]++;
 

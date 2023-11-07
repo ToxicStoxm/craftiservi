@@ -1,6 +1,3 @@
-Logger (efficient and sustainable Logger / Logging-System | probably using console.commandSender because of colours)
-Config-Manager (reload/load/reset - config)
-Startup/Setup (Startup-Handling)
 LuckPerms-API (Advanced Permission System)
 Vault-API (Simple Permission System)
 Commands/Features (Planned, more to come)
@@ -9,4 +6,15 @@ Commands/Features (Planned, more to come)
 -XP-save areas (or similar, more advanced control over xp areas and more customizable settings and tweaks)
 -AFK-Checker / AFK-Protection (efficient afk checks, AFK-Protection mechanism, highly customizable settings)
 -JumpPads & Grappling Hook (additional funny stuff / easter eggs)
-Plugin/Server-Stats (probably BStats)
+
+
+        b.add(getAFKChecker_effects_enabled());
+        b.add(getAFKChecker_effects_invincible());
+        b.add(getAFKChecker_effects_invincible2());
+        b.add(getAFKChecker_effects_invincibleCustom());
+        b.add(getAFKChecker_effects_invisible());
+        b.add(getAFKChecker_effects_noCollision());
+        b.add(getAFKChecker_effects_grayNameTag());
+        b.add(getAFKChecker_effects_AfkPrefix());
+        s.add(getAFKChecker_effects_AfkPrefix_prefix());
+        lS.add(getAFKChecker_effects_DTypes());

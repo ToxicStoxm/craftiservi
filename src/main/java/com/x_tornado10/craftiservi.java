@@ -40,6 +40,7 @@ import org.checkerframework.checker.units.qual.C;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class craftiservi extends JavaPlugin {
 
@@ -59,8 +60,8 @@ public final class craftiservi extends JavaPlugin {
     private TextFormatting txtformatting;
     private ObjectCompare HMC;
     private static HashMap<UUID, Long> afkList;
-    private static HashMap<UUID, Long> afkPlayers;
-    private static HashMap<UUID, Long> playersToCheck;
+    private static ConcurrentHashMap<UUID, Long> afkPlayers;
+    private static ConcurrentHashMap<UUID, Long> playersToCheck;
     private HashMap<String, List<Location>> xpsaveareas;
     private Paths paths;
     private HashMap<UUID, List<Float>> playersinsavearea;
@@ -194,7 +195,8 @@ public final class craftiservi extends JavaPlugin {
         playersinsavearea = new HashMap<>();
         afkList = new HashMap<>();
         inv_saves = new HashMap<>();
-        afkPlayers = new HashMap<>();
+        afkPlayers = new ConcurrentHashMap<>();
+        playersToCheck = new ConcurrentHashMap<>();
         pm = Bukkit.getPluginManager();
         blockedStrings = new ArrayList<>();
         toFromBase64 = new ToFromBase64();
@@ -219,7 +221,7 @@ public final class craftiservi extends JavaPlugin {
         xpsaveareas = fm.getXpSaveAreaFromTextFile();
         playersinsavearea = fm.getPlayersInSaveAreaFromTextFile();
         inv_saves = fm.getPlayerInvSavePointsFromTextFile();
-        afkPlayers = fm.getAfkPlayersFromTextFile();
+        //afkPlayers = fm.getAfkPlayersFromTextFile();
     }
     private void finalizeSetup() {
         joinListener = new JoinListener();
@@ -229,8 +231,8 @@ public final class craftiservi extends JavaPlugin {
         graplingHookListener = new GraplingHookListener(configManager.getY_velocity_g());
         jumpPads = new JumpPads(configManager.getY_velocity(), configManager.getVelocity_multiplier());
         invisPlayers = new InvisPlayers();
-        afkListener = new AFKListener();
         afkChecker = new AFKChecker();
+        afkListener = new AFKListener();
 
         pm.registerEvents(joinListener, this);
         pm.registerEvents(playerMoveListener, this);
@@ -433,7 +435,7 @@ public final class craftiservi extends JavaPlugin {
     }
 
     public HashMap<UUID, Long> getAfkList() {return afkList;}
-    public HashMap<UUID, Long> getAfkPlayers() {return afkPlayers;}
+    public ConcurrentHashMap<UUID, Long> getAfkPlayers() {return afkPlayers;}
     public AFKChecker getAfkChecker() {
         return afkChecker;
     }
@@ -493,7 +495,7 @@ public final class craftiservi extends JavaPlugin {
         logger.info(message.toString());
     }
 
-    public HashMap<UUID, Long> getPlayersToCheck() {
+    public ConcurrentHashMap<UUID, Long> getPlayersToCheck() {
         return playersToCheck;
     }
 

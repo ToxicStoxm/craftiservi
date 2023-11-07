@@ -6,6 +6,8 @@ authors: [ x_Tornado10 ]
 website: https://www.spigotmc.org/resources/crafti-servi.108546/
 prefix: "Craftiservi"
 description: This Plugin provides a few useful tools alongside a basic server infrastructure
+depend:
+  -LuckPerms
 loadbefore:
   - craftiservi-discord
   - Server-Restart

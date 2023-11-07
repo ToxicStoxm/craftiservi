@@ -85,17 +85,7 @@ public class ConfigManager {
     public boolean getAfkChecker_allow_afk_chat() {return config.getBoolean(paths.getAfk_checker_allow_afk_chat());}
     public boolean getAfkChecker_exclude_enabled() {return config.getBoolean(paths.getAfk_checker_exclude_enabled());}
     public List<String> getAfkChecker_exclude() {
-
-        List<String> temp = config.getStringList(paths.getAfk_checker_exclude());
-        List<String> returnl;
-
-        temp.clear();
-
-        returnl = getAfkChecker_exclude_enabled()
-                ? temp
-                : new ArrayList<>();
-
-        return returnl;
+        return new ArrayList<>(getAfkChecker_exclude_enabled() ? config.getStringList(paths.getAfk_checker_exclude()) : new ArrayList<>());
     }
     public boolean getAFKChecker_broadcastAFK() {return config.getBoolean(paths.getAfk_checker_broadcastAFK_enabled());}
     public boolean getAFKChecker_broadcastTime() {return  config.getBoolean(paths.getAfk_checker_broadcastTime_enabled());}

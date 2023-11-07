@@ -3,6 +3,7 @@ package com.x_tornado10.events.listeners.afkprot;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.features.afk_protection.AFKChecker;
+import com.x_tornado10.logger.Logger;
 import com.x_tornado10.utils.CustomData;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -10,30 +11,30 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AFKListener implements Listener {
 
     private craftiservi plugin = craftiservi.getInstance();
-    private HashMap<UUID, Long> afkList;
-    private HashMap<UUID, Long> afkPlayers;
-    private HashMap<UUID, Long> playersToCheck;
+    private ConcurrentHashMap<UUID, Long> afkPlayers;
+    private ConcurrentHashMap<UUID, Long> playersToCheck;
     private AFKChecker checker;
     public static boolean enabled;
+    private Logger logger;
     public static boolean allowChat;
 
     public AFKListener() {
         afkPlayers = plugin.getAfkPlayers();
         playersToCheck = plugin.getPlayersToCheck();
         checker = plugin.getAfkChecker();
+        logger = plugin.getCustomLogger();
     }
 
     @EventHandler
@@ -41,10 +42,11 @@ public class AFKListener implements Listener {
         if (!enabled) {return;}
         UUID pid = e.getPlayer().getUniqueId();
         if (afkPlayers.containsKey(pid)) {
-            checker.removeAFK(pid);
+            checker.removeAFK(pid,false);
+            logger.info("onMove Removed");
         }
         if (playersToCheck.containsKey(pid)) {
-            playersToCheck.put(pid,System.currentTimeMillis());
+            checker.addCheck(pid);
         }
     }
 
@@ -55,12 +57,15 @@ public class AFKListener implements Listener {
 
         if (!(e.getEntity() instanceof Player p)) {return;}
 
+        if (((Player) e.getEntity()).getHealth() <= e.getFinalDamage()) {return;}
+
         UUID pid = e.getEntity().getUniqueId();
         if (afkPlayers.containsKey(pid)) {
-            checker.removeAFK(pid);
+            checker.removeAFK(pid,false);
+            logger.info("onEntityDamage Removed");
         }
         if (playersToCheck.containsKey(pid)) {
-            playersToCheck.put(pid,System.currentTimeMillis());
+            checker.addCheck(pid);
         }
 
     }
@@ -72,12 +77,61 @@ public class AFKListener implements Listener {
 
         UUID pid = e.getPlayer().getUniqueId();
         if (afkPlayers.containsKey(pid)) {
-            checker.removeAFK(pid);
-        }
-        if (playersToCheck.containsKey(pid)) {
-            playersToCheck.put(pid,System.currentTimeMillis());
+            checker.removeAFK(pid,true);
+            logger.info("onPlayerQuit Removed");
+        } else {
+            checker.removeCheck(pid);
         }
 
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+
+        if (!enabled) {return;}
+
+        UUID pid = e.getPlayer().getUniqueId();
+        if (!afkPlayers.containsKey(pid) && !e.getPlayer().isDead()) {
+            checker.addCheck(pid);
+        }
+    }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent e) {
+
+        if (!enabled || allowChat) {return;}
+
+        UUID pid = e.getPlayer().getUniqueId();
+        if (afkPlayers.containsKey(pid)) {
+            checker.removeAFK(pid,false);
+            logger.info("onChat Removed");
+        }
+        if (playersToCheck.containsKey(pid)) {
+            checker.addCheck(pid);
+        }
+
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        if (!enabled) {return;}
+        UUID pid = e.getEntity().getUniqueId();
+        if (afkPlayers.containsKey(pid)) {
+            checker.removeAFK(pid,true);
+        } else {
+            checker.removeCheck(pid);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent e) {
+        if (!enabled) {return;}
+        UUID pid = e.getPlayer().getUniqueId();
+        if (afkPlayers.containsKey(pid)) {
+            checker.removeAFK(pid,false);
+        } else {
+            checker.addCheck(pid);
+        }
     }
 
     @EventHandler

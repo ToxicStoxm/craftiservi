@@ -69,7 +69,6 @@ public class FileManager {
         files.add(player_inv_saves);
         files.add(player_inv_saves_backup);
         files.add(backup_config);
-        files.add(afkPlayers);
 
         if (backupdir.mkdirs()) {
 
@@ -492,81 +491,5 @@ public class FileManager {
             }
         }
     }
-    public void writeAfkPlayersToTextFile(HashMap<UUID, Long> afkPlayers) {
 
-        File afkPlayersf = new File(paths.getAfk_players());
-
-        try (BufferedWriter bf = new BufferedWriter(new FileWriter(afkPlayersf))) {
-
-            new FileWriter(afkPlayersf, false).close();
-
-            for (Map.Entry<UUID, Long> entry : afkPlayers.entrySet()) {
-
-                UUID key = entry.getKey();
-                long value = entry.getValue();
-
-                String separate = "|";
-
-                bf.write(key + separate + value);
-                bf.newLine();
-
-            }
-
-            bf.flush();
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-        }
-
-    }
-    public HashMap<UUID, Long> getAfkPlayersFromTextFile() {
-
-        HashMap<UUID, Long> mapFileContents = new HashMap<>();
-
-        File afkPlayersf = new File(paths.getAfk_players());
-
-
-        BufferedReader br = null;
-        try {
-
-            br = new BufferedReader(new FileReader(afkPlayersf));
-
-            String line;
-
-            while ((line = br.readLine()) != null) {
-
-                String[] parts = line.split("\\|");
-
-                UUID key = UUID.fromString(parts[0].trim());
-                long value = Long.parseLong(parts[1].trim());
-
-                mapFileContents.put(key, value);
-
-            }
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-        } finally {
-
-            if (br != null) {
-
-                try {
-
-                    br.close();
-
-                } catch (Exception e) {
-
-                    e.printStackTrace();
-
-                }
-            }
-
-        }
-
-        return mapFileContents;
-    }
 }

@@ -1,6 +1,7 @@
 package com.x_tornado10.features.invis_players;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.utils.ObjectCompare;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -28,12 +29,17 @@ public class InvisPlayers {
     public List<UUID> getInvis_players() {
         return invis_players;
     }
+    private BukkitTask run;
+    public InvisPlayers() {
+        invis_players = new ArrayList<>();
+        check();
+    }
 
     private void check() {
 
         List<UUID> temp = new ArrayList<>();
 
-        BukkitTask run = new BukkitRunnable() {
+        run = new BukkitRunnable() {
             @Override
             public void run() {
 
@@ -74,6 +80,12 @@ public class InvisPlayers {
 
         }
 
+    }
+
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+        run.cancel();
+        check();
     }
 
 }

@@ -26,17 +26,24 @@ import com.x_tornado10.managers.FileManager;
 import com.x_tornado10.managers.ConfigManager;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
+import jdk.jfr.Description;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.group.GroupManager;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.model.user.UserManager;
+import net.luckperms.api.node.Node;
+import net.luckperms.api.node.types.*;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.units.qual.C;
 
 import java.io.*;
 import java.util.*;
@@ -83,6 +90,7 @@ public final class craftiservi extends JavaPlugin {
     private AFKChecker afkChecker;
     private InvisPlayers invisPlayers;
     private java.util.logging.Logger setupLogger;
+    private LuckPerms LpAPI;
 
     public static craftiservi getInstance() {
         return instance;
@@ -137,6 +145,8 @@ public final class craftiservi extends JavaPlugin {
 
         finalizeSetup();
 
+        luckPermsSetup();
+
         finish = System.currentTimeMillis();
         if (finish-start>20000) {
 
@@ -158,11 +168,37 @@ public final class craftiservi extends JavaPlugin {
 
         saveData();
 
+        afkChecker.clearAFK();
+
         unregisterHandlers();
 
         logger.info("Everything was saved successfully!");
         logger.info("Successfully disabled!");
 
+    }
+
+    private void luckPermsSetup() {
+        logger.debug("Hooking into the LuckPerms API...");
+        if (Objects.requireNonNull(pm.getPlugin("LuckPerms")).isEnabled()) {
+            LpAPI = LuckPermsProvider.get();
+            logger.debug("§aSuccessfully hooked into the LuckPerms API!");
+        } else {
+            logger.debug("§cAn error occurred while hooking into the LuckPerms API!");
+        }
+        if (LpAPI != null) {
+            GroupManager groupManager = LpAPI.getGroupManager();
+            if (groupManager.getGroup("afkTag") == null) {
+                Group group = groupManager.createAndLoadGroup("afkTag").join();
+                PrefixNode prefixNode = PrefixNode.builder("§7§o[AFK] ", 0).build();
+                WeightNode weightNode = WeightNode.builder(0).build();
+                group.data().add(weightNode);
+                group.data().add(prefixNode);
+                groupManager.saveGroup(group);
+            }
+            if(!setDefaultNegatedPermission("afkTag")) {
+                logger.severe("An error occurred!");
+            }
+        }
     }
 
     private void unregisterHandlers() {
@@ -221,7 +257,6 @@ public final class craftiservi extends JavaPlugin {
         xpsaveareas = fm.getXpSaveAreaFromTextFile();
         playersinsavearea = fm.getPlayersInSaveAreaFromTextFile();
         inv_saves = fm.getPlayerInvSavePointsFromTextFile();
-        //afkPlayers = fm.getAfkPlayersFromTextFile();
     }
     private void finalizeSetup() {
         joinListener = new JoinListener();
@@ -312,7 +347,6 @@ public final class craftiservi extends JavaPlugin {
 
         }
 
-
     }
 
     private void saveData() {
@@ -343,15 +377,6 @@ public final class craftiservi extends JavaPlugin {
 
         }
         logger.debug("PlayersInSaveArea...§adone");
-        /*
-        if (new File(paths.getAfk_players()).exists()) {
-
-            fm.writeAfkPlayersToTextFile(afkPlayers);
-
-        }
-        logger.debug("AfkPlayers...§adone");
-
-         */
         logger.debug("");
         logger.debug("§8-----------------------------");
         logger.debug("");
@@ -499,6 +524,99 @@ public final class craftiservi extends JavaPlugin {
         return playersToCheck;
     }
 
+    public LuckPerms getLpAPI() {
+        return LpAPI;
+    }
+
+    public boolean addPlayerToGroup(UUID pid, String groupName) {
+        UserManager userManager = LpAPI.getUserManager();
+        User user = userManager.getUser(pid);
+        if (user == null) {
+            return false;
+        }
+        GroupManager groupManager = LpAPI.getGroupManager();
+        Group group = groupManager.getGroup("afkTag");
+        if (group == null) {
+            return false;
+        }
+
+        InheritanceNode inheritanceNode = InheritanceNode.builder(group).build();
+        user.data().add(inheritanceNode);
+        userManager.saveUser(user);
+        return true;
+
+    }
+    public boolean addSuffixToPlayer(UUID pid, String suffix) {
+        UserManager userManager = LpAPI.getUserManager();
+        User user = userManager.getUser(pid);
+        if (user == null) {
+            return false;
+        }
+
+        SuffixNode suffixNode = SuffixNode.builder(suffix,0).build();
+        user.data().add(suffixNode);
+        userManager.saveUser(user);
+        return true;
+    }
+
+    public boolean removePlayerFromGroup(UUID pid, String groupName) {
+        UserManager userManager = LpAPI.getUserManager();
+        User user = userManager.getUser(pid);
+        if (user == null) {
+            return false;
+        }
+        GroupManager groupManager = LpAPI.getGroupManager();
+        Group group = groupManager.getGroup("afkTag");
+        if (group == null) {
+            return false;
+        }
+
+        Node node = InheritanceNode.builder(group).build();
+        user.data().remove(node);
+        userManager.saveUser(user);
+        return true;
+    }
+    public boolean removeSuffixFromPlayer(UUID pid, String suffix) {
+        UserManager userManager = LpAPI.getUserManager();
+        User user = userManager.getUser(pid);
+        if (user == null) {
+            return false;
+        }
+
+        for (Node node : user.getNodes()) {
+            if (node instanceof SuffixNode) {
+                if (((SuffixNode) node).getPriority() == 0) {
+                    user.data().remove(node);
+                }
+            }
+        }
+        userManager.saveUser(user);
+        return true;
+    }
+
+    public boolean setDefaultNegatedPermission(String permissionToNegate) {
+        GroupManager groupManager = LpAPI.getGroupManager();
+        Group group = groupManager.getGroup("afkTag");
+        if (group == null) {
+            return false;
+        }
+        Group defaultGroup = groupManager.getGroup("default");
+
+        if (defaultGroup == null) {
+            return false;
+        }
+
+        Node permissionNode = PermissionNode.builder(permissionToNegate).value(false).build();
+
+        if (!group.getNodes().contains(permissionNode)) {
+            defaultGroup.data().add(permissionNode);
+        }
+
+        groupManager.saveGroup(group);
+        return true;
+    }
+
+    @Description("Reloads config values during runtime using a Bukkit Custom Event")
     public void reload(CustomDataWrapper customDataWrapper) {
         ReloadEvent reload = new ReloadEvent(customDataWrapper);
         Bukkit.getServer().getPluginManager().callEvent(reload);

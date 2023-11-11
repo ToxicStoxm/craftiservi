@@ -8,16 +8,15 @@ import com.x_tornado10.messages.PlayerMessages;
 import com.x_tornado10.utils.CustomData;
 import com.x_tornado10.utils.ObjectCompare;
 import com.x_tornado10.utils.TextFormatting;
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,6 +49,7 @@ public class AFKChecker implements Listener {
     private TextFormatting textFormatting;
     private InvisPlayers invisPlayers = plugin.getInvisPlayers();
     private BukkitTask run;
+    private LuckPerms LpAPI;
 
     public AFKChecker() {
 
@@ -61,7 +61,7 @@ public class AFKChecker implements Listener {
         plmsg = plugin.getPlayerMessages();
         OC = plugin.getOC();
         textFormatting = plugin.getTxtformatting();
-
+        LpAPI = plugin.getLpAPI();
     }
 
     public boolean isAFK(UUID pid) {
@@ -73,6 +73,11 @@ public class AFKChecker implements Listener {
         removeAfkEffects(pid,getAFKTime(pid));
         AFKPlayers.remove(pid);
         logger.info("REMOVED " + Bukkit.getPlayer(pid).getName());
+    }
+    public void clearAFK() {
+        for (Map.Entry<UUID, Long> entry : AFKPlayers.entrySet()) {
+            removeAFK(entry.getKey(), true);
+        }
     }
 
     public void addAFK(UUID pid, Long time) {
@@ -112,8 +117,20 @@ public class AFKChecker implements Listener {
             logger.broadcast(name + " is now §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(pid)));
         }
         if (AFKeffects) {
-
-
+            if (effects_invisible) {
+                invisPlayers.add(pid);
+            }
+            if (effects_grayNameTag) {
+                if (!plugin.addPlayerToGroup(pid,"afkTag")) {
+                    logger.severe("Error occurred!");
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yy HH:mm:ss");
+                    Date date = new Date(getAFKTime(pid));
+                    if (!plugin.addSuffixToPlayer(pid, " [" + dateFormat.format(date) + "]")) {
+                        logger.severe("Error occurred!");
+                    }
+                }
+            }
         }
 
     }
@@ -136,7 +153,16 @@ public class AFKChecker implements Listener {
                 logger.broadcast(name + " is no longer §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(pid)));
             }
         }
-
+        invisPlayers.remove(pid);
+        if (!plugin.removePlayerFromGroup(pid,"afkTag")) {
+            logger.severe("Error occurred!");
+        } else {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yy HH:mm:ss");
+            Date date = new Date(getAFKTime(pid));
+            if (!plugin.removeSuffixFromPlayer(pid, " [" + dateFormat.format(date) + "]")) {
+                logger.severe("Error occurred!");
+            }
+        }
     }
 
     private void afkChecker() {

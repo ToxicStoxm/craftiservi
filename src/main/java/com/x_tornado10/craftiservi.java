@@ -195,6 +195,12 @@ public final class craftiservi extends JavaPlugin {
                 group.data().add(prefixNode);
                 groupManager.saveGroup(group);
             }
+            if (groupManager.getGroup("afkInvis") == null) {
+                Group group = groupManager.createAndLoadGroup("afkInvis").join();
+                WeightNode weightNode = WeightNode.builder(0).build();
+                group.data().add(weightNode);
+                groupManager.saveGroup(group);
+            }
             if(!setDefaultNegatedPermission("afkTag")) {
                 logger.severe("An error occurred!");
             }
@@ -212,6 +218,7 @@ public final class craftiservi extends JavaPlugin {
         handlerList.unregister(graplingHookListener);
         handlerList.unregister(msgFilter);
         handlerList.unregister(afkListener);
+        handlerList.unregister(invisPlayers);
     }
 
     private void setup() {
@@ -280,6 +287,7 @@ public final class craftiservi extends JavaPlugin {
         pm.registerEvents(plmsg, this);
         pm.registerEvents(afkChecker, this);
         pm.registerEvents(msgFilter, this);
+        pm.registerEvents(invisPlayers, this);
         logger.debug("Listeners..§adone");
         logger.debug("");
 

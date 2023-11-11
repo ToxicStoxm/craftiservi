@@ -117,9 +117,6 @@ public class AFKChecker implements Listener {
             logger.broadcast(name + " is now §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(pid)));
         }
         if (AFKeffects) {
-            if (effects_invisible) {
-                invisPlayers.add(pid);
-            }
             if (effects_grayNameTag) {
                 if (!plugin.addPlayerToGroup(pid,"afkTag")) {
                     logger.severe("Error occurred!");
@@ -129,6 +126,12 @@ public class AFKChecker implements Listener {
                     if (!plugin.addSuffixToPlayer(pid, " [" + dateFormat.format(date) + "]")) {
                         logger.severe("Error occurred!");
                     }
+                }
+            }
+            if (effects_invisible) {
+                //invisPlayers.add(pid);
+                if(!invisPlayers.addInvis(pid)) {
+                    logger.severe("Error occurred!");
                 }
             }
         }
@@ -153,7 +156,7 @@ public class AFKChecker implements Listener {
                 logger.broadcast(name + " is no longer §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(pid)));
             }
         }
-        invisPlayers.remove(pid);
+        //invisPlayers.remove(pid);
         if (!plugin.removePlayerFromGroup(pid,"afkTag")) {
             logger.severe("Error occurred!");
         } else {
@@ -162,6 +165,9 @@ public class AFKChecker implements Listener {
             if (!plugin.removeSuffixFromPlayer(pid, " [" + dateFormat.format(date) + "]")) {
                 logger.severe("Error occurred!");
             }
+        }
+        if(!invisPlayers.removeInvis(pid)) {
+            logger.severe("Error occurred!");
         }
     }
 

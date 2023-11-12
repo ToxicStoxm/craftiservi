@@ -14,13 +14,13 @@ import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommandTabComplet
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.events.listeners.JoinListener;
 import com.x_tornado10.events.listeners.PlayerMoveListener;
-import com.x_tornado10.events.listeners.afkprot.AFKListener;
+import com.x_tornado10.events.listeners.afk_checking.AFKListener;
 import com.x_tornado10.events.listeners.grapling_hook.GraplingHookListener;
 import com.x_tornado10.events.listeners.inventory.InventoryListener;
 import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
 import com.x_tornado10.events.listeners.jpads.JumpPads;
 import com.x_tornado10.features.afk_protection.AFKChecker;
-import com.x_tornado10.features.invis_players.InvisPlayers;
+import com.x_tornado10.events.listeners.afk_checking.InvisPlayers;
 import com.x_tornado10.utils.*;
 import com.x_tornado10.managers.FileManager;
 import com.x_tornado10.managers.ConfigManager;
@@ -38,12 +38,16 @@ import net.luckperms.api.node.types.*;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.io.*;
 import java.util.*;
@@ -201,8 +205,23 @@ public final class craftiservi extends JavaPlugin {
                 group.data().add(weightNode);
                 groupManager.saveGroup(group);
             }
-            if(!setDefaultNegatedPermission("afkTag")) {
-                logger.severe("An error occurred!");
+            if (groupManager.getGroup("afkNoCollision") == null) {
+                Group group = groupManager.createAndLoadGroup("afkNoCollision").join();
+                WeightNode weightNode = WeightNode.builder(0).build();
+                group.data().add(weightNode);
+                groupManager.saveGroup(group);
+            }
+            if (groupManager.getGroup("afkInvincible") == null) {
+                Group group = groupManager.createAndLoadGroup("afkInvincible").join();
+                WeightNode weightNode = WeightNode.builder(0).build();
+                group.data().add(weightNode);
+                groupManager.saveGroup(group);
+            }
+            if (groupManager.getGroup("afkInvincible2") == null) {
+                Group group = groupManager.createAndLoadGroup("afkInvincible2").join();
+                WeightNode weightNode = WeightNode.builder(0).build();
+                group.data().add(weightNode);
+                groupManager.saveGroup(group);
             }
         }
     }
@@ -531,11 +550,9 @@ public final class craftiservi extends JavaPlugin {
     public ConcurrentHashMap<UUID, Long> getPlayersToCheck() {
         return playersToCheck;
     }
-
     public LuckPerms getLpAPI() {
         return LpAPI;
     }
-
     public boolean addPlayerToGroup(UUID pid, String groupName) {
         UserManager userManager = LpAPI.getUserManager();
         User user = userManager.getUser(pid);
@@ -566,7 +583,6 @@ public final class craftiservi extends JavaPlugin {
         userManager.saveUser(user);
         return true;
     }
-
     public boolean removePlayerFromGroup(UUID pid, String groupName) {
         UserManager userManager = LpAPI.getUserManager();
         User user = userManager.getUser(pid);
@@ -602,27 +618,35 @@ public final class craftiservi extends JavaPlugin {
         return true;
     }
 
-    public boolean setDefaultNegatedPermission(String permissionToNegate) {
-        GroupManager groupManager = LpAPI.getGroupManager();
-        Group group = groupManager.getGroup("afkTag");
-        if (group == null) {
-            return false;
-        }
-        Group defaultGroup = groupManager.getGroup("default");
-
-        if (defaultGroup == null) {
-            return false;
-        }
-
-        Node permissionNode = PermissionNode.builder(permissionToNegate).value(false).build();
-
-        if (!group.getNodes().contains(permissionNode)) {
-            defaultGroup.data().add(permissionNode);
-        }
-
-        groupManager.saveGroup(group);
-        return true;
+    public FileManager getFm() {
+        return fm;
     }
+    public boolean isPaperServer() {
+        return Bukkit.getVersion().toLowerCase().contains("paper");
+    }
+
+    /*
+    public void addPlayerToTeam(Player player, String teamName) {
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+
+        Team team = scoreboard.getTeam(teamName);
+        if (team == null) {
+            team = scoreboard.registerNewTeam(teamName);
+        }
+
+        team.addEntry(player.getName());
+    }
+
+    public void removePlayerFromTeam(Player player, String teamName) {
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+
+        Team team = scoreboard.getTeam(teamName);
+        if (team != null) {
+            team.removeEntry(player.getName());
+        }
+    }
+
+     */
 
     @Description("Reloads config values during runtime using a Bukkit Custom Event")
     public void reload(CustomDataWrapper customDataWrapper) {

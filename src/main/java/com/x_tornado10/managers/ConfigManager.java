@@ -8,7 +8,7 @@ import com.x_tornado10.commands.open_gui_command.OpenGUICommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommandTabCompletion;
 import com.x_tornado10.craftiservi;
-import com.x_tornado10.events.listeners.afkprot.AFKListener;
+import com.x_tornado10.events.listeners.afk_checking.AFKListener;
 import com.x_tornado10.events.listeners.inventory.InventoryListener;
 import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
 import com.x_tornado10.features.afk_protection.AFKChecker;
@@ -96,10 +96,14 @@ public class ConfigManager {
     public boolean getAFKChecker_effects_invincibleCustom() {return config.getBoolean(paths.getAfk_checker_effects_invincible_custom());}
     public List<String> getAFKChecker_effects_DTypes() {return config.getStringList(paths.getAfk_checker_effects_invincibleC_dTypes());}
     public boolean getAFKChecker_effects_invisible() {return config.getBoolean(paths.getAfk_checker_effects_invisible());}
+    public boolean getAfkChecker_effects_invisible_usePe() {return config.getBoolean(paths.getAfk_checker_effects_invisible_usePEffect());}
     public boolean getAFKChecker_effects_noCollision() {return config.getBoolean(paths.getAfk_checker_effects_noCollision());}
-    public boolean getAFKChecker_effects_grayNameTag() {return config.getBoolean(paths.getAfk_checker_effects_grayNameTag());}
-    public boolean getAFKChecker_effects_AfkPrefix() {return config.getBoolean(paths.getAfk_checker_effects_AfkPrefix());}
-    public String getAFKChecker_effects_AfkPrefix_prefix() {return config.getString(paths.getAfk_checker_effects_AfkPrefix_prefix());}
+    public boolean getAFKChecker_effects_invisible_hholo() {return config.getBoolean(paths.getAfk_checker_effects_invisible_hholo());}
+    public boolean getAFKChecker_effects_invisible_hholo_fullTag() {return config.getBoolean(paths.getAfk_checker_effects_invisible_hholo_fullTag());}
+    public boolean getAFKChecker_effects_AfkNameTag() {return config.getBoolean(paths.getAfk_checker_effects_AfkNameTag());}
+    public String getAFKChecker_effects_AfkNameTag_prefix() {return config.getString(paths.getAfk_checker_effects_AfkNameTag_prefix());}
+    public String getAFKChecker_effects_AfkNameTag_suffix() {return config.getString(paths.getAfk_checker_effects_AfkNameTag_suffix());}
+
     public double getGrappling_hook_cooldown() {return config.getDouble(paths.getGrappling_hook_cooldown()) * 1000;}
     public boolean getGrappling_hook_prevent_falldmg() {return config.getBoolean(paths.getGrappling_hook_prevent_falldmg());}
     public double getJPads_cooldown() {return config.getDouble(paths.getJPads_cooldown()) * 1000;}
@@ -201,11 +205,14 @@ public class ConfigManager {
         b.add(getAFKChecker_effects_invincible2());
         b.add(getAFKChecker_effects_invincibleCustom());
         b.add(getAFKChecker_effects_invisible());
+        b.add(getAFKChecker_effects_invisible_hholo());
+        b.add(getAFKChecker_effects_invisible_hholo_fullTag());
         b.add(getAFKChecker_effects_noCollision());
-        b.add(getAFKChecker_effects_grayNameTag());
-        b.add(getAFKChecker_effects_AfkPrefix());
+        b.add(getAFKChecker_effects_AfkNameTag());
         b.add(getAfkChecker_enabled());
-        s.add(getAFKChecker_effects_AfkPrefix_prefix());
+        b.add(getAfkChecker_effects_invisible_usePe());
+        s.add(getAFKChecker_effects_AfkNameTag_prefix());
+        s.add(getAFKChecker_effects_AfkNameTag_suffix());
         lS.add(getAFKChecker_effects_DTypes());
         i.add(getAfkChecker_afk_time());
 
@@ -248,6 +255,10 @@ public class ConfigManager {
 
         b.add(getAfkChecker_enabled());
         b.add(getAfkChecker_allow_afk_chat());
+        b.add(getAFKChecker_effects_invincible());
+        b.add(getAFKChecker_effects_invincible2());
+        b.add(getAFKChecker_effects_invincibleCustom());
+        b.add(getAFKChecker_effects_noCollision());
 
         return new CustomData(null, b, null, null, null);
     }

@@ -60,11 +60,20 @@ public class Paths {
     private final String afk_checker_effects_invincible_custom = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible-Custom.Enabled";
     private final String afk_checker_effects_invincibleC_dTypes = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible-Custom.Damage-types";
     private final String afk_checker_effects_invisible = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invisible.Enabled";
+    private final String afk_checker_effects_invisible_usePEffect = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invisible.Use-Potion-Effect";
+    private final String afk_checker_effects_invisible_hholo = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invisible.Head-Hologram.Enabled";
+    private final String afk_checker_effects_invisible_hholo_fullTag = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invisible.Head-Hologram.Hologram-FullPlayerNameTag";
     private final String afk_checker_effects_noCollision = "Craftiservi.Afk-Checker.Afk-Effects.Effects.No-Collision.Enabled";
-    private final String afk_checker_effects_grayNameTag = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Gray-Name-Tag.Enabled";
-    private final String afk_checker_effects_AfkPrefix = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-Prefix.Enabled";
-    private final String afk_checker_effects_AfkPrefix_prefix = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-Prefix.Prefix";
+    private final String afk_checker_effects_AfkNameTag = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-NameTag.Enabled";
+    private final String afk_checker_effects_AfkNameTag_prefix = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-NameTag.Prefix";
 
+    public String getJPads_cooldown() {
+        return jPads_cooldown;
+    }
+    public String getJPads_prevent_falldmg() {
+        return jPads_prevent_falldmg;
+    }
+    private final String afk_checker_effects_AfkNameTag_suffix = "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-NameTag.Suffix";
     public String getPlpath() {
         return plpath;
     }
@@ -197,14 +206,11 @@ public class Paths {
     public String getAfk_checker_effects_noCollision() {
         return afk_checker_effects_noCollision;
     }
-    public String getAfk_checker_effects_grayNameTag() {
-        return afk_checker_effects_grayNameTag;
+    public String getAfk_checker_effects_AfkNameTag() {
+        return afk_checker_effects_AfkNameTag;
     }
-    public String getAfk_checker_effects_AfkPrefix() {
-        return afk_checker_effects_AfkPrefix;
-    }
-    public String getAfk_checker_effects_AfkPrefix_prefix() {
-        return afk_checker_effects_AfkPrefix_prefix;
+    public String getAfk_checker_effects_AfkNameTag_prefix() {
+        return afk_checker_effects_AfkNameTag_prefix;
     }
     public String getGrappling_hook_cooldown() {
         return grappling_hook_cooldown;
@@ -212,10 +218,16 @@ public class Paths {
     public String getGrappling_hook_prevent_falldmg() {
         return grappling_hook_prevent_falldmg;
     }
-    public String getJPads_cooldown() {
-        return jPads_cooldown;
+    public String getAfk_checker_effects_invisible_hholo() {
+        return afk_checker_effects_invisible_hholo;
     }
-    public String getJPads_prevent_falldmg() {
-        return jPads_prevent_falldmg;
+    public String getAfk_checker_effects_invisible_hholo_fullTag() {
+        return afk_checker_effects_invisible_hholo_fullTag;
+    }
+    public String getAfk_checker_effects_AfkNameTag_suffix() {
+        return afk_checker_effects_AfkNameTag_suffix;
+    }
+    public String getAfk_checker_effects_invisible_usePEffect() {
+        return afk_checker_effects_invisible_usePEffect;
     }
 }

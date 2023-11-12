@@ -90,7 +90,7 @@ public class GraplingHookListener implements Listener {
 
             if (!(timeElapsed >= cooldown_value)) {
 
-                plmsg.msg(p,"§cYou must wait §e0.5s§c between uses! (" + ((cooldown_value - timeElapsed) / 1000) + "," + (Math.round(((cooldown_value - timeElapsed) % 1000) * 100)) / 100 + "s left)");
+                plmsg.msg(p,"§cYou must wait §e0.5s§c between uses! (" + ((cooldown_value - timeElapsed) / 1000) + "s left)");
 
             } else {
 

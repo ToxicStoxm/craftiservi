@@ -2,20 +2,27 @@ package com.x_tornado10.features.afk_protection;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
-import com.x_tornado10.features.invis_players.InvisPlayers;
+import com.x_tornado10.events.listeners.afk_checking.InvisPlayers;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
 import com.x_tornado10.utils.CustomData;
 import com.x_tornado10.utils.ObjectCompare;
 import com.x_tornado10.utils.TextFormatting;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.group.GroupManager;
+import net.luckperms.api.node.Node;
+import net.luckperms.api.node.types.PrefixNode;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
+import java.awt.print.Paper;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
@@ -34,10 +41,13 @@ public class AFKChecker implements Listener {
     private static boolean effects_invincibleCustom;
     private static boolean effects_invisible;
     private static boolean effects_noCollision;
-    private static boolean effects_grayNameTag;
-    private static boolean effects_AfkPrefix;
+    private static boolean effects_invisible_hholo;
+    private static boolean effects_invisible_hholo_fullTag;
+    private static boolean effects_AfkNameTag;
+    private static boolean effects_invisible_usePe;
     private static List<String> damageTypes;
     private static String AFKprefix;
+    private static String AFKsuffix;
     private static List<String> exclude;
     private int seconds;
     private ConcurrentHashMap<UUID, Long> playersToCheck;
@@ -62,6 +72,7 @@ public class AFKChecker implements Listener {
         OC = plugin.getOC();
         textFormatting = plugin.getTxtformatting();
         LpAPI = plugin.getLpAPI();
+
     }
 
     public boolean isAFK(UUID pid) {
@@ -70,7 +81,11 @@ public class AFKChecker implements Listener {
     public void removeAFK(UUID pid, boolean exclude) {
 
         if (!exclude) {playersToCheck.put(pid,System.currentTimeMillis());}
-        removeAfkEffects(pid,getAFKTime(pid));
+        if (getAFKTime(pid) != null) {
+            removeAfkEffects(pid, getAFKTime(pid));
+        } else {
+            removeAfkEffects(pid, System.currentTimeMillis());
+        }
         AFKPlayers.remove(pid);
         logger.info("REMOVED " + Bukkit.getPlayer(pid).getName());
     }
@@ -117,21 +132,34 @@ public class AFKChecker implements Listener {
             logger.broadcast(name + " is now §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(pid)));
         }
         if (AFKeffects) {
-            if (effects_grayNameTag) {
+            if (effects_AfkNameTag) {
                 if (!plugin.addPlayerToGroup(pid,"afkTag")) {
                     logger.severe("Error occurred!");
                 } else {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yy HH:mm:ss");
                     Date date = new Date(getAFKTime(pid));
-                    if (!plugin.addSuffixToPlayer(pid, " [" + dateFormat.format(date) + "]")) {
+                    String temp = AFKsuffix;
+                    if (temp.contains("%AFK-TIME%")) {
+                        temp = temp.replace("%AFK-TIME%", dateFormat.format(date));
+                    }
+                    if (!plugin.addSuffixToPlayer(pid, temp)) {
                         logger.severe("Error occurred!");
                     }
                 }
             }
             if (effects_invisible) {
-                //invisPlayers.add(pid);
-                if(!invisPlayers.addInvis(pid)) {
+                if(!invisPlayers.addInvis(pid, effects_invisible_hholo, effects_invisible_hholo_fullTag, effects_invisible_usePe)) {
                     logger.severe("Error occurred!");
+                }
+            }
+            if (effects_noCollision) {
+                plugin.addPlayerToGroup(pid, "afkNoCollision");
+            }
+            if (effects_invincible) {
+                plugin.addPlayerToGroup(pid, "afkInvincible");
+            } else {
+                if (effects_invincible2) {
+                    plugin.addPlayerToGroup(pid,"afkInvincible2");
                 }
             }
         }
@@ -156,19 +184,19 @@ public class AFKChecker implements Listener {
                 logger.broadcast(name + " is no longer §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(pid)));
             }
         }
-        //invisPlayers.remove(pid);
         if (!plugin.removePlayerFromGroup(pid,"afkTag")) {
             logger.severe("Error occurred!");
-        } else {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yy HH:mm:ss");
-            Date date = new Date(getAFKTime(pid));
-            if (!plugin.removeSuffixFromPlayer(pid, " [" + dateFormat.format(date) + "]")) {
-                logger.severe("Error occurred!");
-            }
+        }
+        String temp = "";
+        if (!plugin.removeSuffixFromPlayer(pid, temp)) {
+            logger.severe("Error occurred!");
         }
         if(!invisPlayers.removeInvis(pid)) {
             logger.severe("Error occurred!");
         }
+        plugin.removePlayerFromGroup(pid, "afkNoCollision");
+        plugin.removePlayerFromGroup(pid,"afkInvincible");
+        plugin.removePlayerFromGroup(pid,"afkInvincible2");
     }
 
     private void afkChecker() {
@@ -176,33 +204,27 @@ public class AFKChecker implements Listener {
         run = new BukkitRunnable() {
             @Override
             public void run() {
+                if (enabled) {
 
-                //logger.info("Tick");
-                for (Map.Entry entry : playersToCheck.entrySet()) {
-                    //logger.info("check " + entry.getKey().toString());
-                }
-                for (Map.Entry entry : AFKPlayers.entrySet()) {
-                    //logger.info("AFK " + entry.getKey().toString());
-                }
+                    if (!playersToCheck.isEmpty()) {
 
-                if (!playersToCheck.isEmpty()) {
+                        for (Map.Entry<UUID, Long> entry : playersToCheck.entrySet()) {
 
-                    for (Map.Entry<UUID,Long> entry : playersToCheck.entrySet()) {
-
-                        UUID pid = entry.getKey();
-                        Long lastActivity = entry.getValue();
-                        Long currentTime = System.currentTimeMillis();
-                        if (currentTime-lastActivity >= seconds * 1000L) {
-                            addAFK(pid,currentTime);
+                            UUID pid = entry.getKey();
+                            Long lastActivity = entry.getValue();
+                            Long currentTime = System.currentTimeMillis();
+                            if (currentTime - lastActivity >= seconds * 1000L) {
+                                addAFK(pid, currentTime);
+                            }
                         }
+
                     }
+                    if (!AFKPlayers.isEmpty()) {
 
-                }
-                if (!AFKPlayers.isEmpty()) {
+                        temp.clear();
+                        temp.putAll(AFKPlayers);
 
-                    temp.clear();
-                    temp.putAll(AFKPlayers);
-
+                    }
                 }
 
             }
@@ -241,21 +263,22 @@ public class AFKChecker implements Listener {
         cancelTasks();
         CustomData afkData = e.getData(2);
         List<Boolean> b = afkData.getB();
+        List<String> s = afkData.getS();
         List<List<String>> lS = afkData.getlS();
         List<String> temp1 = lS.get(0);
         exclude.clear();
         if (!temp1.isEmpty()) {
-            for (String s : temp1) {
+            for (String st : temp1) {
                 try {
-                    UUID tempID = UUID.fromString(s);
+                    UUID tempID = UUID.fromString(st);
                     exclude.add(String.valueOf(tempID));
                 } catch (IllegalArgumentException ex) {
                     try {
-                        UUID tempID = Bukkit.getPlayer(s).getUniqueId();
+                        UUID tempID = Bukkit.getPlayer(st).getUniqueId();
                         exclude.add(String.valueOf(tempID));
                     } catch (IllegalArgumentException | NullPointerException exe) {
                         try {
-                            UUID tempID = Bukkit.getOfflinePlayer(s).getUniqueId();
+                            UUID tempID = Bukkit.getOfflinePlayer(st).getUniqueId();
                             exclude.add(String.valueOf(tempID));
                         } catch (IllegalArgumentException | NullPointerException exep) {
                             logger.warning("Wasn't able to get player specified in the config (Path: Craftiservi.Afk-Checker.Exclude). Please use a valid UUID!");
@@ -274,11 +297,14 @@ public class AFKChecker implements Listener {
         effects_invincible2 = b.get(5);
         effects_invincibleCustom = b.get(6);
         effects_invisible = b.get(7);
-        effects_noCollision = b.get(8);
-        effects_grayNameTag = b.get(9);
-        effects_AfkPrefix = b.get(10);
-        enabled = b.get(11);
-        AFKprefix = afkData.getS(0);
+        effects_invisible_hholo = b.get(8);
+        effects_invisible_hholo_fullTag = b.get(9);
+        effects_noCollision = b.get(10);
+        effects_AfkNameTag = b.get(11);
+        enabled = b.get(12);
+        effects_invisible_usePe = b.get(13);
+        AFKprefix = s.get(0);
+        AFKsuffix = s.get(1);
         damageTypes = lS.get(1);
         seconds = afkData.getI(0);
 
@@ -300,6 +326,51 @@ public class AFKChecker implements Listener {
                 }
             }
         }
+
+        if (LpAPI != null) {
+            GroupManager groupManager = LpAPI.getGroupManager();
+            if (!groupManager.isLoaded("afkTag")) {
+                groupManager.loadGroup("afkTag");
+            }
+            Group group = groupManager.getGroup("afkTag");
+
+            PrefixNode prefixNode = PrefixNode.builder(AFKprefix, 0).build();
+            for (Node node : group.getNodes()) {
+                if (node instanceof PrefixNode) {
+                    group.data().remove(node);
+                }
+            }
+            group.data().add(prefixNode);
+        } else {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+                LpAPI = plugin.getLpAPI();
+                GroupManager groupManager = LpAPI.getGroupManager();
+                if (!groupManager.isLoaded("afkTag")) {
+                    groupManager.loadGroup("afkTag");
+                }
+                Group group = groupManager.getGroup("afkTag");
+
+                PrefixNode prefixNode = PrefixNode.builder(AFKprefix, 0).build();
+                for (Node node : group.getNodes()) {
+                    if (node instanceof PrefixNode) {
+                        group.data().remove(node);
+                    }
+                }
+                group.data().add(prefixNode);
+
+            }, 100);
+
+        }
+
+        /*
+        if (scM.getMainScoreboard().getTeam("Collision") == null) {
+            Collision = scM.getMainScoreboard().registerNewTeam("Collision");
+        }
+        Collision = scM.getMainScoreboard().getTeam("Collision");
+        Collision.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OWN_TEAM);
+
+         */
+
         playersToCheck.clear();
         playersToCheck.putAll(temp);
         startTasks();

@@ -1,12 +1,10 @@
-package com.x_tornado10.events.listeners.afkprot;
+package com.x_tornado10.events.listeners.afk_checking;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.features.afk_protection.AFKChecker;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.utils.CustomData;
-import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,9 +12,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,6 +25,10 @@ public class AFKListener implements Listener {
     public static boolean enabled;
     private Logger logger;
     public static boolean allowChat;
+    private static boolean effects_noCollision;
+    private static boolean effects_invincible;
+    private static boolean effects_invincible2;
+    private static boolean effects_invincibleCustom;
 
     public AFKListener() {
         afkPlayers = plugin.getAfkPlayers();
@@ -39,10 +39,13 @@ public class AFKListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (!enabled) {return;}
+        if (!enabled) {
+            return;
+        }
+
         UUID pid = e.getPlayer().getUniqueId();
         if (afkPlayers.containsKey(pid)) {
-            checker.removeAFK(pid,false);
+            checker.removeAFK(pid, false);
             logger.info("onMove Removed");
         }
         if (playersToCheck.containsKey(pid)) {
@@ -141,6 +144,10 @@ public class AFKListener implements Listener {
 
         enabled = b.get(0);
         allowChat = b.get(1);
+        effects_invincible = b.get(2);
+        effects_invincible2 = b.get(3);
+        effects_invincibleCustom = b.get(4);
+        effects_noCollision = b.get(5);
 
     }
 

@@ -184,19 +184,31 @@ Craftiservi:
         Invisible:
           #DEFAULT: false
           Enabled: false
+          #Uses the Invisibility potion effect instead of Bukkit.show() / Bukkit.hide()
+          #If set to false player is not displayed on TabList and can't be hit by other players
+          #DEFAULT: true
+          Use-Potion-Effect: true
+          Head-Hologram:
+            #A hologram of the Players head is displayed instead if the Skin
+            #DEFAULT: true
+            Enabled: true
+            #If the hologram should have the same name tag as the player (with prefix and suffix)
+            #If set to false the name tag will just be the players name
+            #DEFAULT: true
+            Hologram-FullPlayerNameTag: true
         #Players have no collision, so they can't be pushed around by other players or entities
+        #Warning: This option is currently Disabled!
         No-Collision:
+          #DEFAULT: false
+          Enabled: false
+        #Players have an AFK-NameTag in the Tab-List and Chat
+        Afk-NameTag:
           #DEFAULT: true
           Enabled: true
-        #Players have a Gray Name-Tag in the Tab-List
-        Gray-Name-Tag:
-          #DEFAULT: true
-          Enabled: true
-        #Players have an AFK prefix in the Tab-List and Chat
-        Afk-Prefix:
-          #DEFAULT: true
-          Enabled: true
-          #DEFAULT: "[AFK] "
-          Prefix: "[AFK] "
+          #DEFAULT: "§7§o[AFK] "
+          Prefix: "§7§o[AFK] "
+          #Use %AFK-TIME% as Placeholder to display the time the player went afk
+          #DEFAULT: " [%AFK-TIME%]"
+          Suffix: " [%AFK-TIME%]"
 
 #################################################################

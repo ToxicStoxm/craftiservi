@@ -164,6 +164,8 @@ public class InvisPlayers implements Listener {
         armorStand.setBasePlate(false);
         armorStand.setCollidable(false);
         armorStand.setSilent(true);
+        armorStand.setSmall(true);
+        armorStand.setMarker(true);
         player.hideEntity(plugin, armorStand);
         NBT.modifyPersistentData(armorStand, nbt -> {nbt.setBoolean("Hologram", true);});
         ItemStack headItem = getPlayerHead(player);
@@ -193,7 +195,7 @@ public class InvisPlayers implements Listener {
         }
         if (!invis_players.contains(uuid)) {
             if (afkChecker == null) {afkChecker = plugin.getAfkChecker();}
-            afkChecker.removeAFK(uuid, false);
+            afkChecker.removeAFK(uuid, false, false);
         }
     }
 

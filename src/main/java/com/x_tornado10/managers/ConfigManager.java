@@ -103,7 +103,12 @@ public class ConfigManager {
     public boolean getAFKChecker_effects_AfkNameTag() {return config.getBoolean(paths.getAfk_checker_effects_AfkNameTag());}
     public String getAFKChecker_effects_AfkNameTag_prefix() {return config.getString(paths.getAfk_checker_effects_AfkNameTag_prefix());}
     public String getAFKChecker_effects_AfkNameTag_suffix() {return config.getString(paths.getAfk_checker_effects_AfkNameTag_suffix());}
-
+    public boolean getAFKChecker_allowHitPlayers() {return config.getBoolean(paths.getAfk_checker_allow_hit_player());}
+    public boolean getAFKChecker_allowHitMobs() {return config.getBoolean(paths.getAfk_checker_allow_hit_mob());}
+    public boolean getAFKChecker_allowBreakBlock() {return config.getBoolean(paths.getAfk_checker_allow_break_block());}
+    public boolean getAFKChecker_allowPlaceBlock() {return config.getBoolean(paths.getAfk_checker_allow_place_block());}
+    public boolean getAFKChecker_stopCreeperTarget() {return config.getBoolean(paths.getAfk_checker_stop_creeper_target());}
+    public boolean getAFKChecker_killCreeperOnTarget() {return config.getBoolean(paths.getAfk_checker_kill_creeper_on_target());}
     public double getGrappling_hook_cooldown() {return config.getDouble(paths.getGrappling_hook_cooldown()) * 1000;}
     public boolean getGrappling_hook_prevent_falldmg() {return config.getBoolean(paths.getGrappling_hook_prevent_falldmg());}
     public double getJPads_cooldown() {return config.getDouble(paths.getJPads_cooldown()) * 1000;}
@@ -252,6 +257,7 @@ public class ConfigManager {
     }
     private CustomData constructAFKLData() {
         List<Boolean> b = new ArrayList<>();
+        List<List<String>> lS = new ArrayList<>();
 
         b.add(getAfkChecker_enabled());
         b.add(getAfkChecker_allow_afk_chat());
@@ -259,8 +265,15 @@ public class ConfigManager {
         b.add(getAFKChecker_effects_invincible2());
         b.add(getAFKChecker_effects_invincibleCustom());
         b.add(getAFKChecker_effects_noCollision());
+        b.add(getAFKChecker_allowHitMobs());
+        b.add(getAFKChecker_allowHitPlayers());
+        b.add(getAFKChecker_allowPlaceBlock());
+        b.add(getAFKChecker_allowBreakBlock());
+        b.add(getAFKChecker_stopCreeperTarget());
+        b.add(getAFKChecker_killCreeperOnTarget());
+        lS.add(getAFKChecker_effects_DTypes());
 
-        return new CustomData(null, b, null, null, null);
+        return new CustomData(null, b, null, null, lS);
     }
 
     public boolean resetConfig() {

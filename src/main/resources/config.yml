@@ -115,6 +115,18 @@ Craftiservi:
     #If a player should remain marked as afk when they write something in chat
     #DEFAULT: true
     allow-afk-chat: true
+    #If an AFK player should be able to hit mobs without being removed from AFK
+    allow-hit-mobs: true
+    #If an AFK player should be able to hit players without being removed from AFK
+    allow-hit-players: false
+    #If an AFK player should be able to place blocks without being removed from AFK
+    allow-place-blocks: true
+    #If an AFK player should be able to break blocks without being removed from AFK
+    allow-break-blocks: true
+    #If the plugin should stop creepers from targeting an AFK player
+    stop-creeper-target: true
+    #If the plugin should kill creepers trying to target an AFK player
+    kill-creeper-on-target: false
     # If the exclude list should be used
     #DEFAULT: false
     enable-exclude: false

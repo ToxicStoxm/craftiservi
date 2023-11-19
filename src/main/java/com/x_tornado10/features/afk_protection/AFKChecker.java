@@ -78,20 +78,20 @@ public class AFKChecker implements Listener {
     public boolean isAFK(UUID pid) {
         return AFKPlayers.containsKey(pid);
     }
-    public void removeAFK(UUID pid, boolean exclude) {
+    public void removeAFK(UUID pid, boolean exclude, boolean messages) {
 
         if (!exclude) {playersToCheck.put(pid,System.currentTimeMillis());}
         if (getAFKTime(pid) != null) {
-            removeAfkEffects(pid, getAFKTime(pid));
+            removeAfkEffects(pid, getAFKTime(pid), messages);
         } else {
-            removeAfkEffects(pid, System.currentTimeMillis());
+            removeAfkEffects(pid, System.currentTimeMillis(), messages);
         }
         AFKPlayers.remove(pid);
-        logger.info("REMOVED " + Bukkit.getPlayer(pid).getName());
+        //logger.info("REMOVED " + Bukkit.getPlayer(pid).getName());
     }
     public void clearAFK() {
         for (Map.Entry<UUID, Long> entry : AFKPlayers.entrySet()) {
-            removeAFK(entry.getKey(), true);
+            removeAFK(entry.getKey(), true,true);
         }
     }
 
@@ -165,23 +165,23 @@ public class AFKChecker implements Listener {
         }
 
     }
-    private void removeAfkEffects(UUID pid, long afkTime) {
+    private void removeAfkEffects(UUID pid, long afkTime, boolean messages) {
         Player p = Bukkit.getPlayer(pid);
         if (p == null) {
-            logger.severe("Error while trying to get Player from UUID!");
+            if (messages) logger.severe("Error while trying to get Player from UUID!");
             return;
         }
         String name = p.getDisplayName();
         if (displayPersonalTime) {
-            plmsg.msg(p, "You are no longer §2§l§oAFK§7 (AFK time: " +  formatTime(System.currentTimeMillis() - afkTime) + ")");
+            if (messages) plmsg.msg(p, "You are no longer §2§l§oAFK§7 (AFK time: " +  formatTime(System.currentTimeMillis() - afkTime) + ")");
         } else {
-            plmsg.msg(p, "You are no longer §2§l§oAFK§7");
+            if (messages) plmsg.msg(p, "You are no longer §2§l§oAFK§7");
         }
         if (broadcastAFK) {
             if (broadcastTime) {
-                logger.broadcast(name + " is no longer §2§l§oAFK§7 (AFK time: " + formatTime(System.currentTimeMillis() - afkTime) + ")", false, new ArrayList<>(Collections.singleton(pid)));
+                if (messages) logger.broadcast(name + " is no longer §2§l§oAFK§7 (AFK time: " + formatTime(System.currentTimeMillis() - afkTime) + ")", false, new ArrayList<>(Collections.singleton(pid)));
             } else {
-                logger.broadcast(name + " is no longer §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(pid)));
+                if (messages) logger.broadcast(name + " is no longer §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(pid)));
             }
         }
         if (!plugin.removePlayerFromGroup(pid,"afkTag")) {
@@ -317,7 +317,7 @@ public class AFKChecker implements Listener {
                         temp.put(pid, System.currentTimeMillis());
                     }
                 } else {
-                    removeAFK(pid, true);
+                    removeAFK(pid, true, false);
                 }
             } else {
                 if (!AFKPlayers.containsKey(pid) && !p.isDead()) {
@@ -361,15 +361,6 @@ public class AFKChecker implements Listener {
             }, 100);
 
         }
-
-        /*
-        if (scM.getMainScoreboard().getTeam("Collision") == null) {
-            Collision = scM.getMainScoreboard().registerNewTeam("Collision");
-        }
-        Collision = scM.getMainScoreboard().getTeam("Collision");
-        Collision.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.FOR_OWN_TEAM);
-
-         */
 
         playersToCheck.clear();
         playersToCheck.putAll(temp);

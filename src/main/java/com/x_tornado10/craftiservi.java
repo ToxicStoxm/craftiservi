@@ -625,29 +625,6 @@ public final class craftiservi extends JavaPlugin {
         return Bukkit.getVersion().toLowerCase().contains("paper");
     }
 
-    /*
-    public void addPlayerToTeam(Player player, String teamName) {
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-
-        Team team = scoreboard.getTeam(teamName);
-        if (team == null) {
-            team = scoreboard.registerNewTeam(teamName);
-        }
-
-        team.addEntry(player.getName());
-    }
-
-    public void removePlayerFromTeam(Player player, String teamName) {
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-
-        Team team = scoreboard.getTeam(teamName);
-        if (team != null) {
-            team.removeEntry(player.getName());
-        }
-    }
-
-     */
-
     @Description("Reloads config values during runtime using a Bukkit Custom Event")
     public void reload(CustomDataWrapper customDataWrapper) {
         ReloadEvent reload = new ReloadEvent(customDataWrapper);

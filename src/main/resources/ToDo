@@ -1,20 +1,8 @@
 LuckPerms-API (Advanced Permission System)
 Vault-API (Simple Permission System)
 Commands/Features (Planned, more to come)
--FirstJoin (command + saveFile)
+-FirstJoin (command + saveFile) .
 -Inv-Saves (command + saveFile + efficient logic system for handling saves and loading / restoring saves)
 -XP-save areas (or similar, more advanced control over xp areas and more customizable settings and tweaks)
--AFK-Checker / AFK-Protection (efficient afk checks, AFK-Protection mechanism, highly customizable settings)
--JumpPads & Grappling Hook (additional funny stuff / easter eggs)
-
-
-        b.add(getAFKChecker_effects_enabled());
-        b.add(getAFKChecker_effects_invincible());
-        b.add(getAFKChecker_effects_invincible2());
-        b.add(getAFKChecker_effects_invincibleCustom());
-        b.add(getAFKChecker_effects_invisible());
-        b.add(getAFKChecker_effects_noCollision());
-        b.add(getAFKChecker_effects_grayNameTag());
-        b.add(getAFKChecker_effects_AfkPrefix());
-        s.add(getAFKChecker_effects_AfkPrefix_prefix());
-        lS.add(getAFKChecker_effects_DTypes());
+-AFK-Checker / AFK-Protection (efficient afk checks, AFK-Protection mechanism, highly customizable settings) .
+-JumpPads & Grappling Hook (additional funny stuff / easter eggs) .

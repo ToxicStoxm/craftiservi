@@ -4,6 +4,7 @@ import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -25,13 +26,15 @@ public class FirstJoinedCommand implements CommandExecutor {
     private PlayerMessages plmsg;
     public static boolean enabled;
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
+    public FirstJoinedCommand() {
         plugin = craftiservi.getInstance();
         logger = plugin.getCustomLogger();
         plmsg = plugin.getPlayerMessages();
         playerlist = plugin.getPlayerlist();
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         if (!enabled) {
 
@@ -117,15 +120,17 @@ public class FirstJoinedCommand implements CommandExecutor {
 
     private boolean getUser(String player) {
 
-        try {
-
-            return playerlist.containsKey(Bukkit.getPlayer(player).getUniqueId());
-
-        } catch (Exception e) {
-
-            return playerlist.containsKey(Bukkit.getOfflinePlayer(player).getUniqueId());
-
+        Player p = Bukkit.getPlayer(player);
+        OfflinePlayer oP;
+        UUID pid;
+        if (p == null) {
+            oP = Bukkit.getOfflinePlayer(player);
+            pid = oP.getUniqueId();
+        } else {
+             pid = p.getUniqueId();
         }
+
+        return playerlist.containsKey(pid);
     }
 
 }

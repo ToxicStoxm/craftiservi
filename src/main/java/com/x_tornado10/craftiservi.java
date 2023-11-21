@@ -12,8 +12,8 @@ import com.x_tornado10.commands.open_gui_command.OpenGUICommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommand;
 import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommandTabCompletion;
 import com.x_tornado10.events.custom.ReloadEvent;
-import com.x_tornado10.events.listeners.JoinListener;
-import com.x_tornado10.events.listeners.PlayerMoveListener;
+import com.x_tornado10.events.listeners.join_listener.JoinListener;
+import com.x_tornado10.events.listeners.xp_area_listener.PlayerMoveListener;
 import com.x_tornado10.events.listeners.afk_checking.AFKListener;
 import com.x_tornado10.events.listeners.grapling_hook.GraplingHookListener;
 import com.x_tornado10.events.listeners.inventory.InventoryListener;
@@ -21,6 +21,8 @@ import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
 import com.x_tornado10.events.listeners.jpads.JumpPads;
 import com.x_tornado10.features.afk_protection.AFKChecker;
 import com.x_tornado10.events.listeners.afk_checking.InvisPlayers;
+import com.x_tornado10.features.inv_saves.InvSaveMgr;
+import com.x_tornado10.messages.OpMessages;
 import com.x_tornado10.utils.*;
 import com.x_tornado10.managers.FileManager;
 import com.x_tornado10.managers.ConfigManager;
@@ -38,16 +40,12 @@ import net.luckperms.api.node.types.*;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import java.io.*;
 import java.util.*;
@@ -60,6 +58,7 @@ public final class craftiservi extends JavaPlugin {
     private long finish;
     private Logger logger;
     private PlayerMessages plmsg;
+    private OpMessages opmsg;
     private String prefix;
     private String dc_prefix;
     private String colorprefix;
@@ -80,6 +79,7 @@ public final class craftiservi extends JavaPlugin {
     private PlayerMoveListener playerMoveListener;
     private InventoryOpenListener inventoryOpenListener;
     private InventoryListener inventoryListener;
+    private InvSaveMgr invSaveMgr;
     private GraplingHookListener graplingHookListener;
     private JumpPads jumpPads;
     private AFKListener afkListener;
@@ -230,6 +230,7 @@ public final class craftiservi extends JavaPlugin {
         HandlerList handlerList = ReloadEvent.getHandlerList();
         handlerList.unregister(logger);
         handlerList.unregister(plmsg);
+        handlerList.unregister(opmsg);
         handlerList.unregister(afkChecker);
         handlerList.unregister(jumpPads);
         handlerList.unregister(inventoryListener);
@@ -238,6 +239,7 @@ public final class craftiservi extends JavaPlugin {
         handlerList.unregister(msgFilter);
         handlerList.unregister(afkListener);
         handlerList.unregister(invisPlayers);
+        handlerList.unregister(invSaveMgr);
     }
 
     private void setup() {
@@ -252,6 +254,7 @@ public final class craftiservi extends JavaPlugin {
 
         logger = new Logger();
         plmsg = new PlayerMessages(colorprefix);
+        opmsg = new OpMessages(colorprefix);
         playerlist = new HashMap<>();
         xpsaveareas = new HashMap<>();
         playersinsavearea = new HashMap<>();
@@ -288,6 +291,7 @@ public final class craftiservi extends JavaPlugin {
         joinListener = new JoinListener();
         playerMoveListener = new PlayerMoveListener();
         inventoryOpenListener = new InventoryOpenListener();
+        invSaveMgr = new InvSaveMgr();
         inventoryListener = new InventoryListener();
         graplingHookListener = new GraplingHookListener(configManager.getY_velocity_g());
         jumpPads = new JumpPads(configManager.getY_velocity(), configManager.getVelocity_multiplier());
@@ -304,9 +308,11 @@ public final class craftiservi extends JavaPlugin {
         pm.registerEvents(afkListener, this);
         pm.registerEvents(logger, this);
         pm.registerEvents(plmsg, this);
+        pm.registerEvents(opmsg, this);
         pm.registerEvents(afkChecker, this);
         pm.registerEvents(msgFilter, this);
         pm.registerEvents(invisPlayers, this);
+        pm.registerEvents(invSaveMgr,this);
         logger.debug("Listeners..§adone");
         logger.debug("");
 

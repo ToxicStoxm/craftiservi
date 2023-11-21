@@ -38,37 +38,37 @@ public class Paths {
     public String getChat_filter_enabled() {return "Craftiservi.Chat.Filter.Enabled";}
     public String getJump_pads_enabled() {return "Craftiservi.Gadgets.Movement.Jump-Pads.Enabled";}
     public String getGrappling_hook_enabled() {return "Craftiservi.Gadgets.Movement.Grappling-hook.Enabled";}
-    public String getCommands_invsave_enabled() {return "Craftiservi.Commands.InvSave.Enabled";}
-    public String getCommands_xparea_enabled() {return "Craftiservi.Commands.XpArea.Enabled";}
-    public String getCommands_firstjoin_enabled() {return "Craftiservi.Commands.FirstJoin.Enabled";}
-    public String getAfk_checker_enabled() {return "Craftiservi.Afk-Checker.Enabled";}
-    public String getAfk_checker_afk_time() {return "Craftiservi.Afk-Checker.Afk-Time";}
-    public String getAfk_checker_allow_afk_chat() {return "Craftiservi.Afk-Checker.allow-afk-chat";}
-    public String getAfk_checker_exclude() {return "Craftiservi.Afk-Checker.Exclude";}
-    public String getAfk_checker_exclude_enabled() {return "Craftiservi.Afk-Checker.enable-exclude";}
-    public String getAfk_checker_broadcastAFK_enabled() {return "Craftiservi.Afk-Checker.BroadcastAFK";}
-    public String getAfk_checker_broadcastTime_enabled() {return "Craftiservi.Afk-Checker.BroadcastAFK-Time";}
-    public String getAfk_checker_personal_time_enabled() {return "Craftiservi.Afk-Checker.Display-Personal-Time";}
-    public String getAfk_checker_afkEffects_enabled() {return "Craftiservi.Afk-Checker.Afk-Effects.Enabled";}
-    public String getAfk_checker_effects_invincible() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible.Enabled";}
-    public String getAfk_checker_effects_invincible_2() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible-2.Enabled";}
-    public String getAfk_checker_effects_invincible_custom() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible-Custom.Enabled";}
-    public String getAfk_checker_effects_invincibleC_dTypes() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invincible-Custom.Damage-types";}
-    public String getAfk_checker_effects_invisible() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invisible.Enabled";}
-    public String getAfk_checker_effects_noCollision() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.No-Collision.Enabled";}
-    public String getAfk_checker_effects_AfkNameTag() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-NameTag.Enabled";}
-    public String getAfk_checker_effects_AfkNameTag_prefix() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-NameTag.Prefix";}
+    public String getCommands_invsave_enabled() {return "Craftiservi.Commands-Features.InvSave.Enabled";}
+    public String getCommands_xparea_enabled() {return "Craftiservi.Commands-Features.XpArea.Enabled";}
+    public String getCommands_firstjoin_enabled() {return "Craftiservi.Commands-Features.FirstJoin.Enabled";}
+    public String getAfk_checker_enabled() {return "Craftiservi.Commands-Features.AFK-Checker.Enabled";}
+    public String getAfk_checker_afk_time() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Time";}
+    public String getAfk_checker_allow_afk_chat() {return "Craftiservi.Commands-Features.AFK-Checker.allow-afk-chat";}
+    public String getAfk_checker_exclude() {return "Craftiservi.Commands-Features.AFK-Checker.Exclude";}
+    public String getAfk_checker_exclude_enabled() {return "Craftiservi.Commands-Features.AFK-Checker.enable-exclude";}
+    public String getAfk_checker_broadcastAFK_enabled() {return "Craftiservi.Commands-Features.AFK-Checker.BroadcastAFK";}
+    public String getAfk_checker_broadcastTime_enabled() {return "Craftiservi.Commands-Features.AFK-Checker.BroadcastAFK-Time";}
+    public String getAfk_checker_personal_time_enabled() {return "Craftiservi.Commands-Features.AFK-Checker.Display-Personal-Time";}
+    public String getAfk_checker_afkEffects_enabled() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Enabled";}
+    public String getAfk_checker_effects_invincible() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Invincible.Enabled";}
+    public String getAfk_checker_effects_invincible_2() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Invincible-2.Enabled";}
+    public String getAfk_checker_effects_invincible_custom() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Invincible-Custom.Enabled";}
+    public String getAfk_checker_effects_invincibleC_dTypes() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Invincible-Custom.Damage-types";}
+    public String getAfk_checker_effects_invisible() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Invisible.Enabled";}
+    public String getAfk_checker_effects_noCollision() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.No-Collision.Enabled";}
+    public String getAfk_checker_effects_AfkNameTag() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Afk-NameTag.Enabled";}
+    public String getAfk_checker_effects_AfkNameTag_prefix() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Afk-NameTag.Prefix";}
     public String getGrappling_hook_cooldown() {return "Craftiservi.Gadgets.Movement.Grappling-hook.cooldown";}
     public String getGrappling_hook_prevent_falldmg() {return "Craftiservi.Gadgets.Movement.Grappling-hook.prevent-fall-damage";}
-    public String getAfk_checker_effects_invisible_hholo() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invisible.Head-Hologram.Enabled";}
-    public String getAfk_checker_effects_invisible_hholo_fullTag() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invisible.Head-Hologram.Hologram-FullPlayerNameTag";}
-    public String getAfk_checker_effects_AfkNameTag_suffix() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Afk-NameTag.Suffix";}
-    public String getAfk_checker_effects_invisible_usePEffect() {return "Craftiservi.Afk-Checker.Afk-Effects.Effects.Invisible.Use-Potion-Effect";}
-    public String getAfk_checker_allow_hit_mob() {return "Craftiservi.Afk-Checker.allow-hit-mobs";}
-    public String getAfk_checker_allow_hit_player() {return "Craftiservi.Afk-Checker.allow-hit-players";}
-    public String getAfk_checker_allow_break_block() {return "Craftiservi.Afk-Checker.allow-break-blocks";}
-    public String getAfk_checker_allow_place_block() {return "Craftiservi.Afk-Checker.allow-place-blocks";}
-    public String getAfk_checker_stop_creeper_target() {return "Craftiservi.Afk-Checker.stop-creeper-target";}
-    public String getAfk_checker_kill_creeper_on_target() {return "Craftiservi.Afk-Checker.kill-creeper-on-target";}
+    public String getAfk_checker_effects_invisible_hholo() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Invisible.Head-Hologram.Enabled";}
+    public String getAfk_checker_effects_invisible_hholo_fullTag() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Invisible.Head-Hologram.Hologram-FullPlayerNameTag";}
+    public String getAfk_checker_effects_AfkNameTag_suffix() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Afk-NameTag.Suffix";}
+    public String getAfk_checker_effects_invisible_usePEffect() {return "Craftiservi.Commands-Features.AFK-Checker.Afk-Effects.Effects.Invisible.Use-Potion-Effect";}
+    public String getAfk_checker_allow_hit_mob() {return "Craftiservi.Commands-Features.AFK-Checker.allow-hit-mobs";}
+    public String getAfk_checker_allow_hit_player() {return "Craftiservi.Commands-Features.AFK-Checker.allow-hit-players";}
+    public String getAfk_checker_allow_break_block() {return "Craftiservi.Commands-Features.AFK-Checker.allow-break-blocks";}
+    public String getAfk_checker_allow_place_block() {return "Craftiservi.Commands-Features.AFK-Checker.allow-place-blocks";}
+    public String getAfk_checker_stop_creeper_target() {return "Craftiservi.Commands-Features.AFK-Checker.stop-creeper-target";}
+    public String getAfk_checker_kill_creeper_on_target() {return "Craftiservi.Commands-Features.AFK-Checker.kill-creeper-on-target";}
 
 }

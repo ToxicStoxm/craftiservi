@@ -25,16 +25,25 @@ import java.util.*;
 
 public class InventoryListener implements Listener {
 
-    private final craftiservi plugin = craftiservi.getInstance();
-    private final Logger logger = plugin.getCustomLogger();
-    private final PlayerMessages plmsg = plugin.getPlayerMessages();
-    private final HashMap<UUID, Long> cooldown = new HashMap<>();
-    private boolean cancel = false;
-    private HashMap<UUID, String> playerlist = plugin.getPlayerlist();
-
-    private final HashMap<Integer, Inventory> invs_review = plugin.getInvs_review();
-    private HashMap<UUID, Integer> penidng_request = new HashMap<>();
+    private final craftiservi plugin;
+    private final Logger logger;
+    private final PlayerMessages plmsg;
+    private final HashMap<UUID, Long> cooldown;
+    private HashMap<UUID, String> playerlist;
+    private final HashMap<Integer, Inventory> invs_review;
+    private HashMap<UUID, Integer> penidng_request;
+    private BukkitTask run;
     public static boolean enabled;
+
+    public InventoryListener() {
+        plugin = craftiservi.getInstance();
+        logger = plugin.getCustomLogger();
+        plmsg = plugin.getPlayerMessages();
+        cooldown = new HashMap<>();
+        playerlist = plugin.getPlayerlist();
+        invs_review = plugin.getInvs_review();
+        penidng_request = new HashMap<>();
+    }
 
     @EventHandler
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent e) {
@@ -164,8 +173,6 @@ public class InventoryListener implements Listener {
                 p.closeInventory();
             }
 
-            //restoreInv(p, e.getInventory());
-
         }
 
 
@@ -177,21 +184,13 @@ public class InventoryListener implements Listener {
             cancelrun();
 
             Inventory temp = e.getInventory();
-
             List<String> gui_id_lore = temp.getItem(51).getItemMeta().getLore();
-
             String[] parts = gui_id_lore.get(0).split(":");
-
             int id = Integer.parseInt(parts[1].trim());
-
             Player pl = Bukkit.getPlayer(e.getView().getTitle());
-
             Inventory temp_inv = e.getInventory();
-
             restoreInv(pl, temp_inv);
-
             remove_delayed(id);
-
             p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 99999999999999999999999999999999999999f, 1f);
             p.closeInventory();
 
@@ -215,13 +214,9 @@ public class InventoryListener implements Listener {
             cancelrun();
 
             Inventory temp = e.getClickedInventory();
-
             List<String> gui_id_lore = temp.getItem(51).getItemMeta().getLore();
-
             String[] parts = gui_id_lore.get(0).split(":");
-
             Player pl = Bukkit.getPlayer(e.getView().getTitle());
-
             invs_review.remove(Integer.parseInt(parts[1].trim()));
 
             p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
@@ -257,16 +252,16 @@ public class InventoryListener implements Listener {
             invs_review.remove(penidng_request.get(p.getUniqueId()));
             penidng_request.remove(p.getUniqueId());
 
-        }
 
-        for (Player pl : Bukkit.getOnlinePlayers()) {
+            for (Player pl : Bukkit.getOnlinePlayers()) {
 
-            if (pl.isOp()) {
+                if (pl.isOp()) {
 
-                plmsg.msg_inlines(pl, "§cCanceled Inv request from §e" + p.getName() + "\n" + plugin.getColorprefix() + "Cause: §cDisconnected");
+                    plmsg.msg_inlines(pl, "§cCanceled Inv request from §e" + p.getName() + "\n" + plugin.getColorprefix() + "Cause: §cDisconnected");
+
+                }
 
             }
-
         }
 
     }
@@ -312,54 +307,33 @@ public class InventoryListener implements Listener {
         ItemStack offhand;
 
         ItemStack air = new ItemStack(Material.AIR);
-
         for (int i = 0; i<37; i++) {
-
             if (inv.getItem(i) == null) {
-
                 slots.add(air);
-
             } else {
-
                 slots.add(inv.getItem(i));
-
             }
-
         }
 
 
         for (int j = 36; j<40; j++) {
-
             if (inv.getItem(j) == null) {
-
                 armour_slots.add(air);
-
             } else {
-
                 armour_slots.add(inv.getItem(j));
-
             }
-
         }
 
         if (inv.getItem(40) == null) {
-
             offhand = new ItemStack(Material.AIR);
-
         } else {
-
             offhand = inv.getItem(40);
-
         }
 
         for (ItemStack slot : p.getInventory()) {
-
             if (slot != null) {
-
                 p.getWorld().dropItem(p.getLocation(), slot).setPickupDelay(100);
-
             }
-
         }
 
         p.getInventory().clear();
@@ -372,32 +346,22 @@ public class InventoryListener implements Listener {
         p.getInventory().setItem(40, offhand);
 
         for (int l = 0; l<37; l++) {
-
             p.getInventory().addItem(slots.get(l));
-
         }
     }
 
     private boolean onlineStaff() {
-
         for (Player p : Bukkit.getOnlinePlayers()) {
-
             if (p.isOp()) {
-
                 return true;
-
             }
-
         }
-
         return false;
-
     }
 
 
     private void run(int id, Player p) {
-
-        BukkitTask run = new BukkitRunnable() {
+        run = new BukkitRunnable() {
 
             @Override
             public void run() {
@@ -407,11 +371,8 @@ public class InventoryListener implements Listener {
                 for (Player pl : Bukkit.getOnlinePlayers()) {
 
                     if (pl.isOp()) {
-
                         plmsg.msg(pl, "§cAutodenied Inv request form " + p.getName());
-
                     }
-
                 }
 
                 plmsg.msg(p,"Your Inventory restore request was §cauto denied!");
@@ -421,33 +382,12 @@ public class InventoryListener implements Listener {
                 cancel();
 
             }
-
-
         }.runTaskTimer(plugin, 1200, 20);
-
-
-        BukkitTask cancelrun = new BukkitRunnable() {
-            @Override
-            public void run() {
-
-                if (cancel) {
-
-                    run.cancel();
-                    cancel = false;
-
-                }
-
-            }
-
-        }.runTaskTimer(plugin,0,20);
-
 
     }
 
     private void cancelrun() {
-
-        cancel = true;
-
+        run.cancel();
     }
 
 }

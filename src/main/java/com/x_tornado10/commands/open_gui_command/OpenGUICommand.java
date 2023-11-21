@@ -28,24 +28,15 @@ public class OpenGUICommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         if (!enabled) {
-
             if (sender instanceof Player) {
-
                 plmsg.msg((Player) sender, "This command is disabled.");
-
             } else {
-
                 logger.info("This command is disabled.");
-
             }
             return true;
         }
-
-
         if (!(sender instanceof Player)) {
-
             logger.info("Only Players can run this command!");
-
             return true;
         }
 
@@ -69,18 +60,14 @@ public class OpenGUICommand implements CommandExecutor {
             switch (key) {
                 case "GUI" -> {
                     if (isStringInt(sid)) {
-
                         int id = Integer.parseInt(sid);
-
                         HashMap<Integer, Inventory> invs_review = plugin.getInvs_review();
-
                         if (!invs_review.containsKey(id)) {
 
                             plmsg.msg(p, "Invalid GUI_ID! (GUI_" + id + ")");
                             break;
 
                         }
-
                         Inventory inv = invs_review.get(id);
 
                         ItemStack approve = new ItemStack(Material.GREEN_CONCRETE);

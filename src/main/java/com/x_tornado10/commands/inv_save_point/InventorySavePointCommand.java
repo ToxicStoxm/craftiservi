@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -126,14 +127,7 @@ public class InventorySavePointCommand implements CommandExecutor {
                             Inventory saved_inv = Bukkit.createInventory(inv.getHolder(), inv.getSize(), Bukkit.getPlayer(pid).getName());
                             saved_inv.setContents(slots);
 
-                            ItemStack restore = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-                            ItemMeta restore_meta = restore.getItemMeta();
-                            restore_meta.setDisplayName("§aRestore Inventory");
-
-                            List<String> restore_lore = new ArrayList<>();
-                            restore_lore.add("§7Restores the saved Inventory and drops the items of your current inventory!");
-                            restore_meta.setLore(restore_lore);
-                            restore.setItemMeta(restore_meta);
+                            ItemStack restore = getItemStack();
 
                             saved_inv.setItem(53, restore);
 
@@ -214,7 +208,7 @@ public class InventorySavePointCommand implements CommandExecutor {
                 }
             }
             case 3 -> {
-                if (args[0].toLowerCase().equals("rename")) {
+                if (args[0].equalsIgnoreCase("rename")) {
 
                     if (!inv_saves.containsKey(pid)) {
 
@@ -257,6 +251,19 @@ public class InventorySavePointCommand implements CommandExecutor {
         }
 
         return true;
+    }
+
+    @NotNull
+    private static ItemStack getItemStack() {
+        ItemStack restore = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
+        ItemMeta restore_meta = restore.getItemMeta();
+        restore_meta.setDisplayName("§aRestore Inventory");
+
+        List<String> restore_lore = new ArrayList<>();
+        restore_lore.add("§7Restores the saved Inventory and drops the items of your current inventory!");
+        restore_meta.setLore(restore_lore);
+        restore.setItemMeta(restore_meta);
+        return restore;
     }
 
     private void playerSendUsage(Player p) {

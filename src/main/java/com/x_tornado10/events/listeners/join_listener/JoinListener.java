@@ -1,4 +1,4 @@
-package com.x_tornado10.events.listeners;
+package com.x_tornado10.events.listeners.join_listener;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;

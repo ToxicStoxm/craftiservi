@@ -82,6 +82,7 @@ public class OpMessages implements Listener {
             List<UUID> temp = new ArrayList<>();
             @Override
             public void run() {
+                if (!enabled) {return;}
                 temp.clear();
                 Set<OfflinePlayer> ops = Bukkit.getOperators();
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -98,6 +99,7 @@ public class OpMessages implements Listener {
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
+                if (!enabled) {return;}
                 if (queue.isEmpty()) {cancel();}
                 if (online_admins.isEmpty()) {
                     queueAdd(queue);
@@ -112,6 +114,7 @@ public class OpMessages implements Listener {
         run2 = new BukkitRunnable() {
             @Override
             public void run() {
+                if (!enabled) {return;}
                if (!queue.isEmpty()) {
                    if (online_admins.isEmpty()) {
                        for (Map.Entry<String, Long> entry : queue.entrySet()) {

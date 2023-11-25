@@ -127,7 +127,7 @@ public class MainCommand implements CommandExecutor {
 
                         }
                         case "restoreconfig" -> {
-                            if (!configManager.BackupConfigExists()) {
+                            if (configManager.BackupConfigExists()) {
                                 plmsg.msg(p,"File not found!");
                                 plmsg.msg(p,"Can't restore values/variables from backup config!");
                                 plmsg.msg(p,"This is normal if this is the first time running the plugin!");
@@ -199,7 +199,7 @@ public class MainCommand implements CommandExecutor {
 
                         }
                         case "restoreconfig" -> {
-                            if (!configManager.BackupConfigExists()) {
+                            if (configManager.BackupConfigExists()) {
                                 logger.warning("Config restore failed! Backup config file not found!");
                                 logger.warning("This is normal if this is the first time running the plugin!");
                                 return true;

@@ -491,6 +491,9 @@ public final class craftiservi extends JavaPlugin {
     public InvisPlayers getInvisPlayers() {
         return invisPlayers;
     }
+    public OpMessages getOpmsg() {
+        return opmsg;
+    }
     public static boolean isVersionHigher(String version1, String version2) {
         String[] parts1 = version1.split("\\.");
         String[] parts2 = version2.split("\\.");

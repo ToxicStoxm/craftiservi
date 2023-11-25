@@ -28,9 +28,9 @@ import java.util.List;
 
 public class ConfigManager {
     private Configuration config;
-    private Paths paths;
-    private FileManager fm;
-    private craftiservi p = craftiservi.getInstance();
+    private final Paths paths;
+    private final FileManager fm;
+    private final craftiservi p = craftiservi.getInstance();
     private long cooldown = System.currentTimeMillis() - 6000;
 
     public ConfigManager(Configuration config, Paths paths, FileManager fm) {
@@ -138,7 +138,7 @@ public class ConfigManager {
             p.setPrefix(this, new TextFormatting());
 
             p.reload(constructWrapper());
-            if (!updateCommands()) {if (!updateCommands()){err = true;}}
+            if (updateCommands()) {if (updateCommands()){err = true;}}
 
             p.saveConfig();
 
@@ -335,9 +335,9 @@ public class ConfigManager {
             AFKChecker.enabled = afkc_enabled;
             AFKListener.enabled = afkc_enabled;
             //
-            return true;
-        } catch (Exception e) {
             return false;
+        } catch (Exception e) {
+            return true;
         }
 
     }
@@ -357,7 +357,7 @@ public class ConfigManager {
 
     public boolean BackupConfigExists() {
         File file = new File(paths.getBackup_config());
-        return file.exists();
+        return !file.exists();
     }
 
     public boolean restoreConfig() {

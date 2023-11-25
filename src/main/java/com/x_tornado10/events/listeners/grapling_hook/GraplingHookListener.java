@@ -4,6 +4,7 @@ import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
+import com.x_tornado10.utils.CDID;
 import com.x_tornado10.utils.CustomData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -126,7 +127,7 @@ public class GraplingHookListener implements Listener {
 
     @EventHandler
     public void onReload(ReloadEvent e) {
-        CustomData GhData = e.getData(4);
+        CustomData GhData = e.getData(CDID.GH_DATA);
         List<Boolean> b = GhData.getB();
         List<Double> d = GhData.getD();
 

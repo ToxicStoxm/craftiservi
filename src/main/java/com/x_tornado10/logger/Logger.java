@@ -2,6 +2,7 @@ package com.x_tornado10.logger;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
+import com.x_tornado10.utils.CDID;
 import com.x_tornado10.utils.CustomData;
 import com.x_tornado10.utils.TextFormatting;
 import org.bukkit.Bukkit;
@@ -105,7 +106,7 @@ public class Logger implements Listener {
 
     @EventHandler
     public void onReload(ReloadEvent e) {
-        CustomData loggerData = e.getData(0);
+        CustomData loggerData = e.getData(CDID.LOGGER_DATA);
         prefix = loggerData.getS(0);
         setEnabled(loggerData.getB(0));
         setDebug(loggerData.getB(1));

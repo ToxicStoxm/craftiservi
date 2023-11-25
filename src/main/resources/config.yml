@@ -75,6 +75,14 @@ Craftiservi:
       use-custom-Prefix: false
       # Provide your custom prefix, including colors and text-formatting (https://minecraft.tools/en/color-code.php). (DEFAULT: "[AdminChat] ")
       custom-Prefix: "[AdminChat] "
+      Queue:
+        # Enable the admin chat message queue feature. (DEFAULT: true)
+        Enabled: true
+        # Time (in minutes) admin chat messages are queued. (DEFAULT: 86400)
+        Queue-Time: 86400
+        # Max messages stored in the admin chat queue. (DEFAULT: -1)
+        Queue-Message-Limit: -1
+
 
 #########################################################################
 #                       FEATURE/COMMAND SETTINGS                        #

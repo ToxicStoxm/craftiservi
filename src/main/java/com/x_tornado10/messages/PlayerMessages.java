@@ -1,6 +1,7 @@
 package com.x_tornado10.messages;
 
 import com.x_tornado10.events.custom.ReloadEvent;
+import com.x_tornado10.utils.CDID;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -67,7 +68,7 @@ public class PlayerMessages implements Listener {
     @EventHandler
     public void onReload(ReloadEvent e) {
 
-        prefix = e.getData(1).getS(0);
+        prefix = e.getData(CDID.PLMSG_DATA).getS(0);
 
     }
 

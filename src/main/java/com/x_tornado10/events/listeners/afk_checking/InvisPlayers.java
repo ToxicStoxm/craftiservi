@@ -97,7 +97,7 @@ public class InvisPlayers implements Listener {
                             LpAPI = plugin.getLpAPI();
                         }
                         ArmorStand armorStand = (ArmorStand) Bukkit.getEntity(holograms.get(pid));
-                        String formattedDisplayName = getDisplayName(pid, p);
+                        String formattedDisplayName = plugin.getDisplayName(pid, p);
                         if (formattedDisplayName == null || formattedDisplayName.contains("null")) {
                             formattedDisplayName = p.getDisplayName();
                         }
@@ -108,20 +108,6 @@ public class InvisPlayers implements Listener {
             }
         }
         return true;
-    }
-
-    @Nullable
-    private String getDisplayName(UUID pid, Player p) {
-        UserManager userManager = LpAPI.getUserManager();
-        if (!userManager.isLoaded(pid)) {
-            userManager.loadUser(pid);
-        }
-        User user = userManager.getUser(pid);
-        if (user == null) {return new String("null");}
-        String formattedDisplayName = user.getCachedData().getMetaData().getPrefix() +
-                p.getName() +
-                user.getCachedData().getMetaData().getSuffix();
-        return formattedDisplayName;
     }
 
     public boolean removeInvis(UUID pid) {

@@ -36,17 +36,20 @@ import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
+import net.luckperms.api.node.NodeEqualityPredicate;
 import net.luckperms.api.node.types.*;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -199,27 +202,9 @@ public final class craftiservi extends JavaPlugin {
                 group.data().add(prefixNode);
                 groupManager.saveGroup(group);
             }
-            if (groupManager.getGroup("afkInvis") == null) {
-                Group group = groupManager.createAndLoadGroup("afkInvis").join();
-                WeightNode weightNode = WeightNode.builder(0).build();
-                group.data().add(weightNode);
-                groupManager.saveGroup(group);
-            }
-            if (groupManager.getGroup("afkNoCollision") == null) {
-                Group group = groupManager.createAndLoadGroup("afkNoCollision").join();
-                WeightNode weightNode = WeightNode.builder(0).build();
-                group.data().add(weightNode);
-                groupManager.saveGroup(group);
-            }
-            if (groupManager.getGroup("afkInvincible") == null) {
-                Group group = groupManager.createAndLoadGroup("afkInvincible").join();
-                WeightNode weightNode = WeightNode.builder(0).build();
-                group.data().add(weightNode);
-                groupManager.saveGroup(group);
-            }
-            if (groupManager.getGroup("afkInvincible2") == null) {
-                Group group = groupManager.createAndLoadGroup("afkInvincible2").join();
-                WeightNode weightNode = WeightNode.builder(0).build();
+            if (groupManager.getGroup("admins") == null) {
+                Group group = groupManager.createAndLoadGroup("admins").join();
+                WeightNode weightNode = WeightNode.builder(1000).build();
                 group.data().add(weightNode);
                 groupManager.saveGroup(group);
             }
@@ -254,7 +239,7 @@ public final class craftiservi extends JavaPlugin {
 
         logger = new Logger();
         plmsg = new PlayerMessages(colorprefix);
-        opmsg = new OpMessages(colorprefix);
+        opmsg = new OpMessages();
         playerlist = new HashMap<>();
         xpsaveareas = new HashMap<>();
         playersinsavearea = new HashMap<>();
@@ -566,7 +551,7 @@ public final class craftiservi extends JavaPlugin {
             return false;
         }
         GroupManager groupManager = LpAPI.getGroupManager();
-        Group group = groupManager.getGroup("afkTag");
+        Group group = groupManager.getGroup(groupName);
         if (group == null) {
             return false;
         }
@@ -596,7 +581,7 @@ public final class craftiservi extends JavaPlugin {
             return false;
         }
         GroupManager groupManager = LpAPI.getGroupManager();
-        Group group = groupManager.getGroup("afkTag");
+        Group group = groupManager.getGroup(groupName);
         if (group == null) {
             return false;
         }
@@ -605,6 +590,21 @@ public final class craftiservi extends JavaPlugin {
         user.data().remove(node);
         userManager.saveUser(user);
         return true;
+    }
+    public boolean isPlayerInGroup(UUID pid, String groupName) {
+        UserManager userManager = LpAPI.getUserManager();
+        User user = userManager.getUser(pid);
+        if (user == null) {
+            return false;
+        }
+        GroupManager groupManager = LpAPI.getGroupManager();
+        Group group = groupManager.getGroup(groupName);
+        if (group == null) {
+            return false;
+        }
+
+        Node node = InheritanceNode.builder(group).build();
+        return user.data().contains(node, NodeEqualityPredicate.ONLY_KEY).asBoolean();
     }
     public boolean removeSuffixFromPlayer(UUID pid, String suffix) {
         UserManager userManager = LpAPI.getUserManager();
@@ -622,6 +622,20 @@ public final class craftiservi extends JavaPlugin {
         }
         userManager.saveUser(user);
         return true;
+    }
+
+    @Nullable
+    public String getDisplayName(UUID pid, Player p) {
+        UserManager userManager = LpAPI.getUserManager();
+        if (!userManager.isLoaded(pid)) {
+            userManager.loadUser(pid);
+        }
+        User user = userManager.getUser(pid);
+        if (user == null) {return new String("null");}
+        String formattedDisplayName = user.getCachedData().getMetaData().getPrefix() +
+                p.getName() +
+                user.getCachedData().getMetaData().getSuffix();
+        return formattedDisplayName;
     }
 
     public FileManager getFm() {

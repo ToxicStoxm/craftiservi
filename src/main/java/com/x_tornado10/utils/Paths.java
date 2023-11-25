@@ -34,6 +34,15 @@ public class Paths {
     public String getShort_prefix() {return "Craftiservi.short-Prefix";}
     public String getUse_custom_Prefix() {return "Craftiservi.use-custom-Prefix";}
     public String getCustom_Prefix() {return "Craftiservi.custom-Prefix";}
+    public String getAdmin_Chat() {return "Craftiservi.Chat.Admin-Chat.Enabled";}
+    public String getAdmin_Chat_Auto_Assign() {return "Craftiservi.Chat.Admin-Chat.Auto-Assign";}
+    public String getAdmin_Chat_Admins() {return "Craftiservi.Chat.Admin-Chat.Admins";}
+    public String getAdmin_Chat_short_prefix() {return "Craftiservi.Chat.Admin-Chat.short-Prefix";}
+    public String getAdmin_Chat_useCustomPrefix() {return "Craftiservi.Chat.Admin-Chat.use-custom-Prefix";}
+    public String getAdmin_Chat_customPrefix() {return "Craftiservi.Chat.Admin-Chat.custom-Prefix";}
+    public String getAdmin_Chat_queue() {return "Craftiservi.Chat.Admin-Chat.Queue.Enabled";}
+    public String getAdmin_Chat_queueTime() {return "Craftiservi.Chat.Admin-Chat.Queue.Queue-Time";}
+    public String getAdmin_Chat_queueLimit() {return "Craftiservi.Chat.Admin-Chat.Queue.Queue-Message-Limit";}
     public String getCustom_dc_Prefix() {return "Craftiservi.custom-discord-Prefix";}
     public String getChat_filter_enabled() {return "Craftiservi.Chat.Filter.Enabled";}
     public String getJump_pads_enabled() {return "Craftiservi.Gadgets.Movement.Jump-Pads.Enabled";}

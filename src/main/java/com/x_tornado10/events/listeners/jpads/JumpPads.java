@@ -1,6 +1,7 @@
 package com.x_tornado10.events.listeners.jpads;
 
 import com.x_tornado10.events.custom.ReloadEvent;
+import com.x_tornado10.utils.CDID;
 import com.x_tornado10.utils.CustomData;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -95,7 +96,7 @@ public class JumpPads implements Listener {
 
     @EventHandler
     public void onReload(ReloadEvent e) {
-        CustomData JpData = e.getData(3);
+        CustomData JpData = e.getData(CDID.JP_DATA);
         List<Double> d = JpData.getD();
         List<Boolean> b = JpData.getB();
         enabled = b.get(0);

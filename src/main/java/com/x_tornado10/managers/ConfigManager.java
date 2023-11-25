@@ -113,8 +113,15 @@ public class ConfigManager {
     public boolean getGrappling_hook_prevent_falldmg() {return config.getBoolean(paths.getGrappling_hook_prevent_falldmg());}
     public double getJPads_cooldown() {return config.getDouble(paths.getJPads_cooldown()) * 1000;}
     public boolean getJPads_prevent_falldmg() {return config.getBoolean(paths.getJPads_prevent_falldmg());}
-
-
+    public boolean getAdminChat() {return config.getBoolean(paths.getAdmin_Chat());}
+    public List<String> getAdminChat_Admins() {return config.getStringList(paths.getAdmin_Chat_Admins());}
+    public boolean getAdminChat_AutoAssign() {return config.getBoolean(paths.getAdmin_Chat_Auto_Assign());}
+    public boolean getAdminChat_shortPrefix() {return config.getBoolean(paths.getAdmin_Chat_short_prefix());}
+    public boolean getAdminChat_useCustomPrefix() {return config.getBoolean(paths.getAdmin_Chat_useCustomPrefix());}
+    public String getAdminChat_customPrefix() {return config.getString(paths.getAdmin_Chat_customPrefix());}
+    public boolean getAdminChat_queue() {return config.getBoolean(paths.getAdmin_Chat_queue());}
+    public double getAdminChat_queueTime() {return config.getDouble(paths.getAdmin_Chat_queueTime());}
+    public double getAdminChat_queueLimit() {return config.getDouble(paths.getAdmin_Chat_queueLimit()) == -1 ? -1 : Math.round(config.getDouble(paths.getAdmin_Chat_queueLimit()));}
 
     public boolean reloadConfig(boolean force) {
 
@@ -131,8 +138,6 @@ public class ConfigManager {
             p.setPrefix(this, new TextFormatting());
 
             p.reload(constructWrapper());
-
-            //if (!p.getAfkChecker().startCheck()) {if (!p.getAfkChecker().startCheck()) {err = true;}}
             if (!updateCommands()) {if (!updateCommands()){err = true;}}
 
             p.saveConfig();
@@ -157,6 +162,7 @@ public class ConfigManager {
         customDataList.add(constructGhData());
         customDataList.add(constructCFilterData());
         customDataList.add(constructAFKLData());
+        customDataList.add(constructOpmsgData());
 
         return new CustomDataWrapper(customDataList);
     }
@@ -175,7 +181,6 @@ public class ConfigManager {
 
         return new CustomData(s, b, i, d, lS);
     }
-
      */
 
     private CustomData constructLoggerData() {
@@ -274,6 +279,25 @@ public class ConfigManager {
         lS.add(getAFKChecker_effects_DTypes());
 
         return new CustomData(null, b, null, null, lS);
+    }
+
+    private CustomData constructOpmsgData() {
+        List<String> s = new ArrayList<>();
+        List<Boolean> b = new ArrayList<>();
+        List<Double> d = new ArrayList<>();
+        List<List<String>> lS = new ArrayList<>();
+
+        s.add(getAdminChat_customPrefix());
+        b.add(getAdminChat());
+        b.add(getAdminChat_AutoAssign());
+        b.add(getAdminChat_useCustomPrefix());
+        b.add(getAdminChat_shortPrefix());
+        b.add(getAdminChat_queue());
+        lS.add(getAdminChat_Admins());
+        d.add(getAdminChat_queueTime());
+        d.add(getAdminChat_queueLimit());
+
+        return new CustomData(s, b, null, d, lS);
     }
 
     public boolean resetConfig() {

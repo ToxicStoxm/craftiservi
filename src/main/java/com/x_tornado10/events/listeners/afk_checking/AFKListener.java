@@ -4,6 +4,7 @@ import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.features.afk_protection.AFKChecker;
 import com.x_tornado10.logger.Logger;
+import com.x_tornado10.utils.CDID;
 import com.x_tornado10.utils.CustomData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -345,7 +346,7 @@ public class AFKListener implements Listener {
 
     @EventHandler
     public void onReload(ReloadEvent e) {
-        CustomData afkData = e.getData(6);
+        CustomData afkData = e.getData(CDID.AFKL_DATA);
         List<Boolean> b = afkData.getB();
 
         enabled = b.get(0);

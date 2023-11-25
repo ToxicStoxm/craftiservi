@@ -5,9 +5,7 @@ import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.events.listeners.afk_checking.InvisPlayers;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.messages.PlayerMessages;
-import com.x_tornado10.utils.CustomData;
-import com.x_tornado10.utils.ObjectCompare;
-import com.x_tornado10.utils.TextFormatting;
+import com.x_tornado10.utils.*;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
@@ -87,7 +85,6 @@ public class AFKChecker implements Listener {
             removeAfkEffects(pid, System.currentTimeMillis(), messages);
         }
         AFKPlayers.remove(pid);
-        //logger.info("REMOVED " + Bukkit.getPlayer(pid).getName());
     }
     public void clearAFK() {
         for (Map.Entry<UUID, Long> entry : AFKPlayers.entrySet()) {
@@ -133,7 +130,7 @@ public class AFKChecker implements Listener {
         }
         if (AFKeffects) {
             if (effects_AfkNameTag) {
-                if (!plugin.addPlayerToGroup(pid,"afkTag")) {
+                if (!plugin.addPlayerToGroup(pid,GROUP.AFKT)) {
                     logger.severe("Error occurred!");
                 } else {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yy HH:mm:ss");
@@ -150,16 +147,6 @@ public class AFKChecker implements Listener {
             if (effects_invisible) {
                 if(!invisPlayers.addInvis(pid, effects_invisible_hholo, effects_invisible_hholo_fullTag, effects_invisible_usePe)) {
                     logger.severe("Error occurred!");
-                }
-            }
-            if (effects_noCollision) {
-                plugin.addPlayerToGroup(pid, "afkNoCollision");
-            }
-            if (effects_invincible) {
-                plugin.addPlayerToGroup(pid, "afkInvincible");
-            } else {
-                if (effects_invincible2) {
-                    plugin.addPlayerToGroup(pid,"afkInvincible2");
                 }
             }
         }
@@ -184,7 +171,7 @@ public class AFKChecker implements Listener {
                 if (messages) logger.broadcast(name + " is no longer §2§l§oAFK§7", false, new ArrayList<>(Collections.singleton(pid)));
             }
         }
-        if (!plugin.removePlayerFromGroup(pid,"afkTag")) {
+        if (!plugin.removePlayerFromGroup(pid,GROUP.AFKT)) {
             logger.severe("Error occurred!");
         }
         String temp = "";
@@ -194,9 +181,6 @@ public class AFKChecker implements Listener {
         if(!invisPlayers.removeInvis(pid)) {
             logger.severe("Error occurred!");
         }
-        plugin.removePlayerFromGroup(pid, "afkNoCollision");
-        plugin.removePlayerFromGroup(pid,"afkInvincible");
-        plugin.removePlayerFromGroup(pid,"afkInvincible2");
     }
 
     private void afkChecker() {
@@ -261,7 +245,7 @@ public class AFKChecker implements Listener {
     @EventHandler
     public void onReload(ReloadEvent e) {
         cancelTasks();
-        CustomData afkData = e.getData(2);
+        CustomData afkData = e.getData(CDID.AFKC_DATA);
         List<Boolean> b = afkData.getB();
         List<String> s = afkData.getS();
         List<List<String>> lS = afkData.getlS();
@@ -281,7 +265,7 @@ public class AFKChecker implements Listener {
                             UUID tempID = Bukkit.getOfflinePlayer(st).getUniqueId();
                             exclude.add(String.valueOf(tempID));
                         } catch (IllegalArgumentException | NullPointerException exep) {
-                            logger.warning("Wasn't able to get player specified in the config (Path: Craftiservi.Afk-Checker.Exclude). Please use a valid UUID!");
+                            logger.warning("Wasn't able to get player specified in the config (Path: Craftiservi.Commands-Features.Afk-Checker.Exclude). Please use a valid UUID!");
                             logger.warning("If you are using the players name, try it with the UUID instead!");
                         }
                     }
@@ -329,10 +313,10 @@ public class AFKChecker implements Listener {
 
         if (LpAPI != null) {
             GroupManager groupManager = LpAPI.getGroupManager();
-            if (!groupManager.isLoaded("afkTag")) {
-                groupManager.loadGroup("afkTag");
+            if (!groupManager.isLoaded(GROUP.AFKT)) {
+                groupManager.loadGroup(GROUP.AFKT);
             }
-            Group group = groupManager.getGroup("afkTag");
+            Group group = groupManager.getGroup(GROUP.AFKT);
 
             PrefixNode prefixNode = PrefixNode.builder(AFKprefix, 0).build();
             for (Node node : group.getNodes()) {
@@ -345,10 +329,10 @@ public class AFKChecker implements Listener {
             Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
                 LpAPI = plugin.getLpAPI();
                 GroupManager groupManager = LpAPI.getGroupManager();
-                if (!groupManager.isLoaded("afkTag")) {
-                    groupManager.loadGroup("afkTag");
+                if (!groupManager.isLoaded(GROUP.AFKT)) {
+                    groupManager.loadGroup(GROUP.AFKT);
                 }
-                Group group = groupManager.getGroup("afkTag");
+                Group group = groupManager.getGroup(GROUP.AFKT);
 
                 PrefixNode prefixNode = PrefixNode.builder(AFKprefix, 0).build();
                 for (Node node : group.getNodes()) {

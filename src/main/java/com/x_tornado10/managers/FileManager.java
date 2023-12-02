@@ -5,7 +5,6 @@ import com.x_tornado10.utils.Paths;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
@@ -15,8 +14,8 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static com.x_tornado10.utils.ToFromBase64.fromBase64;
-import static com.x_tornado10.utils.ToFromBase64.toBase64;
+import static com.x_tornado10.utils.data.convert.ToFromBase64.fromBase64;
+import static com.x_tornado10.utils.data.convert.ToFromBase64.toBase64;
 
 public class FileManager {
 

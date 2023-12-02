@@ -2,7 +2,7 @@ package com.x_tornado10.events.listeners.xp_area_listener;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
-import com.x_tornado10.messages.PlayerMessages;
+import com.x_tornado10.message_sys.PlayerMessages;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

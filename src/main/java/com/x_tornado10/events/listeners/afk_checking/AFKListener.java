@@ -4,11 +4,9 @@ import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.features.afk_protection.AFKChecker;
 import com.x_tornado10.logger.Logger;
-import com.x_tornado10.utils.CDID;
-import com.x_tornado10.utils.CustomData;
-import org.bukkit.Bukkit;
+import com.x_tornado10.utils.statics.CDID;
+import com.x_tornado10.utils.custom_data.CustomData;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
@@ -22,7 +20,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +121,6 @@ public class AFKListener implements Listener {
                 }
             }
         }
-        if (((Player) e.getEntity()).getHealth() <= e.getFinalDamage()) {return;}
 
         UUID pid = p.getUniqueId();
 
@@ -143,6 +139,7 @@ public class AFKListener implements Listener {
             } else if (effects_invincibleCustom && dTypes.contains(e.getCause().name())) {
                 e.setCancelled(true);
             } else {
+                if (((Player) e.getEntity()).getHealth() <= e.getFinalDamage()) {return;}
                 checker.removeAFK(pid, false, true);
                 if (playersToCheck.containsKey(pid)) {
                     checker.addCheck(pid);
@@ -186,7 +183,6 @@ public class AFKListener implements Listener {
 
         if (!enabled) {return;}
         if (!(e.getEntity() instanceof Player p)) {return;}
-        if (((Player) e.getEntity()).getHealth() <= e.getFinalDamage()) {return;}
 
         UUID pid = e.getEntity().getUniqueId();
 
@@ -198,6 +194,7 @@ public class AFKListener implements Listener {
                     e.setCancelled(true);
                 }
             } else {
+                if (((Player) e.getEntity()).getHealth() <= e.getFinalDamage()) {return;}
                 checker.removeAFK(pid, false, true);
                 if (playersToCheck.containsKey(pid)) {
                     checker.addCheck(pid);

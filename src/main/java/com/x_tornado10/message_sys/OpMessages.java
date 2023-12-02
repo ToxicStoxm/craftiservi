@@ -1,11 +1,13 @@
-package com.x_tornado10.messages;
+package com.x_tornado10.message_sys;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.logger.Logger;
-import com.x_tornado10.utils.CDID;
-import com.x_tornado10.utils.CustomData;
-import com.x_tornado10.utils.GROUP;
+import com.x_tornado10.utils.statics.CDID;
+import com.x_tornado10.utils.custom_data.CustomData;
+import com.x_tornado10.utils.statics.GROUP;
+import net.kyori.text.TextComponent;
+import net.kyori.text.adapter.bukkit.TextAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -15,6 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class OpMessages implements Listener {
 
@@ -32,28 +35,29 @@ public class OpMessages implements Listener {
     private Logger logger;
     private BukkitTask run;
     private BukkitTask run2;
-    private HashMap<String, Long> queue;
+    private ConcurrentHashMap<Long, String> queue;
     private double queueTime;
     private double queueLimit;
     private boolean queue_;
+    private static boolean queueOutput = false;
 
     public OpMessages () {
 
         plugin = craftiservi.getInstance();
         admins = new ArrayList<>();
         online_admins = new ArrayList<>();
-        def_prefix = "&c&l[Admin-Chat]:&r ";
-        def_short_prefix = "&c&l[OC]:&r ";
+        def_prefix = "§c§l[Admin-Chat]§r ";
+        def_short_prefix = "§c§l[OC]§r ";
         prefix = def_prefix;
         logger = plugin.getCustomLogger();
-        queue = new HashMap<>();
+        queue = new ConcurrentHashMap<>();
     }
 
     public void send(String message) {
         if (!enabled) {return;}
         if (online_admins.isEmpty() && queue_) {
             if (queueLimit != -1) if (queue.size() >= queueLimit) return;
-            queue.put(message,System.currentTimeMillis());
+            queue.put(System.currentTimeMillis(),message);
             check_queue();
             return;
         }
@@ -65,16 +69,16 @@ public class OpMessages implements Listener {
         }
     }
     public void send(Player p, String message) {
-        send(plugin.getDisplayName(p.getUniqueId(), p) + message);
+        send(Objects.requireNonNull(plugin.getDisplayName(p.getUniqueId(), p)).replace("null","") + ": " + message);
     }
     public void send(UUID pid, String message) {
         Player p = Bukkit.getPlayer(pid);
         if (p != null) {
-            send(plugin.getDisplayName(pid, p) + message);
+            send(Objects.requireNonNull(plugin.getDisplayName(pid, p)).replace("null","") + ": " + message);
         }
     }
     public void send(String sender_name, String message) {
-        send(sender_name + message);
+        send(sender_name + ": " + message);
     }
 
     private void update_admins() {
@@ -96,19 +100,24 @@ public class OpMessages implements Listener {
         }.runTaskTimerAsynchronously(plugin,20,40);
     }
     private void queueOutput(List<String> queue) {
-        BukkitTask task = new BukkitRunnable() {
+        logger.severe("queueOutput");
+        logger.severe(String.valueOf(getPeriod(queue.size())));
+        new BukkitRunnable() {
             @Override
             public void run() {
-                if (!enabled) {return;}
-                if (queue.isEmpty()) {cancel();}
+                logger.severe(String.valueOf(queue.size()));
+                if (!enabled) {queueOutput = false; return; }
+                if (queue.isEmpty()) {cancel();queueOutput = false;return;}
                 if (online_admins.isEmpty()) {
                     queueAdd(queue);
                     cancel();
+                    queueOutput = false;
+                } else {
+                    send(queue.get(queue.size() - 1));
+                    queue.remove(queue.size() - 1);
                 }
-                send(queue.get(queue.size()-1));
-                queue.remove(queue.size()-1);
             }
-        }.runTaskTimerAsynchronously(plugin, 0,10);
+        }.runTaskTimerAsynchronously(plugin, 20, getPeriod(queue.size()));
     }
     private void check_queue() {
         run2 = new BukkitRunnable() {
@@ -117,18 +126,21 @@ public class OpMessages implements Listener {
                 if (!enabled) {return;}
                if (!queue.isEmpty()) {
                    if (online_admins.isEmpty()) {
-                       for (Map.Entry<String, Long> entry : queue.entrySet()) {
-                           if (entry.getValue() - System.currentTimeMillis() > queueTime) {
+                       for (Map.Entry<Long, String> entry : queue.entrySet()) {
+                           if (entry.getKey() - System.currentTimeMillis() > queueTime) {
                                queue.remove(entry.getKey());
                            }
                        }
                    } else {
-                       List<String> queueEntries = new ArrayList<>();
-                       for (Map.Entry<String, Long> entry : queue.entrySet()) {
-                               queueEntries.add(entry.getKey());
+                       if (!queueOutput) {
+                           List<String> queueEntries = new ArrayList<>();
+                           for (Map.Entry<Long, String> entry : queue.entrySet()) {
+                               queueEntries.add(entry.getValue());
                                queue.remove(entry.getKey());
+                           }
+                           queueOutput(queueEntries);
+                           queueOutput = true;
                        }
-                       queueOutput(queueEntries);
                    }
                }
             }
@@ -136,15 +148,30 @@ public class OpMessages implements Listener {
     }
     private void queueAdd(List<String> temp) {
         for (String s : temp) {
-            queue.put(s, System.currentTimeMillis());
+            queue.put(System.currentTimeMillis(), s);
         }
+    }
+
+    private int getPeriod(int queueSize) {
+        int result = 10;
+        int entries = queueSize / 10;
+
+        for (int i = 0; i < entries; i++) {
+            if (i == 3 || i == 2) {
+                result -= 2;
+            } else {
+                result -= 1;
+            }
+        }
+
+        return Math.max(0, result);
     }
 
     @EventHandler
     public void onReload(ReloadEvent e) {
 
-        run.cancel();
-        run2.cancel();
+        if (run != null) run.cancel();
+        if (run2 != null) run2.cancel();
         CustomData opmsg_data = e.getData(CDID.OPMSG_DATA);
         List<Boolean> b = opmsg_data.getB();
         List<Double> d = opmsg_data.getD();

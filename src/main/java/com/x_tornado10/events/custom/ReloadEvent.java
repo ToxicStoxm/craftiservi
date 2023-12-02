@@ -1,7 +1,7 @@
 package com.x_tornado10.events.custom;
 
-import com.x_tornado10.utils.CustomData;
-import com.x_tornado10.utils.CustomDataWrapper;
+import com.x_tornado10.utils.custom_data.CustomData;
+import com.x_tornado10.utils.custom_data.CustomDataWrapper;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 

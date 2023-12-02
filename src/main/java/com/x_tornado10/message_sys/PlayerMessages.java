@@ -1,7 +1,7 @@
-package com.x_tornado10.messages;
+package com.x_tornado10.message_sys;
 
 import com.x_tornado10.events.custom.ReloadEvent;
-import com.x_tornado10.utils.CDID;
+import com.x_tornado10.utils.statics.CDID;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

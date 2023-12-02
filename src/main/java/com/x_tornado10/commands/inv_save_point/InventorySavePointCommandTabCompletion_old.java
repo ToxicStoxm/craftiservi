@@ -9,7 +9,7 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.*;
 
-public class InventorySavePointCommandTabCompletion implements TabCompleter {
+public class InventorySavePointCommandTabCompletion_old implements TabCompleter {
 
     private craftiservi plugin = craftiservi.getInstance();
     private HashMap<UUID, HashMap<String, Inventory>> inv_saves = plugin.getInv_saves();
@@ -21,8 +21,6 @@ public class InventorySavePointCommandTabCompletion implements TabCompleter {
     public static boolean enabled;
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-
-        if (true) {return null;}
 
         if (!enabled) {return null;}
 

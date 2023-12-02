@@ -1,4 +1,4 @@
-package com.x_tornado10.utils;
+package com.x_tornado10.utils.data.convert;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;

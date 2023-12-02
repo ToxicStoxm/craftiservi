@@ -1,8 +1,8 @@
 package com.x_tornado10.chat.filters;
 
 import com.x_tornado10.events.custom.ReloadEvent;
-import com.x_tornado10.utils.CDID;
-import com.x_tornado10.utils.CustomData;
+import com.x_tornado10.utils.statics.CDID;
+import com.x_tornado10.utils.custom_data.CustomData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.bukkit.event.EventHandler;

@@ -28,8 +28,6 @@ public class JoinListener implements Listener {
     private boolean show = false;
 
     private Logger logger;
-    private Player player;
-    private UUID pid2;
 
     public JoinListener() {
         logger = plugin.getCustomLogger();
@@ -40,8 +38,6 @@ public class JoinListener implements Listener {
 
         Player p = e.getPlayer();
         UUID pid = p.getUniqueId();
-        player = p;
-        pid2 = pid;
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
 
@@ -52,13 +48,13 @@ public class JoinListener implements Listener {
 
         } else {
 
-           show();
+           show(p);
 
         }
 
     }
 
-    private void show() {
+    private void show(Player player) {
 
         if (player.isDead()) {return;}
 
@@ -69,19 +65,15 @@ public class JoinListener implements Listener {
             public void run() {
 
                 if (timesrun[0] >= 5) {
-
                     cancel();
                     timesrun[0] = 0;
-
                 }
 
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§l§6§k2" + ChatColor.DARK_RED + (ChatColor.BOLD + "Welcome back ") + Bukkit.getPlayer(pid2).getName() + "§l§6§k2"));
-
-
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§l§6§k2" + ChatColor.DARK_RED + (ChatColor.BOLD + "Welcome back ") + player.getName() + "§l§6§k2"));
                 timesrun[0]++;
 
             }
-        }.runTaskTimer(craftiservi.getInstance(), 0, 20); //in mc ticks
+        }.runTaskTimer(craftiservi.getInstance(), 0, 20);
 
     }
 }

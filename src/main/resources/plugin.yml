@@ -39,3 +39,10 @@ commands:
     aliases:
       - cs
     usage: "Usage: /craftiservi <reloadconfig-resetconfig-help>"
+  adminchat:
+    description: chat to communicate with other admins
+    permission: craftiservi.command.adminchat
+    aliases:
+      - ac
+      - oc
+    usage: "Usage: /adminchat <message>"

@@ -1,9 +1,8 @@
 package com.x_tornado10.commands.open_gui_command;
 
-import com.x_tornado10.commands.inv_save_point.InventorySavePointCommand;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
-import com.x_tornado10.messages.PlayerMessages;
+import com.x_tornado10.message_sys.PlayerMessages;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

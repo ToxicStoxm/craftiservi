@@ -2,7 +2,7 @@ package com.x_tornado10.events.listeners.inventory;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
-import com.x_tornado10.messages.PlayerMessages;
+import com.x_tornado10.message_sys.PlayerMessages;
 import net.kyori.text.TextComponent;
 import net.kyori.text.adapter.bukkit.TextAdapter;
 import net.kyori.text.format.TextColor;

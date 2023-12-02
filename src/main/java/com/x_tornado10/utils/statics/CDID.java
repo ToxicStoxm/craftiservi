@@ -1,4 +1,4 @@
-package com.x_tornado10.utils;
+package com.x_tornado10.utils.statics;
 
 public class CDID {
     public static final int LOGGER_DATA = 0;

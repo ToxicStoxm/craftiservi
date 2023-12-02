@@ -2,11 +2,12 @@ package com.x_tornado10.features.inv_saves;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
-import com.x_tornado10.messages.OpMessages;
-import com.x_tornado10.messages.PlayerMessages;
+import com.x_tornado10.message_sys.OpMessages;
+import com.x_tornado10.message_sys.PlayerMessages;
+import io.papermc.paper.text.PaperComponents;
 import net.kyori.text.TextComponent;
+import net.kyori.text.adapter.bukkit.TextAdapter;
 import net.kyori.text.format.TextColor;
-import org.apache.logging.log4j.core.appender.rolling.action.IfAccumulatedFileCount;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.awt.print.Paper;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -42,6 +44,7 @@ public class InvSaveMgr implements Listener {
         Inventory inv = convertInv(p,temp,name);
         if (inv == null) {return false;}
         HashMap<String,Inventory> temp2 = new HashMap<>();
+        if (inv_saves.containsKey(pid)) temp2 = inv_saves.get(pid);
         temp2.put(name,inv);
         inv_saves.put(pid, temp2);
         return true;
@@ -52,10 +55,15 @@ public class InvSaveMgr implements Listener {
         return true;
     }
     public boolean remove(UUID pid, String name) {
-        if (inv_saves.containsKey(pid)) {
+        if (exists(pid,name)) {
             HashMap<String,Inventory> temp = inv_saves.get(pid);
             return temp.remove(name) != null;
-        } else return false;
+        } else if (name.equals("*")) {
+            HashMap<String,Inventory> temp = inv_saves.get(pid);
+            temp.clear();
+            return true;
+        }
+        return false;
     }
     public boolean rename(UUID pid, String name, String new_name) {
         if (!exists(pid, name)) {return false;}
@@ -67,7 +75,7 @@ public class InvSaveMgr implements Listener {
             if (inv2 == null) {return false;}
             temp.remove(name);
             temp.put(new_name, inv2);
-            return remove(pid,name) && add(pid,temp);
+            return true;
     }
     public boolean view(UUID pid, String name) {
         if (exists(pid,name)) {
@@ -149,7 +157,7 @@ public class InvSaveMgr implements Listener {
                 .append(TextComponent.builder(plugin.getColorprefix() + plmsg.getLine()))
                 .color(TextColor.GRAY)
                 .build();
-        opmsg.send(inv_restore_request_open_inv.toString());
+        opmsg.send(inv_restore_request_open_inv.content());
         return true;
     }
     private boolean openInventory(UUID pid, String name) {
@@ -228,7 +236,7 @@ public class InvSaveMgr implements Listener {
 
     }
 
-    private boolean exists(UUID pid, String name) {
+    public boolean exists(UUID pid, String name) {
         if (inv_saves.containsKey(pid)) {
             HashMap<String, Inventory> temp = inv_saves.get(pid);
             return temp.containsKey(name);
@@ -243,7 +251,14 @@ public class InvSaveMgr implements Listener {
         temp.setContents(slots);
         return temp;
     }
-
+    public ArrayList<String> getPlayerInvSaves(UUID pid) {
+        ArrayList<String> result = new ArrayList<>();
+        if (!inv_saves.containsKey(pid)) {return new ArrayList<>();}
+        for (Map.Entry<String, Inventory> entry : inv_saves.get(pid).entrySet()) {
+            result.add(entry.getKey());
+        }
+        return result;
+    }
 
     @EventHandler
     public void onReload(ReloadEvent e) {

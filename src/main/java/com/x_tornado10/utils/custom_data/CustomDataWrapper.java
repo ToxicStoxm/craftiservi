@@ -1,4 +1,4 @@
-package com.x_tornado10.utils;
+package com.x_tornado10.utils.custom_data;
 
 import java.util.List;
 

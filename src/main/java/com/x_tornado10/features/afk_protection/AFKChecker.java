@@ -4,8 +4,12 @@ import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.events.listeners.afk_checking.InvisPlayers;
 import com.x_tornado10.logger.Logger;
-import com.x_tornado10.messages.PlayerMessages;
-import com.x_tornado10.utils.*;
+import com.x_tornado10.message_sys.PlayerMessages;
+import com.x_tornado10.utils.custom_data.CustomData;
+import com.x_tornado10.utils.data.compare.ObjectCompare;
+import com.x_tornado10.utils.data.convert.TextFormatting;
+import com.x_tornado10.utils.statics.CDID;
+import com.x_tornado10.utils.statics.GROUP;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
@@ -17,10 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
 
-import java.awt.print.Paper;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
@@ -63,6 +64,8 @@ public class AFKChecker implements Listener {
 
         playersToCheck = plugin.getPlayersToCheck();
         AFKPlayers = plugin.getAfkPlayers();
+        AFKprefix = "";
+        AFKsuffix = "";
         exclude = new ArrayList<>();
         temp = new HashMap<>();
         logger = plugin.getCustomLogger();
@@ -130,7 +133,7 @@ public class AFKChecker implements Listener {
         }
         if (AFKeffects) {
             if (effects_AfkNameTag) {
-                if (!plugin.addPlayerToGroup(pid,GROUP.AFKT)) {
+                if (!plugin.addPlayerToGroup(pid, GROUP.AFKT)) {
                     logger.severe("Error occurred!");
                 } else {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yy HH:mm:ss");
@@ -333,7 +336,6 @@ public class AFKChecker implements Listener {
                     groupManager.loadGroup(GROUP.AFKT);
                 }
                 Group group = groupManager.getGroup(GROUP.AFKT);
-
                 PrefixNode prefixNode = PrefixNode.builder(AFKprefix, 0).build();
                 for (Node node : group.getNodes()) {
                     if (node instanceof PrefixNode) {

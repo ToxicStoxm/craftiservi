@@ -1,337 +1,182 @@
 package com.x_tornado10.commands.inv_save_point;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.features.inv_saves.InvSaveMgr;
 import com.x_tornado10.logger.Logger;
-import com.x_tornado10.messages.PlayerMessages;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import com.x_tornado10.message_sys.OpMessages;
+import com.x_tornado10.message_sys.PlayerMessages;
+import com.x_tornado10.utils.statics.PERMISSION;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class InventorySavePointCommand implements CommandExecutor {
 
-    private Player p;
-
-    private Logger logger;
-
-    private craftiservi plugin;
-
-    private HashMap<UUID, HashMap<String, Inventory>> inv_saves;
-
-    private PlayerMessages plmsg;
     public static boolean enabled;
+    private craftiservi plugin;
+    private PlayerMessages plmsg;
+    private OpMessages opmsg;
+    private Logger logger;
+    private InvSaveMgr invSaveMgr;
+    private final List<String> illegal_chars = new ArrayList<>();
+    public InventorySavePointCommand() {
+        plugin = craftiservi.getInstance();
+        plmsg = plugin.getPlayerMessages();
+        opmsg = plugin.getOpmsg();
+        logger = plugin.getCustomLogger();
+        invSaveMgr = plugin.getInvSaveMgr();
+            illegal_chars.add("\\");
+            illegal_chars.add("\"");
+            illegal_chars.add(".");
+            illegal_chars.add("*");
+    }
+
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-        plugin = craftiservi.getInstance();
-        logger = plugin.getCustomLogger();
-        plmsg = plugin.getPlayerMessages();
-        inv_saves = plugin.getInv_saves();
-
-        if (!enabled) {
-
-            if (sender instanceof Player) {
-
-                plmsg.msg((Player) sender, "This command is disabled.");
-
-            } else {
-
-                logger.info("This command is disabled.");
-
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        if (!enabled) {return true;}
+        if (!(sender instanceof Player p)) {
+            logger.info("This command can only be executed by a player!");
+            return true;
+        } else {
+            if (!plugin.hasPermission(p, PERMISSION.COMMAND_INVSAVE)) {
+                noPerms(p);
+                return true;
             }
-            return true;
-        }
+            UUID pid = p.getUniqueId();
 
-        if (!(sender instanceof Player)) {
-
-            logger.info("This command can only be performed by a player!");
-
-            return true;
-        }
-
-        p = (Player) sender;
-        UUID pid = p.getUniqueId();
-
-        switch (args.length) {
-
-            case 1 -> {
-                switch (args[0].toLowerCase()) {
-                    case "new" -> plmsg.msg(p, "Please provide a name for this InventorySavePoint!");
-                    case "remove" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to remove!");
-                    case "rename" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to rename!");
-                    case "review" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to review!");
-                    default -> playerSendUsage(p);
+            switch (args.length) {
+                case 1 -> {
+                    switch (args[0].toLowerCase()) {
+                        case "new" -> plmsg.msg(p, "Please provide a name for this InventorySavePoint!");
+                        case "remove" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to remove!");
+                        case "rename" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to rename!");
+                        case "view" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to review!");
+                        case "restore" -> plmsg.msg(p, "Please specify which InventorySavePoint you want to restore!");
+                        case "list" -> {
+                            ArrayList<String> inv_names = invSaveMgr.getPlayerInvSaves(pid);
+                            if (!inv_names.isEmpty()) {
+                                plmsg.msg(p, ArrayToStringList(inv_names, ","));
+                            } else {
+                                plmsg.msg(p,"No InventorySavePoint's were found!");
+                            }
+                        }
+                        default -> playerSendUsage(p);
+                    }
                 }
-            }
-            case 2 -> {
-                switch (args[0].toLowerCase()) {
-                    case "new" -> {
-                        if (!inv_saves.containsKey(pid)) {
-
-                            inv_saves.put(pid, new HashMap<>());
-
-                        }
-                        HashMap<String,Inventory> p_invs = inv_saves.get(pid);
-                        if (args[1].isEmpty()) {
-
-                            playerSendUsage(p);
-                            return true;
-
-                        }
-                        if (p_invs.containsKey(args[1])) {
-
-                            plmsg.msg(p, "'" + args[1] + "' does already exist! If you want to rename it do /invsave rename " + args[1] + " <NewInvName>");
-                            return true;
-
-                        } else {
-
-                            if(checkName(args[1])) {
-
-                                p_invs.put(args[1], inv_point(p));
+                case 2 -> {
+                    switch (args[0].toLowerCase()) {
+                        case "new" -> {
+                            if (isInvalid(args[1])) {
+                                plmsg.msg(p,"Name contains Illegal or Invalid Characters! " + ArrayToStringList((ArrayList<String>) illegal_chars, "|"));
+                                break;
+                            }
+                            if (invSaveMgr.exists(pid,args[1])) {
+                                plmsg.msg(p, "'" + args[1] + "' does already exist! If you want to rename it do /invsave rename " + args[1] + " <NewInvName>");
+                                break;
+                            }
+                            if (invSaveMgr.add(pid, args[1])) {
                                 plmsg.msg(p, "Successfully created new InventorySavePoint '" + args[1] + "'!");
                                 logger.info(p.getName() + " created new InventorySavePoint '" + args[1] + "'!");
-
                             } else {
-
-                                plmsg.msg(p, "Illegal symbol/s detected! Name can't contain: . | \" | \\");
-                                return true;
-
+                                plmsg.msg(p,"Wasn't able to create new InventorySavePoint! Try again");
                             }
-
                         }
-                    }
-                    case "view" -> {
-                        if (!inv_saves.containsKey(pid)) {
-
-                            plmsg.msg(p,"You have no InventorySavePoints to review!");
-                            return true;
-
-                        }
-                        HashMap<String, Inventory> p_invs = inv_saves.get(pid);
-                        if (p_invs.containsKey(args[1])) {
-
-                            Inventory inv = p_invs.get(args[1]);
-                            ItemStack[] slots = inv.getContents();
-
-                            Inventory saved_inv = Bukkit.createInventory(inv.getHolder(), inv.getSize(), Bukkit.getPlayer(pid).getName());
-                            saved_inv.setContents(slots);
-
-                            ItemStack restore = getItemStack();
-
-                            saved_inv.setItem(53, restore);
-
-                            p.openInventory(saved_inv);
-
-                        } else {
-
-                            if (p_invs.isEmpty()) {
-
-                                plmsg.msg(p, "You have no InventorySavePoints to review!");
-
+                        case "view" -> {
+                            if (notFound(p,args[1])) break;
+                            if (invSaveMgr.view(pid, args[1])) {
+                                plmsg.msg(p,"Viewing " + args[1] + "...");
                             } else {
-
-                                plmsg.msg(p, "Error! Name '" + args[1] + "' was not found!");
-
+                                plmsg.msg(p,"There was an error opening " + args[1] + "! Please try again!");
                             }
-
                         }
-
-                    }
-                    case "remove" -> {
-                        if (!inv_saves.containsKey(pid)) {
-
-                            plmsg.msg(p, "You have no InventorySavePoints to delete!");
-                            return true;
-
-                        }
-                        HashMap<String, Inventory> p_invs2 = inv_saves.get(pid);
-                        if (p_invs2.containsKey(args[1])) {
-
-                            p_invs2.remove(args[1]);
-                            plmsg.msg(p, "Successfully deleted '" + args[1] + "'!");
-                            logger.info(p.getName() + " deleted InventorySavePoint '" + args[1] + "'!");
-
-                        } else {
-
-                            if (args[1].equals("*")) {
-
-                                if (p_invs2.isEmpty()) {
-
-                                    plmsg.msg(p, "You have no InventorySavePoints to delete!");
-
-                                } else {
-
-                                    p_invs2.clear();
+                        case "remove" -> {
+                            if (notFound(p,args[1]) && !args[1].equals("*")) break;
+                            if (invSaveMgr.remove(pid, args[1])) {
+                                if (args[1].equals("*")) {
                                     plmsg.msg(p, "Successfully deleted all InventorySavePoints!");
+                                } else {
+                                    plmsg.msg(p, "Successfully deleted '" + args[1] + "'!");
+                                    logger.info(p.getName() + " deleted InventorySavePoint '" + args[1] + "'!");
                                 }
-
-
                             } else {
-
-                                plmsg.msg(p, "Deletion failed! Name '" + args[1] + "' was not found!");
+                                plmsg.msg(p,"There was an error deleting " + args[1] + "! Please try again!");
                             }
-
                         }
-
-                        inv_saves.replace(pid, p_invs2);
+                        case "rename" -> {
+                            if (notFound(p,args[1])) break;
+                            plmsg.msg(p,"Renaming Failed! Please provide a new name!");
+                        }
+                        case "restore" -> {
+                           if (notFound(p,args[1])) break;
+                           if (invSaveMgr.requestRestore(pid,args[1])) {
+                               plmsg.msg(p,"Successfully requested to restore " + args[1] + "!");
+                           } else plmsg.msg(p,"Request failed! Please try again!");
+                        }
+                        default -> playerSendUsage(p);
                     }
-                    case "rename" -> {
-                        if (!inv_saves.containsKey(pid)) {
-
-                            plmsg.msg(p, "You have no saved Inventories to rename!");
-                            return true;
-
-                        }
-                        HashMap<String, Inventory> p_invs3 = inv_saves.get(pid);
-                        if (p_invs3.containsKey(args[1])) {
-
-                            plmsg.msg(p, "Renaming Failed! Please provide a new name!");
-
-                        } else {
-
-                            plmsg.msg(p, "Error! Name '" + args[1] + "' was not found!");
-
-                        }
-                    }
-                    default -> playerSendUsage(p);
                 }
-            }
-            case 3 -> {
-                if (args[0].equalsIgnoreCase("rename")) {
-
-                    if (!inv_saves.containsKey(pid)) {
-
-                        plmsg.msg(p, "You have no saved Inventories to rename!");
-                        return true;
-
-                    }
-
-                    HashMap<String, Inventory> p_invs2 = inv_saves.get(pid);
-
-                    if (p_invs2.containsKey(args[1])) {
-
-                        if (checkName(args[2])) {
-
-                            Inventory temp = p_invs2.get(args[1]);
-                            p_invs2.remove(args[1]);
-                            p_invs2.put(args[2], temp);
+                case 3 -> {
+                    if (args[0].equals("rename")) {
+                        if (notFound(p,args[1])) break;
+                        if (isInvalid(args[2])) {
+                            plmsg.msg(p,"Name contains Illegal or Invalid Characters! " + ArrayToStringList((ArrayList<String>) illegal_chars,"|"));
+                            break;
+                        }
+                        if (invSaveMgr.exists(pid,args[2])) {
+                            plmsg.msg(p,"'" + args[2] + "' already exists! Please choose another name!");
+                            break;
+                        }
+                        if (invSaveMgr.rename(pid,args[1],args[2])) {
                             plmsg.msg(p, "Successfully renamed '" + args[1] + "' to '" + args[2] + "'!");
                             logger.info(p.getName() + " renamed InventorySavePoint '" + args[1] + "' to '" + args[2] + "'!");
-                        } else {
-
-                            plmsg.msg(p, "Illegal symbol/s detected! Name can't contain: . | \" | \\");
-                            return true;
-
-                        }
-
-                    } else {
-
-                        plmsg.msg(p, "Error! Name '" + args[1] + "' was not found!");
-
+                        } else plmsg.msg(p,"Renaming failed! Please try again!");
                     }
-
-                } else {
-
-                    playerSendUsage(p);
-
+                    else playerSendUsage(p);
                 }
+                default -> plmsg.msg(p,"You provided too many arguments!");
             }
-            default -> playerSendUsage(p);
+
         }
 
         return true;
     }
 
-    @NotNull
-    private static ItemStack getItemStack() {
-        ItemStack restore = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-        ItemMeta restore_meta = restore.getItemMeta();
-        restore_meta.setDisplayName("§aRestore Inventory");
-
-        List<String> restore_lore = new ArrayList<>();
-        restore_lore.add("§7Restores the saved Inventory and drops the items of your current inventory!");
-        restore_meta.setLore(restore_lore);
-        restore.setItemMeta(restore_meta);
-        return restore;
+    private String ArrayToStringList(ArrayList<String> list, String seperator) {
+        seperator = seperator+ " ";
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        for (String s : list) {
+            builder.append(s).append(seperator);
+        }
+        builder.deleteCharAt(builder.lastIndexOf(seperator.trim()));
+        builder.append("]");
+        builder.deleteCharAt(builder.lastIndexOf(" "));
+        return builder.toString();
     }
 
     private void playerSendUsage(Player p) {
-
-        plmsg.msg(p,"Usage: /invsave <new-remove-rename> <InvName> <NewInvName>");
-
+        plmsg.msg(p,"Usage: /invsave <new-remove-rename-restore> <InvName> <NewInvName>");
     }
 
-    private Inventory inv_point(Player p) {
-
-        Inventory temp = p.getInventory();
-
-        Inventory inv = Bukkit.createInventory(p, 54, p.getName());
-
-        ItemStack[] slots = temp.getContents();
-
-        inv.setContents(slots);
-
-        ItemStack info = new ItemStack(Material.PAPER);
-        ItemMeta info_meta = info.getItemMeta();
-        List<String> info_lore = new ArrayList<>();
-
-        Date date1 = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
-        double x = p.getLocation().getX();
-        double y = p.getLocation().getY();
-        double z = p.getLocation().getZ();
-        double yaw = p.getLocation().getYaw();
-        double pitch = p.getLocation().getPitch();
-
-        DecimalFormat df = new DecimalFormat("#.##");
-
-
-        info_meta.setDisplayName("§9§lInventorySavePoint Info v1.0");
-        info_lore.add("§8§lCreation Date:§r§7 " + sdf.format(date1));
-        info_lore.add("§8§lLocation:§r§7 x[" + df.format(x) + "] y[" + df.format(y) + "] z[" + df.format(z) + "] yaw[" + df.format(yaw) + "] pitch[" + df.format(pitch) + "]");
-        info_lore.add("§8§lWorld:§r§7 " + p.getWorld().getName());
-        info_lore.add("§8§lXp-Level:§r§7 " + p.getLevel());
-        info_lore.add("§8§lHealth:§r§7 " + p.getHealth());
-        info_lore.add("§8§lGamemode:§r§7 " + p.getGameMode());
-        info_meta.setLore(info_lore);
-        info.setItemMeta(info_meta);
-
-        inv.setItem(45, info);
-
-        return inv;
-
+    private void noPerms(Player p) {
+        plmsg.msg(p,"You don't have the permission to execute this command!");
     }
-
-    private boolean checkName(String name) {
-
-        List<String> illegalSymbols = new ArrayList<>();
-        illegalSymbols.add("\\");
-        illegalSymbols.add("\"");
-        illegalSymbols.add(".");
-
-        for (String s : illegalSymbols) {
-
-            if (name.contains(s)) {
-
-                return false;
-
-            }
-
+    private boolean isInvalid(String s) {
+        for (String st : illegal_chars) {
+            if (s.contains(st)) {return true;}
         }
-
-        return true;
+        return false;
     }
-
+    private boolean notFound(Player p, String name) {
+        if (!invSaveMgr.exists(p.getUniqueId(),name)) {
+            plmsg.msg(p,"No InventorySavePoint found for the specified name!");
+            return true;
+        }
+        return false;
+    }
 }

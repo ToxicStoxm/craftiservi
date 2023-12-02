@@ -2,6 +2,7 @@ package com.x_tornado10;
 
 import com.tchristofferson.configupdater.ConfigUpdater;
 import com.x_tornado10.chat.filters.MsgFilter;
+import com.x_tornado10.commands.admin_chat_command.AdminChatCommand;
 import com.x_tornado10.commands.main_command.MainCommand;
 import com.x_tornado10.commands.main_command.MainCommandTabCompletion;
 import com.x_tornado10.commands.first_join_command.FirstJoinedCommand;
@@ -22,12 +23,16 @@ import com.x_tornado10.events.listeners.jpads.JumpPads;
 import com.x_tornado10.features.afk_protection.AFKChecker;
 import com.x_tornado10.events.listeners.afk_checking.InvisPlayers;
 import com.x_tornado10.features.inv_saves.InvSaveMgr;
-import com.x_tornado10.messages.OpMessages;
+import com.x_tornado10.message_sys.OpMessages;
 import com.x_tornado10.utils.*;
 import com.x_tornado10.managers.FileManager;
 import com.x_tornado10.managers.ConfigManager;
 import com.x_tornado10.logger.Logger;
-import com.x_tornado10.messages.PlayerMessages;
+import com.x_tornado10.message_sys.PlayerMessages;
+import com.x_tornado10.utils.custom_data.CustomDataWrapper;
+import com.x_tornado10.utils.data.compare.ObjectCompare;
+import com.x_tornado10.utils.data.convert.TextFormatting;
+import com.x_tornado10.utils.data.convert.ToFromBase64;
 import jdk.jfr.Description;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -37,10 +42,12 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeEqualityPredicate;
+import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.*;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -48,8 +55,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import javax.annotation.Nullable;
+import javax.xml.crypto.NodeSetData;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -196,15 +206,15 @@ public final class craftiservi extends JavaPlugin {
             GroupManager groupManager = LpAPI.getGroupManager();
             if (groupManager.getGroup("afkTag") == null) {
                 Group group = groupManager.createAndLoadGroup("afkTag").join();
-                PrefixNode prefixNode = PrefixNode.builder("§7§o[AFK] ", 0).build();
-                WeightNode weightNode = WeightNode.builder(0).build();
+                PrefixNode prefixNode = PrefixNode.builder("§7§o[AFK] ", 100).build();
+                WeightNode weightNode = WeightNode.builder(100).build();
                 group.data().add(weightNode);
                 group.data().add(prefixNode);
                 groupManager.saveGroup(group);
             }
             if (groupManager.getGroup("admins") == null) {
                 Group group = groupManager.createAndLoadGroup("admins").join();
-                WeightNode weightNode = WeightNode.builder(1000).build();
+                WeightNode weightNode = WeightNode.builder(99).build();
                 group.data().add(weightNode);
                 groupManager.saveGroup(group);
             }
@@ -319,7 +329,6 @@ public final class craftiservi extends JavaPlugin {
             logger.debug("xparea...§cdisabled");
 
         }
-
         Bukkit.getPluginCommand("invsave").setExecutor(new InventorySavePointCommand());
         Bukkit.getPluginCommand("invsave").setTabCompleter(new InventorySavePointCommandTabCompletion());
 
@@ -339,6 +348,8 @@ public final class craftiservi extends JavaPlugin {
         Bukkit.getPluginCommand("craftiservi").setExecutor(new MainCommand(getInstance(), configManager, paths, logger, plmsg));
         Bukkit.getPluginCommand("craftiservi").setTabCompleter(new MainCommandTabCompletion());
         logger.debug("config...§adone");
+
+        Bukkit.getPluginCommand("adminchat").setExecutor(new AdminChatCommand());
 
         logger.debug("");
         logger.debug("Configuring filters...");
@@ -572,7 +583,7 @@ public final class craftiservi extends JavaPlugin {
             return false;
         }
 
-        SuffixNode suffixNode = SuffixNode.builder(suffix,0).build();
+        SuffixNode suffixNode = SuffixNode.builder(suffix,100).build();
         user.data().add(suffixNode);
         userManager.saveUser(user);
         return true;
@@ -595,6 +606,7 @@ public final class craftiservi extends JavaPlugin {
         return true;
     }
     public boolean isPlayerInGroup(UUID pid, String groupName) {
+        if (LpAPI == null) {LpAPI = LuckPermsProvider.get();}
         UserManager userManager = LpAPI.getUserManager();
         User user = userManager.getUser(pid);
         if (user == null) {
@@ -618,7 +630,7 @@ public final class craftiservi extends JavaPlugin {
 
         for (Node node : user.getNodes()) {
             if (node instanceof SuffixNode) {
-                if (((SuffixNode) node).getPriority() == 0) {
+                if (((SuffixNode) node).getPriority() == 100) {
                     user.data().remove(node);
                 }
             }
@@ -638,7 +650,22 @@ public final class craftiservi extends JavaPlugin {
         String formattedDisplayName = user.getCachedData().getMetaData().getPrefix() +
                 p.getName() +
                 user.getCachedData().getMetaData().getSuffix();
-        return formattedDisplayName;
+        return formattedDisplayName.replace("&", "§");
+    }
+    public boolean hasPermission(Player p, String permission) {
+        UUID pid = p.getUniqueId();
+        UserManager um = LpAPI.getUserManager();
+        if (!um.isLoaded(pid)) {um.loadUser(pid);}
+        User user = um.getUser(pid);
+        if (user == null) {return false;}
+        return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
+    }
+    public boolean hasPermission(UUID pid, String permission) {
+        UserManager um = LpAPI.getUserManager();
+        if (!um.isLoaded(pid)) {um.loadUser(pid);}
+        User user = um.getUser(pid);
+        if (user == null) {return false;}
+        return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
     }
 
     public FileManager getFm() {
@@ -647,6 +674,8 @@ public final class craftiservi extends JavaPlugin {
     public boolean isPaperServer() {
         return Bukkit.getVersion().toLowerCase().contains("paper");
     }
+
+    public InvSaveMgr getInvSaveMgr() {return invSaveMgr;}
 
     @Description("Reloads config values during runtime using a Bukkit Custom Event")
     public void reload(CustomDataWrapper customDataWrapper) {

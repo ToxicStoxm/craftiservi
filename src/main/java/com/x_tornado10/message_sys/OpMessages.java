@@ -6,17 +6,29 @@ import com.x_tornado10.logger.Logger;
 import com.x_tornado10.utils.statics.CDID;
 import com.x_tornado10.utils.custom_data.CustomData;
 import com.x_tornado10.utils.statics.GROUP;
-import net.kyori.text.TextComponent;
-import net.kyori.text.adapter.bukkit.TextAdapter;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.Audiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Content;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class OpMessages implements Listener {
@@ -35,7 +47,7 @@ public class OpMessages implements Listener {
     private Logger logger;
     private BukkitTask run;
     private BukkitTask run2;
-    private ConcurrentHashMap<Long, String> queue;
+    private ConcurrentHashMap<Long, Object> queue;
     private double queueTime;
     private double queueLimit;
     private boolean queue_;
@@ -54,10 +66,12 @@ public class OpMessages implements Listener {
     }
 
     public void send(String message) {
-        if (!enabled) {return;}
+        if (!enabled) {
+            return;
+        }
         if (online_admins.isEmpty() && queue_) {
             if (queueLimit != -1) if (queue.size() >= queueLimit) return;
-            queue.put(System.currentTimeMillis(),message);
+            queue.put(System.currentTimeMillis(), message);
             check_queue();
             return;
         }
@@ -68,8 +82,26 @@ public class OpMessages implements Listener {
             }
         }
     }
+    public void send(BaseComponent[] baseComponents) {
+        if (!enabled) {
+            return;
+        }
+        if (online_admins.isEmpty() && queue_) {
+            if (queueLimit != -1) if (queue.size() >= queueLimit) return;
+            queue.put(System.currentTimeMillis(), baseComponents);
+            check_queue();
+            return;
+        }
+        for (UUID pid : online_admins) {
+            Player p = Bukkit.getPlayer(pid);
+            if (p != null) {
+                p.spigot().sendMessage(baseComponents);
+            }
+        }
+    }
+
     public void send(Player p, String message) {
-        send(Objects.requireNonNull(plugin.getDisplayName(p.getUniqueId(), p)).replace("null","") + ": " + message);
+        send(Objects.requireNonNull(plugin.getDisplayName(p.getUniqueId(), p)).replace("null", "") + ": " + message);
     }
     public void send(UUID pid, String message) {
         Player p = Bukkit.getPlayer(pid);
@@ -79,6 +111,17 @@ public class OpMessages implements Listener {
     }
     public void send(String sender_name, String message) {
         send(sender_name + ": " + message);
+    }
+    public void send(String line, UUID pid, String name) {
+        BaseComponent[] baseComponents =
+                new ComponentBuilder()
+                        .append(prefix + line + "\n" + prefix + ChatColor.GRAY + "Restore request -> " + Bukkit.getOfflinePlayer(pid).getName() + " - ")
+                        .append(String.valueOf(ChatColor.BOLD) + ChatColor.AQUA + ChatColor.UNDERLINE + name + ChatColor.RESET)
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/opengui GUI_" + pid + ":" + name))
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GRAY + "Click to open Inventory. GUI_" + name)))
+                        .append("\n" + prefix + line)
+                        .create();
+        send(baseComponents);
     }
 
     private void update_admins() {
@@ -99,7 +142,7 @@ public class OpMessages implements Listener {
             }
         }.runTaskTimerAsynchronously(plugin,20,40);
     }
-    private void queueOutput(List<String> queue) {
+    private void queueOutput(List<Object> queue) {
         logger.severe("queueOutput");
         logger.severe(String.valueOf(getPeriod(queue.size())));
         new BukkitRunnable() {
@@ -113,7 +156,12 @@ public class OpMessages implements Listener {
                     cancel();
                     queueOutput = false;
                 } else {
-                    send(queue.get(queue.size() - 1));
+                    Object object = queue.get(queue.size() - 1);
+                    if (object instanceof String) {
+                        send((String) queue.get(queue.size() - 1));
+                    } else if (object instanceof BaseComponent[]) {
+                        send((BaseComponent[]) queue.get(queue.size() - 1));
+                    }
                     queue.remove(queue.size() - 1);
                 }
             }
@@ -126,15 +174,15 @@ public class OpMessages implements Listener {
                 if (!enabled) {return;}
                if (!queue.isEmpty()) {
                    if (online_admins.isEmpty()) {
-                       for (Map.Entry<Long, String> entry : queue.entrySet()) {
+                       for (Map.Entry<Long, Object> entry : queue.entrySet()) {
                            if (entry.getKey() - System.currentTimeMillis() > queueTime) {
                                queue.remove(entry.getKey());
                            }
                        }
                    } else {
                        if (!queueOutput) {
-                           List<String> queueEntries = new ArrayList<>();
-                           for (Map.Entry<Long, String> entry : queue.entrySet()) {
+                           List<Object> queueEntries = new ArrayList<>();
+                           for (Map.Entry<Long, Object> entry : queue.entrySet()) {
                                queueEntries.add(entry.getValue());
                                queue.remove(entry.getKey());
                            }
@@ -146,8 +194,8 @@ public class OpMessages implements Listener {
             }
         }.runTaskTimerAsynchronously(plugin,20,20);
     }
-    private void queueAdd(List<String> temp) {
-        for (String s : temp) {
+    private void queueAdd(List<Object> temp) {
+        for (Object s : temp) {
             queue.put(System.currentTimeMillis(), s);
         }
     }

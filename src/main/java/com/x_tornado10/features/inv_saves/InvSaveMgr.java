@@ -4,12 +4,14 @@ import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.message_sys.OpMessages;
 import com.x_tornado10.message_sys.PlayerMessages;
-import io.papermc.paper.text.PaperComponents;
-import net.kyori.text.TextComponent;
-import net.kyori.text.adapter.bukkit.TextAdapter;
-import net.kyori.text.format.TextColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.hover.content.Content;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,10 +19,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.awt.print.Paper;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 public class InvSaveMgr implements Listener {
 
@@ -141,23 +143,10 @@ public class InvSaveMgr implements Listener {
         }
         return false;
     }
+
     public boolean requestRestore(UUID pid, String name) {
         if (!exists(pid,name)) {return false;}
-        final net.kyori.text.TextComponent inv_restore_request_open_inv = net.kyori.text.TextComponent.builder()
-                .content(plugin.getColorprefix() + plmsg.getLine()  + "\n" + plugin.getColorprefix() + "§7" + Bukkit.getPlayer(pid).getName() + " requested Inventory restore!\n" + plugin.getColorprefix())
-                .color(TextColor.GRAY)
-                .append(net.kyori.text.TextComponent.builder("[Inventory]\n")
-                        .color(TextColor.AQUA)
-                        .hoverEvent(net.kyori.text.event.HoverEvent
-                                .showText(net.kyori.text.TextComponent.builder()
-                                        .content("Click to open Inventory! (GUI_" + pid + "_" + name)
-                                        .color(TextColor.GRAY)
-                                        .build()))
-                        .clickEvent(net.kyori.text.event.ClickEvent.runCommand("/opengui GUI_" + pid + "_" + name)))
-                .append(TextComponent.builder(plugin.getColorprefix() + plmsg.getLine()))
-                .color(TextColor.GRAY)
-                .build();
-        opmsg.send(inv_restore_request_open_inv.content());
+        opmsg.send(plmsg.getLine(), pid, name);
         return true;
     }
     private boolean openInventory(UUID pid, String name) {

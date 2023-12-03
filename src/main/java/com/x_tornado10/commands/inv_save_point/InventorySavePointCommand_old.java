@@ -3,6 +3,8 @@ package com.x_tornado10.commands.inv_save_point;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.message_sys.PlayerMessages;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -23,6 +25,16 @@ public class InventorySavePointCommand_old implements CommandExecutor {
     private Player p;
 
     private Logger logger;
+
+    /*TextComponent component = new TextComponent();
+        component.setText(name);
+        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/opengui GUI_" +pid + ":" + name));
+
+    String message = "%PREFIX%" + plmsg.getLine() + "\n"
+            + "%PREFIX% Restore request -> " + Bukkit.getOfflinePlayer(pid).getName() + " - $" + "\n"
+            + "%PREFIX%" + plmsg.getLine();
+
+     */
 
     private craftiservi plugin;
 

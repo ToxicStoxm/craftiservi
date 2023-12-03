@@ -42,12 +42,10 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeEqualityPredicate;
-import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.*;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -55,11 +53,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.Unmodifiable;
 
 import javax.annotation.Nullable;
-import javax.xml.crypto.NodeSetData;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -132,7 +127,6 @@ public final class craftiservi extends JavaPlugin {
         reloadConfig();
 
         setup();
-
     }
 
 
@@ -573,8 +567,8 @@ public final class craftiservi extends JavaPlugin {
         InheritanceNode inheritanceNode = InheritanceNode.builder(group).build();
         user.data().add(inheritanceNode);
         userManager.saveUser(user);
+        LpAPI.runUpdateTask();
         return true;
-
     }
     public boolean addSuffixToPlayer(UUID pid, String suffix) {
         UserManager userManager = LpAPI.getUserManager();

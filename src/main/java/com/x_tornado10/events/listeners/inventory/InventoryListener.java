@@ -3,9 +3,6 @@ package com.x_tornado10.events.listeners.inventory;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.message_sys.PlayerMessages;
-import net.kyori.text.TextComponent;
-import net.kyori.text.adapter.bukkit.TextAdapter;
-import net.kyori.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -133,27 +130,11 @@ public class InventoryListener implements Listener {
             plmsg.msg(p,"Received request. Please wait!");
 
             if (onlineStaff()) {
-
-                final net.kyori.text.TextComponent inv_restore_request_open_inv = net.kyori.text.TextComponent.builder()
-                        .content(plugin.getColorprefix() + plmsg.getLine()  + "\n" + plugin.getColorprefix() + "§7" + p.getName() + " requested Inventory restore!\n" + plugin.getColorprefix())
-                        .color(TextColor.GRAY)
-                        .append(net.kyori.text.TextComponent.builder("[Inventory]\n")
-                                .color(TextColor.AQUA)
-                                .hoverEvent(net.kyori.text.event.HoverEvent
-                                        .showText(net.kyori.text.TextComponent.builder()
-                                                .content("Click to open Inventory! (GUI_" + id + ")")
-                                                .color(TextColor.GRAY)
-                                                .build()))
-                                .clickEvent(net.kyori.text.event.ClickEvent.runCommand("/opengui GUI_" + id)))
-                        .append(TextComponent.builder(plugin.getColorprefix() + plmsg.getLine()))
-                        .color(TextColor.GRAY)
-                        .build();
-
                 for (Player pl : Bukkit.getOnlinePlayers()) {
 
                     if (pl.isOp()) {
 
-                        TextAdapter.sendComponent(pl, inv_restore_request_open_inv);
+                        //TextAdapter.sendComponent(pl, inv_restore_request_open_inv);
 
                     }
 

@@ -80,7 +80,7 @@ Craftiservi:
         Enabled: true
         # Time (in minutes) admin chat messages are queued. (DEFAULT: 86400)
         Queue-Time: 86400
-        # Max messages stored in the admin chat queue. (DEFAULT: -1)
+        # Maximum messages in admin chat queue. Set to -1 to disable limit. (DEFAULT: -1)
         Queue-Message-Limit: -1
 
 
@@ -98,6 +98,12 @@ Craftiservi:
     InvSave:
       # Enable Inventory Saving feature. (DEFAULT: true)
       Enabled: true
+      Restore-Requests:
+        # Enable or disable Inventory restore requests. (DEFAULT: true)
+        # Caution: Inventory restore requests require admin chat and its queue to be enabled.
+        Enabled: true
+        # Cooldown time between Inventory restore requests (in milliseconds). (DEFAULT: 120000)
+        Restore-Cooldown: 120000
 
     XpArea:
       # Enable XP Area feature. (DEFAULT: true)

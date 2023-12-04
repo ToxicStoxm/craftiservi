@@ -2,9 +2,11 @@ package com.x_tornado10.managers;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.utils.Paths;
+import com.x_tornado10.utils.custom_data.inv_request.RestoreRequest;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
@@ -14,8 +16,7 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static com.x_tornado10.utils.data.convert.ToFromBase64.fromBase64;
-import static com.x_tornado10.utils.data.convert.ToFromBase64.toBase64;
+import static com.x_tornado10.utils.data.convert.ToFromBase64.*;
 
 public class FileManager {
 
@@ -32,6 +33,7 @@ public class FileManager {
     private final File player_inv_saves_backup;
     private final File backup_config;
     private final File afkPlayers;
+    private final File restoreRequests;
 
     /**
      * @implNote Creates specified files. Should fail if the specified file already exists.
@@ -53,7 +55,7 @@ public class FileManager {
         player_inv_saves_backup = new File(paths.getPlayer_inv_saves_backup());
         backup_config = new File(paths.getBackup_config());
         afkPlayers = new File(paths.getAfk_players());
-
+        restoreRequests = new File(paths.getRestoreRequests());
 
     }
 
@@ -69,24 +71,20 @@ public class FileManager {
         files.add(player_inv_saves);
         files.add(player_inv_saves_backup);
         files.add(backup_config);
+        files.add(afkPlayers);
+        files.add(restoreRequests);
 
         if (backupdir.mkdirs()) {
-
             setupLogger.info(backupdir.getName() + " was successfully created!");
-
         }
 
         for (File file : files) {
-
             if (!file.exists()) {
-
                 try {
-
                     if(file.createNewFile()) {
                         setupLogger.info(file.getName() + " was successfully created!");
                     }
                 } catch (IOException e) {
-
                     setupLogger.info("§cSomething went wrong while trying to create files! Please restart the server!§r");
                     return false;
                 }
@@ -110,20 +108,15 @@ public class FileManager {
         try {
 
             br = new BufferedReader(new FileReader(playerlist));
-
             String line;
-
             while ((line = br.readLine()) != null) {
 
                 String[] parts = line.split("\\|");
-
                 String date = parts[1].trim();
                 UUID UUID = java.util.UUID.fromString(parts[0].trim());
 
                 if (!date.isEmpty() && !UUID.toString().isEmpty()) {
-
                     mapFileContents.put(UUID, date);
-
                 }
 
             }
@@ -158,13 +151,9 @@ public class FileManager {
             String line;
 
             //player + "|" + f1 + "|" + f2
-
             while ((line = br.readLine()) != null) {
-
                 String[] parts = line.split("\\|");
-
                 UUID p = UUID.fromString(parts[0].trim());
-
 
                 float f1 = Float.parseFloat(parts[1].trim());
                 float f2 = Float.parseFloat(parts[2].trim());
@@ -172,27 +161,16 @@ public class FileManager {
                 floats.add(f1);
                 floats.add(f2);
 
-
                 mapFileContents.put(p, floats);
-
             }
-
         } catch (Exception e) {
-
             e.printStackTrace();
-
         } finally {
-
             if (br != null) {
-
                 try {
-
                     br.close();
-
                 } catch (Exception e) {
-
                     e.printStackTrace();
-
                 }
             }
         }
@@ -305,6 +283,35 @@ public class FileManager {
 
         }
 
+    }
+    public List<RestoreRequest> getRestoreRequestsFromTextFile() {
+
+        YamlConfiguration rR_file = new YamlConfiguration();
+        try {
+            rR_file.load(restoreRequests);
+        } catch (IOException | InvalidConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<RestoreRequest> result = new ArrayList<>();
+        for (String key : rR_file.getKeys(false)) {
+            String[] parts = key.split("\\$");
+
+            UUID reviewer = null;
+            if (!parts[0].trim().equals("null")) {
+                reviewer = UUID.fromString(parts[0].trim());
+            }
+            UUID requester = UUID.fromString(parts[1].trim());
+            String inv_name = parts[2].trim();
+            boolean reviewed = Boolean.parseBoolean(parts[3].trim());
+            boolean approved = Boolean.parseBoolean(parts[3].trim());
+            RestoreRequest aR0 = new RestoreRequest(requester,inv_name);
+            aR0.setReviewer(reviewer);
+            aR0.setApproved(approved);
+            aR0.setReviewed(reviewed);
+            result.add(aR0);
+        }
+        return result;
     }
     public HashMap<UUID, HashMap<String, Inventory>> getPlayerInvSavePointsFromTextFile() {
 
@@ -469,6 +476,29 @@ public class FileManager {
         }
 
     }
+    public void writeRestoreRequestsToTextFile(List<RestoreRequest> rRe) {
+
+        YamlConfiguration rR_file = new YamlConfiguration();
+
+        for (RestoreRequest rR : rRe) {
+            UUID reviewer = rR.getReviewer();
+            UUID requester = rR.getRequester();
+            String inv_name = rR.getInvName();
+            boolean reviewed = rR.isReviewed();
+            boolean approved = rR.isApproved();
+            String sep = "$";
+
+            String result = reviewer + sep + requester + sep + inv_name + sep + reviewed + sep + approved;
+            rR_file.createSection(result);
+        }
+        try {
+            rR_file.save(restoreRequests);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     public static void copyFileToFile(final File src, final File dest) throws IOException
     {
         copyInputStreamToFile(new FileInputStream(src), dest);

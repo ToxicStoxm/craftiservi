@@ -1,21 +1,25 @@
 package com.x_tornado10.events.listeners.inventory;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.features.inv_saves.InvSaveMgr;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.message_sys.PlayerMessages;
+import com.x_tornado10.utils.custom_data.inv_request.RestoreRequest;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -23,70 +27,39 @@ import java.util.*;
 public class InventoryListener implements Listener {
 
     private final craftiservi plugin;
-    private final Logger logger;
+    //private final Logger logger;
     private final PlayerMessages plmsg;
-    private final HashMap<UUID, Long> cooldown;
-    private HashMap<UUID, String> playerlist;
-    private final HashMap<Integer, Inventory> invs_review;
-    private HashMap<UUID, Integer> penidng_request;
-    private BukkitTask run;
+    private List<RestoreRequest> restoreRequests;
+    private InvSaveMgr invSaveMgr;
     public static boolean enabled;
 
     public InventoryListener() {
         plugin = craftiservi.getInstance();
-        logger = plugin.getCustomLogger();
+        //logger = plugin.getCustomLogger();
         plmsg = plugin.getPlayerMessages();
-        cooldown = new HashMap<>();
-        playerlist = plugin.getPlayerlist();
-        invs_review = plugin.getInvs_review();
-        penidng_request = new HashMap<>();
+        invSaveMgr = plugin.getInvSaveMgr();
+        restoreRequests = plugin.getApprovedRequests();
     }
 
     @EventHandler
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent e) {
-
         if (!enabled) {return;}
-
-        if (isSavedInv(e.getSource()) || isSavedInv(e.getDestination())) {
-
-            e.setCancelled(true);
-
-        }
-
+        if (isSavedInv(e.getSource()) || isSavedInv(e.getDestination())) e.setCancelled(true);
     }
 
     @EventHandler
     public void onInventoryClickEvent(InventoryClickEvent e) {
-
-        if (!enabled) {return;}
-
-        boolean isSaveInv = false;
-
-        for (Map.Entry entry : playerlist.entrySet()) {
-
-            if (e.getView().getTitle().equals(Bukkit.getOfflinePlayer((UUID)entry.getKey()).getName())) {
-
-                isSaveInv = true;
-
-            }
-
-            if (isSaveInv) {break;}
-
+        if (!enabled || e.getClickedInventory() == null || e.getCurrentItem() == null) {return;}
+        try {
+            if (!isSavedInv(e.getView())) {return;}
+        } catch (IllegalArgumentException ex) {
+            if (!isSavedInv(e.getClickedInventory()) && !isSavedInv(e.getInventory())) {return;}
         }
 
-        if (!isSaveInv) {
-
-            return;
-
-        }
-
-        if (e.getClickedInventory() == null || e.getCurrentItem() == null) {
-
-            return;
-
-        }
+        e.setCancelled(true);
 
         Player p = (Player) e.getWhoClicked();
+        UUID pid = p.getUniqueId();
 
         int slot = e.getSlot();
         ItemStack item = e.getClickedInventory().getItem(slot);
@@ -95,179 +68,162 @@ public class InventoryListener implements Listener {
         if (item_meta == null) {return;}
         String item_displayname = item_meta.getDisplayName();
 
-        String displayname = "§aRestore Inventory";
+        String[] parts = e.getView().getTitle().split(":");
 
-        if (item_displayname.equals(displayname)) {
-
-            if (!cooldown.containsKey(p.getUniqueId())) {
-
-                cooldown.put(p.getUniqueId(), System.currentTimeMillis());
-
-            } else {
-
-                long timeElapsed = System.currentTimeMillis() - cooldown.get(p.getUniqueId());
-
-                if (!(timeElapsed >= 120000)) {
-
-                    plmsg.msg(p,"§cYou must wait §e120s§c between uses! (" + ((120000 - timeElapsed) / 1000) + "," + ((120000 - timeElapsed) % 1000) + "s left)");
-                    p.closeInventory();
-                    p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
-                    e.setCancelled(true);
-                    return;
-
-                } else {
-
-                    cooldown.put(p.getUniqueId(), System.currentTimeMillis());
-
-                }
-
-            }
-
-            int id = invs_review.size() + 1;
-            invs_review.put(id, e.getInventory());
-
-            plmsg.msg(p,"Sending Inventory restore request...");
-            plmsg.msg(p,"Received request. Please wait!");
-
-            if (onlineStaff()) {
-                for (Player pl : Bukkit.getOnlinePlayers()) {
-
-                    if (pl.isOp()) {
-
-                        //TextAdapter.sendComponent(pl, inv_restore_request_open_inv);
-
-                    }
-
-                }
-
-                plmsg.msg(p, "Waiting for approval! (60 sec)");
-                penidng_request.put(p.getUniqueId(), id);
-                run(id, p);
-                p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 99999999999999999999999999999999999999f, 1f);
-                p.closeInventory();
-
-            } else {
-
-                plmsg.msg(p, "§c§lRequest denied! Please try again later!");
-                plmsg.msg(p,"Cause: No Operator online!");
-                p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
-                p.closeInventory();
-            }
-
-        }
-
-
+        String displayname = "§7Restore Inventory";
         String approve_displayname = "§aApprove request";
         String deny_displayname = "§cDeny request";
 
+        //logger.severe("InvClickEvent");
+
+        if (item_displayname.equals(displayname)) {
+            //logger.severe("InvClickEvent -> restore button");
+            UUID uuid = getUUID(e.getClickedInventory(),e.getInventory(),parts,p);
+            if (uuid == null) {return;}
+            //logger.severe("InvClickEvent -> restore button - 1");
+            RestoreRequest rR = new RestoreRequest(uuid, parts[1].trim());
+            if (restoreRequests.contains(rR)) {
+                //logger.severe("InvClickEvent -> restore button - already exists");
+                plmsg.msg(p,ChatColor.RED + "Failed to send request! You already have another pending request!");
+                p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+                p.closeInventory();
+                return;
+            }
+            if (invSaveMgr.requestRestore(pid, parts[1].trim())) {
+                restoreRequests.add(rR);
+            }
+            //logger.severe("InvClickEvent -> restore button - restore req send");
+            return;
+        }
         if (item_displayname.equals(approve_displayname)) {
-
-            cancelrun();
-
-            Inventory temp = e.getInventory();
-            List<String> gui_id_lore = temp.getItem(51).getItemMeta().getLore();
-            String[] parts = gui_id_lore.get(0).split(":");
-            int id = Integer.parseInt(parts[1].trim());
-            Player pl = Bukkit.getPlayer(e.getView().getTitle());
-            Inventory temp_inv = e.getInventory();
-            restoreInv(pl, temp_inv);
-            remove_delayed(id);
+            //logger.severe("InvClickEvent -> approve button");
+            UUID uuid = getUUID(e.getClickedInventory(),e.getInventory(),parts,p);
+            if (uuid == null) {return;}
+            //logger.severe("InvClickEvent -> approve button - 1");
+            RestoreRequest rR = new RestoreRequest(uuid, parts[1].trim());
+            if (restoreRequests.contains(rR)) {
+                //logger.severe("InvClickEvent -> approve button - restoreRequest contains");
+                if (restoreRequests.get(restoreRequests.indexOf(rR)).isReviewed()) {
+                    //logger.severe("InvClickEvent -> approve button - restoreRequest contains - is reviewed");
+                    plmsg.msg(p,"This request has already been reviewed!");
+                    p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+                    p.closeInventory();
+                    return;
+                } else {
+                    //logger.severe("InvClickEvent -> approve button - restoreRequest contains - !is reviewed");
+                    RestoreRequest rR0 = restoreRequests.get(restoreRequests.indexOf(rR));
+                    rR0.setApproved(true);
+                    rR0.setReviewed(true);
+                    rR0.setReviewer(pid);
+                }
+            } else {
+                //logger.severe("InvClickEvent -> approve button - restoreRequest !contains");
+                rR.setReviewed(true);
+                rR.setApproved(true);
+                rR.setReviewer(pid);
+                restoreRequests.add(rR);
+            }
+            RestoreRequest rR_final = restoreRequests.get(restoreRequests.indexOf(rR));
+            invSaveMgr.restore(rR_final);
+            p.closeInventory();
             p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 99999999999999999999999999999999999999f, 1f);
-            p.closeInventory();
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-
-                if (p.isOp()) {
-
-                    plmsg.msg_inlines(player,"§e" + p.getName() + " §aapproved §e" + pl.getName() + "'s §aInv request!");
-
-                }
-
-            }
-
-            plmsg.msg_inlines(pl,"§e" + p.getName() + " §aapproved your Inv request!");
-            plmsg.msg(pl, "Restoring inventory...");
-
+            //logger.severe("InvClickEvent -> approve button - ... - complete");
+            return;
         }
-
         if (item_displayname.equals(deny_displayname)) {
-
-            cancelrun();
-
-            Inventory temp = e.getClickedInventory();
-            List<String> gui_id_lore = temp.getItem(51).getItemMeta().getLore();
-            String[] parts = gui_id_lore.get(0).split(":");
-            Player pl = Bukkit.getPlayer(e.getView().getTitle());
-            invs_review.remove(Integer.parseInt(parts[1].trim()));
-
-            p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
-            p.closeInventory();
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-
-                if (p.isOp()) {
-
-                    plmsg.msg_inlines(player,"§e" + p.getName() + " §cdenied §e" + pl.getName() + "'s §cInv request!");
-
+            //logger.severe("InvClickEvent -> deny button");
+            UUID uuid = getUUID(e.getClickedInventory(),e.getInventory(),parts,p);
+            if (uuid == null) {return;}
+            //logger.severe("InvClickEvent -> deny button - 1");
+            RestoreRequest rR = new RestoreRequest(uuid, parts[1].trim());
+            if (restoreRequests.contains(rR)) {
+                //logger.severe("InvClickEvent -> deny button -  restoreRequest contains");
+                RestoreRequest rR0 = restoreRequests.get(restoreRequests.indexOf(rR));
+                if (rR.isReviewed()) {
+                    //logger.severe("InvClickEvent -> deny button -  restoreRequest contains - is reviewed");
+                    plmsg.msg(p,"This request has already been reviewed!");
+                    p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+                    p.closeInventory();
+                    return;
+                } else {
+                    //logger.severe("InvClickEvent -> deny button -  restoreRequest contains - !is reviewed");
+                    rR0.setReviewed(true);
+                    rR0.setApproved(false);
+                    rR0.setReviewer(pid);
                 }
-
+            } else {
+                //logger.severe("InvClickEvent -> deny button -  restoreRequest !contains");
+                rR.setReviewed(true);
+                rR.setApproved(false);
+                rR.setReviewer(pid);
+                restoreRequests.add(restoreRequests.get(restoreRequests.indexOf(rR)));
             }
-
-            plmsg.msg_inlines(pl,"§e" + p.getName() + " §cdenied your Inv request!");
-
+            RestoreRequest rR_final = restoreRequests.get(restoreRequests.indexOf(rR));
+            invSaveMgr.restore(rR_final);
+            p.closeInventory();
+            p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+            //logger.severe("InvClickEvent -> deny button -  ... - complete");
         }
-
-        e.setCancelled(true);
 
     }
 
     @EventHandler
-    public void onDisconnect(PlayerQuitEvent e) {
+    public void onJoin(PlayerJoinEvent e) {
+        invSaveMgr.restoreAll(restoreRequests);
+    }
+
+    @EventHandler
+    public void onInventoryOpen(InventoryOpenEvent e) {
 
         if (!enabled) {return;}
 
-        Player p = e.getPlayer();
+        Player p = (Player) e.getPlayer();
+        Inventory i = e.getInventory();
+        String display_name = "§9§lInventorySavePoint Info v1.0";
 
-        if (penidng_request.containsKey(p.getUniqueId())) {
+        if (i.getSize() != 54) {return;}
 
-            invs_review.remove(penidng_request.get(p.getUniqueId()));
-            penidng_request.remove(p.getUniqueId());
+        ItemStack item = i.getItem(45);
+        if (item == null) {return;}
+        ItemMeta item_meta = item.getItemMeta();
+        if (item_meta == null) {return;}
+        String item_displayname = item_meta.getDisplayName();
 
+        if (item_displayname.equals(display_name)) {
 
-            for (Player pl : Bukkit.getOnlinePlayers()) {
+            p.playSound(p, Sound.ENTITY_PLAYER_LEVELUP, 99999999999999999999999999999999999999f, 1);
 
-                if (pl.isOp()) {
-
-                    plmsg.msg_inlines(pl, "§cCanceled Inv request from §e" + p.getName() + "\n" + plugin.getColorprefix() + "Cause: §cDisconnected");
-
-                }
-
-            }
         }
 
     }
 
-    private void remove_delayed(int id) {
+    private boolean isSavedInv(Inventory inv, Player p) throws IllegalArgumentException{
 
-        BukkitTask remove_delayed = new BukkitRunnable() {
-            @Override
-            public void run() {
+        boolean saveToCheck = false;
+        int index = 0;
 
-                invs_review.remove(id);
-
-                cancel();
-
+        for (HumanEntity humanEntity : inv.getViewers()) {
+            if (humanEntity.getName().equals(p.getName())) {
+                saveToCheck = true;
+                index = inv.getViewers().indexOf(humanEntity);
             }
-        }.runTaskTimer(plugin, 10, 20);
+        }
 
-
+        if (!saveToCheck) {return false;}
+        String title = inv.getViewers().get(index).getOpenInventory().getTitle();
+        String[] parts = title.split(":");
+        return invSaveMgr.exists(UUID.fromString(parts[0].trim()), parts[1].trim());
     }
-
+    private boolean isSavedInv(InventoryView inventoryView) throws IllegalArgumentException{
+        String title = inventoryView.getTitle();
+        String[] parts = title.split(":");
+        if (parts.length != 2) return false;
+        return invSaveMgr.exists(UUID.fromString(parts[0].trim()), parts[1].trim());
+    }
 
     private boolean isSavedInv(Inventory inv) {
 
         String display_name = "§9§lInventorySavePoint Info v1.0";
-
         if (inv.getSize() != 54) {return false;}
 
         ItemStack item = inv.getItem(45);
@@ -280,95 +236,29 @@ public class InventoryListener implements Listener {
 
     }
 
-
-    private void restoreInv(Player p, Inventory inv) {
-
-        List<ItemStack> armour_slots = new ArrayList<>();
-        List<ItemStack> slots = new ArrayList<>();
-        ItemStack offhand;
-
-        ItemStack air = new ItemStack(Material.AIR);
-        for (int i = 0; i<37; i++) {
-            if (inv.getItem(i) == null) {
-                slots.add(air);
-            } else {
-                slots.add(inv.getItem(i));
-            }
-        }
-
-
-        for (int j = 36; j<40; j++) {
-            if (inv.getItem(j) == null) {
-                armour_slots.add(air);
-            } else {
-                armour_slots.add(inv.getItem(j));
-            }
-        }
-
-        if (inv.getItem(40) == null) {
-            offhand = new ItemStack(Material.AIR);
-        } else {
-            offhand = inv.getItem(40);
-        }
-
-        for (ItemStack slot : p.getInventory()) {
-            if (slot != null) {
-                p.getWorld().dropItem(p.getLocation(), slot).setPickupDelay(100);
-            }
-        }
-
-        p.getInventory().clear();
-
-        p.getInventory().setBoots(armour_slots.get(0));
-        p.getInventory().setLeggings(armour_slots.get(1));
-        p.getInventory().setChestplate(armour_slots.get(2));
-        p.getInventory().setHelmet(armour_slots.get(3));
-
-        p.getInventory().setItem(40, offhand);
-
-        for (int l = 0; l<37; l++) {
-            p.getInventory().addItem(slots.get(l));
-        }
-    }
-
-    private boolean onlineStaff() {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (p.isOp()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    private void run(int id, Player p) {
-        run = new BukkitRunnable() {
-
-            @Override
-            public void run() {
-
-                invs_review.remove(id);
-
-                for (Player pl : Bukkit.getOnlinePlayers()) {
-
-                    if (pl.isOp()) {
-                        plmsg.msg(pl, "§cAutodenied Inv request form " + p.getName());
-                    }
+    private UUID getUUID(Inventory clickedInv, Inventory inv0, String[] parts, Player p) {
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(parts[0].trim());
+        } catch (IllegalArgumentException ex) {
+            Inventory inv = null;
+            if (clickedInv.getSize() != 54) {
+                if (inv0.getSize() != 54) {
+                    p.closeInventory();
+                    plmsg.msg(p,"ERROR OCCURRED!");
+                    return null;
                 }
-
-                plmsg.msg(p,"Your Inventory restore request was §cauto denied!");
-                plmsg.msg(p, "Cause: §cExpired request");
-                plmsg.msg(p,"Please try again later!");
-
-                cancel();
-
+                inv = inv0;
             }
-        }.runTaskTimer(plugin, 1200, 20);
-
+            if (inv == null) inv = clickedInv;
+            ItemStack item0 = inv.getItem(51);
+            if (item0 == null) return null;
+            ItemMeta item0_meta = item0.getItemMeta();
+            if (item0_meta == null) return null;
+            List<String> item0_lore = item0_meta.getLore();
+            if (item0_lore == null || item0_lore.get(0) == null) return null;
+            uuid = UUID.fromString(item0_lore.get(0).split(":")[1].trim());
+        }
+        return uuid;
     }
-
-    private void cancelrun() {
-        run.cancel();
-    }
-
 }

@@ -5,7 +5,7 @@ import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.events.listeners.afk_checking.InvisPlayers;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.message_sys.PlayerMessages;
-import com.x_tornado10.utils.custom_data.CustomData;
+import com.x_tornado10.utils.custom_data.reload.CustomData;
 import com.x_tornado10.utils.data.compare.ObjectCompare;
 import com.x_tornado10.utils.data.convert.TextFormatting;
 import com.x_tornado10.utils.statics.CDID;

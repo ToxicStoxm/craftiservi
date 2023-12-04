@@ -18,6 +18,7 @@ public class Paths {
     public String getPlayer_inv_saves() {return plpath + "/player_inv_saves.yml";}
     public String getPlayer_inv_saves_backup() {return plpath + "/backups/player_inv_saves_backup.yml";}
     public String getAfk_players() {return "/afkPlayers.yml";}
+    public String getRestoreRequests() {return plpath + "/restoreRequests.yml";}
     public String getConfig() {return plpath + "/config.yml";}
     public String getBackup_config() {return plpath + "/backups/Backup_config.yml";}
 
@@ -48,6 +49,8 @@ public class Paths {
     public String getJump_pads_enabled() {return "Craftiservi.Gadgets.Movement.Jump-Pads.Enabled";}
     public String getGrappling_hook_enabled() {return "Craftiservi.Gadgets.Movement.Grappling-hook.Enabled";}
     public String getCommands_invsave_enabled() {return "Craftiservi.Commands-Features.InvSave.Enabled";}
+    public String get_invsave_restore_requests() {return "Craftiservi.Commands-Features.InvSave.Restore-Requests.Enabled";}
+    public String get_invsave_restore_requests_cooldown() {return "Craftiservi.Commands-Features.InvSave.Restore-Requests.Restore-Cooldown";}
     public String getCommands_xparea_enabled() {return "Craftiservi.Commands-Features.XpArea.Enabled";}
     public String getCommands_firstjoin_enabled() {return "Craftiservi.Commands-Features.FirstJoin.Enabled";}
     public String getAfk_checker_enabled() {return "Craftiservi.Commands-Features.Afk-Checker.Enabled";}

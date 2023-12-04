@@ -5,7 +5,7 @@ import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.features.afk_protection.AFKChecker;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.utils.statics.CDID;
-import com.x_tornado10.utils.custom_data.CustomData;
+import com.x_tornado10.utils.custom_data.reload.CustomData;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;

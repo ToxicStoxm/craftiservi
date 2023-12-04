@@ -18,7 +18,6 @@ import com.x_tornado10.events.listeners.xp_area_listener.PlayerMoveListener;
 import com.x_tornado10.events.listeners.afk_checking.AFKListener;
 import com.x_tornado10.events.listeners.grapling_hook.GraplingHookListener;
 import com.x_tornado10.events.listeners.inventory.InventoryListener;
-import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
 import com.x_tornado10.events.listeners.jpads.JumpPads;
 import com.x_tornado10.features.afk_protection.AFKChecker;
 import com.x_tornado10.events.listeners.afk_checking.InvisPlayers;
@@ -29,10 +28,10 @@ import com.x_tornado10.managers.FileManager;
 import com.x_tornado10.managers.ConfigManager;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.message_sys.PlayerMessages;
-import com.x_tornado10.utils.custom_data.CustomDataWrapper;
+import com.x_tornado10.utils.custom_data.inv_request.RestoreRequest;
+import com.x_tornado10.utils.custom_data.reload.CustomDataWrapper;
 import com.x_tornado10.utils.data.compare.ObjectCompare;
 import com.x_tornado10.utils.data.convert.TextFormatting;
-import com.x_tornado10.utils.data.convert.ToFromBase64;
 import jdk.jfr.Description;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -74,7 +73,6 @@ public final class craftiservi extends JavaPlugin {
     private HashMap<UUID, String> playerlist;
     private PluginManager pm;
     private FileManager fm;
-    private ToFromBase64 toFromBase64;
     private TextFormatting txtformatting;
     private ObjectCompare HMC;
     private static HashMap<UUID, Long> afkList;
@@ -85,14 +83,13 @@ public final class craftiservi extends JavaPlugin {
     private HashMap<UUID, List<Float>> playersinsavearea;
     private JoinListener joinListener;
     private PlayerMoveListener playerMoveListener;
-    private InventoryOpenListener inventoryOpenListener;
     private InventoryListener inventoryListener;
     private InvSaveMgr invSaveMgr;
     private GraplingHookListener graplingHookListener;
     private JumpPads jumpPads;
     private AFKListener afkListener;
     private HashMap<UUID, HashMap<String, Inventory>> inv_saves;
-    private HashMap<Integer, Inventory> invs_review = new HashMap<>();
+    private List<RestoreRequest> restoreRequests;
     public static Map<UUID, Long> FLYING_TIMEOUT = new HashMap<>();
 
     private List<String> blockedStrings;
@@ -223,7 +220,6 @@ public final class craftiservi extends JavaPlugin {
         handlerList.unregister(afkChecker);
         handlerList.unregister(jumpPads);
         handlerList.unregister(inventoryListener);
-        handlerList.unregister(inventoryOpenListener);
         handlerList.unregister(graplingHookListener);
         handlerList.unregister(msgFilter);
         handlerList.unregister(afkListener);
@@ -249,11 +245,11 @@ public final class craftiservi extends JavaPlugin {
         playersinsavearea = new HashMap<>();
         afkList = new HashMap<>();
         inv_saves = new HashMap<>();
+        restoreRequests = new ArrayList<>();
         afkPlayers = new ConcurrentHashMap<>();
         playersToCheck = new ConcurrentHashMap<>();
         pm = Bukkit.getPluginManager();
         blockedStrings = new ArrayList<>();
-        toFromBase64 = new ToFromBase64();
         msgFilter = new MsgFilter();
         backup_config = new YamlConfiguration();
 
@@ -275,11 +271,11 @@ public final class craftiservi extends JavaPlugin {
         xpsaveareas = fm.getXpSaveAreaFromTextFile();
         playersinsavearea = fm.getPlayersInSaveAreaFromTextFile();
         inv_saves = fm.getPlayerInvSavePointsFromTextFile();
+        restoreRequests = fm.getRestoreRequestsFromTextFile();
     }
     private void finalizeSetup() {
         joinListener = new JoinListener();
         playerMoveListener = new PlayerMoveListener();
-        inventoryOpenListener = new InventoryOpenListener();
         invSaveMgr = new InvSaveMgr();
         inventoryListener = new InventoryListener();
         graplingHookListener = new GraplingHookListener(configManager.getY_velocity_g());
@@ -291,7 +287,6 @@ public final class craftiservi extends JavaPlugin {
         pm.registerEvents(joinListener, this);
         pm.registerEvents(playerMoveListener, this);
         pm.registerEvents(inventoryListener, this);
-        pm.registerEvents(inventoryOpenListener, this);
         pm.registerEvents(graplingHookListener, this);
         pm.registerEvents(jumpPads, this);
         pm.registerEvents(afkListener, this);
@@ -374,40 +369,35 @@ public final class craftiservi extends JavaPlugin {
 
     private void saveData() {
         if (!playerlist.isEmpty() && new File(paths.getPlayerlist()).exists()) {
-
             fm.writePlayerlistToTextFile(playerlist);
-
+            logger.debug("Playerlist...§adone");
         }
-        logger.debug("Playerlist...§adone");
 
         if (new File(paths.getPlayerlist()).exists() && !inv_saves.isEmpty()) {
-
             fm.writePlayerInvSavesToTextFile(inv_saves);
-
+            logger.debug("InventorySavePoints...§adone");
         }
-        logger.debug("InventorySavePoints...§adone");
 
         if (new File(paths.getXpsaveareas()).exists()) {
-
             fm.writeXpSaveAreasToTextFile(xpsaveareas);
-
+            logger.debug("XpSaveAreas...§adone");
         }
-        logger.debug("XpSaveAreas...§adone");
 
         if (new File(paths.getPlayersinsavearea()).exists()) {
-
             fm.writePlayersInSaveAreaToTextFile(playersinsavearea);
-
+            logger.debug("PlayersInSaveArea...§adone");
         }
-        logger.debug("PlayersInSaveArea...§adone");
+
+        if (new File(paths.getRestoreRequests()).exists()) {
+            fm.writeRestoreRequestsToTextFile(restoreRequests);
+            logger.debug("ApprovedRequests...§adone");
+        }
         logger.debug("");
         logger.debug("§8-----------------------------");
         logger.debug("");
 
         if (configManager.backupConfig()) {
-
             logger.debug("Successfully created backup of config.yml");
-
         }
     }
 
@@ -432,9 +422,6 @@ public final class craftiservi extends JavaPlugin {
     }
     public HashMap<UUID, HashMap<String, Inventory>> getInv_saves() {
         return inv_saves;
-    }
-    public HashMap<Integer, Inventory> getInvs_review() {
-        return invs_review;
     }
     public String getColorprefix() {
         return colorprefix;
@@ -640,7 +627,7 @@ public final class craftiservi extends JavaPlugin {
             userManager.loadUser(pid);
         }
         User user = userManager.getUser(pid);
-        if (user == null) {return new String("null");}
+        if (user == null) {return "null";}
         String formattedDisplayName = user.getCachedData().getMetaData().getPrefix() +
                 p.getName() +
                 user.getCachedData().getMetaData().getSuffix();
@@ -668,8 +655,8 @@ public final class craftiservi extends JavaPlugin {
     public boolean isPaperServer() {
         return Bukkit.getVersion().toLowerCase().contains("paper");
     }
-
     public InvSaveMgr getInvSaveMgr() {return invSaveMgr;}
+    public List<RestoreRequest> getApprovedRequests() {return restoreRequests;}
 
     @Description("Reloads config values during runtime using a Bukkit Custom Event")
     public void reload(CustomDataWrapper customDataWrapper) {

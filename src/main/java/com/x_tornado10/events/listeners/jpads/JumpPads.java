@@ -2,7 +2,7 @@ package com.x_tornado10.events.listeners.jpads;
 
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.utils.statics.CDID;
-import com.x_tornado10.utils.custom_data.CustomData;
+import com.x_tornado10.utils.custom_data.reload.CustomData;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

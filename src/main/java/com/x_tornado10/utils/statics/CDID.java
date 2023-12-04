@@ -9,5 +9,6 @@ public class CDID {
     public static final int CFILTER_DATA = 5;
     public static final int AFKL_DATA = 6;
     public static final int OPMSG_DATA = 7;
+    public static final int INV_DATA = 8;
 
 }

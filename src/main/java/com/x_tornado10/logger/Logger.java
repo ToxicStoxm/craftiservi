@@ -3,7 +3,7 @@ package com.x_tornado10.logger;
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.utils.statics.CDID;
-import com.x_tornado10.utils.custom_data.CustomData;
+import com.x_tornado10.utils.custom_data.reload.CustomData;
 import com.x_tornado10.utils.data.convert.TextFormatting;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;

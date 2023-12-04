@@ -2,16 +2,16 @@ package com.x_tornado10.features.inv_saves;
 
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.custom.ReloadEvent;
+import com.x_tornado10.logger.Logger;
 import com.x_tornado10.message_sys.OpMessages;
 import com.x_tornado10.message_sys.PlayerMessages;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
-import net.md_5.bungee.api.chat.hover.content.Content;
+import com.x_tornado10.utils.custom_data.inv_request.RestoreRequest;
+import com.x_tornado10.utils.custom_data.reload.CustomData;
+import com.x_tornado10.utils.statics.CDID;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,15 +26,23 @@ import java.util.List;
 
 public class InvSaveMgr implements Listener {
 
-    private craftiservi plugin;
-    private PlayerMessages plmsg;
-    private OpMessages opmsg;
-    private HashMap<UUID, HashMap<String, Inventory>> inv_saves;
+    private final craftiservi plugin;
+    private final PlayerMessages plmsg;
+    private final OpMessages opmsg;
+    private final HashMap<UUID, HashMap<String, Inventory>> inv_saves;
+    private double cooldown_value;
+    private boolean restore_enabled;
+    private final List<RestoreRequest> restoreRequests;
+    private final Logger logger;
+    public static HashMap<UUID, Long> cooldown;
     public InvSaveMgr() {
         plugin = craftiservi.getInstance();
         inv_saves = plugin.getInv_saves();
         plmsg = plugin.getPlayerMessages();
         opmsg = plugin.getOpmsg();
+        cooldown = new HashMap<>();
+        restoreRequests = plugin.getApprovedRequests();
+        logger = plugin.getCustomLogger();
     }
 
     public boolean add(UUID pid, String name) {
@@ -45,10 +53,10 @@ public class InvSaveMgr implements Listener {
         if (p == null) {return false;}
         Inventory inv = convertInv(p,temp,name);
         if (inv == null) {return false;}
-        HashMap<String,Inventory> temp2 = new HashMap<>();
-        if (inv_saves.containsKey(pid)) temp2 = inv_saves.get(pid);
+        HashMap<String, Inventory> temp2 = new HashMap<>();
+        if (inv_saves.containsKey(pid)) temp2.putAll(inv_saves.get(pid));
         temp2.put(name,inv);
-        inv_saves.put(pid, temp2);
+        inv_saves.put(pid,temp2);
         return true;
     }
     public boolean add(UUID pid, HashMap<String,Inventory> inv_save) {
@@ -58,10 +66,15 @@ public class InvSaveMgr implements Listener {
     }
     public boolean remove(UUID pid, String name) {
         if (exists(pid,name)) {
+            //logger.severe("InvSaveMgr -> remove - normal " + pid + name);
             HashMap<String,Inventory> temp = inv_saves.get(pid);
+            restoreRequests.removeIf(rR -> rR.equals(new RestoreRequest(pid, name)));
             return temp.remove(name) != null;
         } else if (name.equals("*")) {
+            //logger.severe("InvSaveMgr -> remove - * " + pid + name);
             HashMap<String,Inventory> temp = inv_saves.get(pid);
+            if (temp == null) return true;
+            restoreRequests.removeIf(rR -> rR.equals(new RestoreRequest(pid, "*")));
             temp.clear();
             return true;
         }
@@ -73,7 +86,7 @@ public class InvSaveMgr implements Listener {
             Inventory inv = temp.get(name);
             Player p = Bukkit.getPlayer(pid);
             if (p == null) {return false;}
-            Inventory inv2 = changeInvName(p,inv,name);
+            Inventory inv2 = changeInvName(p, inv, new_name);
             if (inv2 == null) {return false;}
             temp.remove(name);
             temp.put(new_name, inv2);
@@ -82,18 +95,74 @@ public class InvSaveMgr implements Listener {
     public boolean view(UUID pid, String name) {
         if (exists(pid,name)) {
             HashMap<String, Inventory> temp = inv_saves.get(pid);
-            Inventory inv = temp.get(name);
+            Inventory temp1 = temp.get(name);
+            Inventory inv = Bukkit.createInventory(temp1.getHolder(), 54, Objects.requireNonNull(Bukkit.getPlayer(pid)).getName() + " : " + name);
+            ItemStack[] contents = temp1.getContents();
+            inv.setContents(contents);
             return openInventory(pid, name, inv);
         }
         return false;
     }
+    public void restoreAll(List<RestoreRequest> restoreRequests) {
+        //logger.severe("InvSaveMgr -> restoreAll " + restoreRequests.toString());
+        List<RestoreRequest> requests = new ArrayList<>(restoreRequests);
+        for (RestoreRequest rR : requests) {
+            restore(rR);
+        }
+        requests.clear();
+    }
+    public boolean restore(RestoreRequest rR) {
+        List<UUID> uuids = new ArrayList<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            uuids.add(p.getUniqueId());
+        }
+        //logger.severe("InvSaveMgr -> restore rR" + rR.toString());
+        UUID requester = rR.getRequester();
+        String inv_name = rR.getInvName();
+        if (uuids.contains(requester) && rR.isReviewed()) {
+            //logger.severe("InvSaveMgr -> restore rR - uuids.contains(requester) && rR.isReviewed()");
+            Player p = Bukkit.getPlayer(requester);
+            UUID reviewer = rR.getReviewer();
+            if (rR.isApproved()) {
+                //logger.severe("InvSaveMgr -> restore rR - uuids.contains(requester) && rR.isReviewed() - is Approved");
+                if (restore(requester, inv_name) && p != null) {
+                    String reviewerName;
+                    Player pl = Bukkit.getPlayer(reviewer);
+                    if (pl != null) reviewerName = pl.getName();
+                    else reviewerName = Bukkit.getOfflinePlayer(reviewer).getName();
+                    plmsg.msg(p, ChatColor.GREEN + (reviewerName == null ? "An Admin approved your Inventory restore request!" : reviewerName + " approved your Inventory restore request!"));
+                    opmsg.send((reviewerName == null ? p.getName() + "s Inventory restore request was approved!" : reviewerName + " approved " + p.getName() + "s Inventory restore request!"));
+                    plmsg.msg(p, "Restoring '" + inv_name + "'...");
+                    p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 99999999999999999999999999999999999999f, 1f);
+                }
+            } else {
+                //logger.severe("InvSaveMgr -> restore rR - uuids.contains(requester) && rR.isReviewed() - !is Approved");
+                String reviewerName;
+                Player pl = Bukkit.getPlayer(reviewer);
+                if (pl != null) reviewerName = pl.getName();
+                else reviewerName = Bukkit.getOfflinePlayer(reviewer).getName();
+                plmsg.msg(Objects.requireNonNull(p), ChatColor.RED + (reviewerName == null ? "An Admin" : reviewerName) + " denied your restore request!");
+                opmsg.send((reviewerName == null ? p.getName() + "s Inventory restore request was denied!" : reviewerName + " denied " + p.getName() + "s Inventory restore request!"));
+                p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+            }
+            restoreRequests.remove(rR);
+            return true;
+        } else {
+            //logger.severe(rR.isReviewed() + " " + uuids.contains(requester));
+            //logger.severe(requester + "");
+            //logger.severe(uuids.toString());
+            //logger.severe("InvSaveMgr -> restore rR - !uuids.contains(requester) && rR.isReviewed()");
+            return false;
+        }
+    }
     public boolean restore(UUID pid, String name) {
         if (exists(pid,name)) {
+            //logger.severe("InvSaveMgr -> restore(" + pid + " " + name +")");
             HashMap<String, Inventory> temp = inv_saves.get(pid);
             Inventory inv = temp.get(name);
             Player p = Bukkit.getPlayer(pid);
             if (p == null) {return false;}
-
+            //logger.severe("InvSaveMgr -> restore(" + pid + " " + name +") - 1");
             List<ItemStack> armour_slots = new ArrayList<>();
             List<ItemStack> slots = new ArrayList<>();
             ItemStack offhand;
@@ -146,7 +215,38 @@ public class InvSaveMgr implements Listener {
 
     public boolean requestRestore(UUID pid, String name) {
         if (!exists(pid,name)) {return false;}
+        //logger.severe("InvClickEvent -> restore button - restore req received");
+        Player p = Bukkit.getPlayer(pid);
+        if (p == null) {return false;}
+        if (!restore_enabled) {
+            //logger.severe("... -> - restore req received - restore disabled");
+            plmsg.msg(p,"Failed to send restore request. The restore feature is currently disabled.");
+            p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+            return true;
+        }
+        if (!cooldown.containsKey(pid)) {
+            //logger.severe("... -> - restore req received - cooldown !contains pid");
+            cooldown.put(pid, System.currentTimeMillis());
+        } else {
+            //logger.severe("... -> - restore req received - cooldown contains pid");
+            long timeElapsed = System.currentTimeMillis() - cooldown.get(pid);
+            if (timeElapsed >= cooldown_value) {
+                //logger.severe("... -> - restore req received - cooldown contains pid - cooldown +");
+                cooldown.put(pid, System.currentTimeMillis());
+            } else {
+                //logger.severe("... -> - restore req received - cooldown contains pid - cooldown -");
+                plmsg.msg(p,"§cYou must wait §e"+ cooldown_value/1000 +"s§c between uses! (" + (int)((cooldown_value - timeElapsed) / 1000) + "," + (int)((cooldown_value - timeElapsed) % 1000) + "s left)");
+                p.closeInventory();
+                p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+                return false;
+            }
+        }
+        //logger.severe("... -> - restore req received - ... - send request");
         opmsg.send(plmsg.getLine(), pid, name);
+        p.closeInventory();
+        p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 99999999999999999999999999999999999999f, 1f);
+        plmsg.msg(p,"Successfully requested to restore " + name + "!");
+        plmsg.msg(p,"Please wait for an admin to review your request!");
         return true;
     }
     private boolean openInventory(UUID pid, String name) {
@@ -176,7 +276,7 @@ public class InvSaveMgr implements Listener {
     private Inventory convertInv(Player holder, Inventory inv, String name) {
         if (inv == null) {return null;}
 
-        Inventory temp = Bukkit.createInventory(holder, 54, holder.getName() + " : " + name);
+        Inventory temp = Bukkit.createInventory(holder, 54, holder.getUniqueId() + " : " + name);
         ItemStack[] slots = inv.getContents();
         temp.setContents(slots);
 
@@ -208,18 +308,34 @@ public class InvSaveMgr implements Listener {
         info.setItemMeta(info_meta);
 
         temp.setItem(45, info);
+        if (restore_enabled) {
+            ItemStack restore = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
+            ItemMeta restore_meta = restore.getItemMeta();
+            if (restore_meta == null) {
+                return null;
+            }
+            restore_meta.setDisplayName("§7Restore Inventory");
 
-        ItemStack restore = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-        ItemMeta restore_meta = restore.getItemMeta();
-        if (restore_meta == null) {return null;}
-        restore_meta.setDisplayName("§aRestore Inventory");
+            List<String> restore_lore = new ArrayList<>();
+            restore_lore.add("§7Restores the saved Inventory and drops the items of your current inventory!");
+            restore_meta.setLore(restore_lore);
+            restore.setItemMeta(restore_meta);
 
-        List<String> restore_lore = new ArrayList<>();
-        restore_lore.add("§7Restores the saved Inventory and drops the items of your current inventory!");
-        restore_meta.setLore(restore_lore);
-        restore.setItemMeta(restore_meta);
+            temp.setItem(53, restore);
+        }
 
-        temp.setItem(53,restore);
+        ItemStack gui_id = new ItemStack(Material.BOOK);
+        ItemMeta gui_id_meta = gui_id.getItemMeta();
+        String gui_id_dispalyname = "§bGUI_ID";
+        List<String> gui_id_lore = new ArrayList<>();
+
+        if (gui_id_meta == null) return null;
+
+        gui_id_lore.add("§7ID: " + holder.getUniqueId() + ":" + name);
+        gui_id_meta.setDisplayName(gui_id_dispalyname);
+        gui_id_meta.setLore(gui_id_lore);
+        gui_id.setItemMeta(gui_id_meta);
+        temp.setItem(51, gui_id);
 
         return temp;
 
@@ -235,7 +351,7 @@ public class InvSaveMgr implements Listener {
 
     private Inventory changeInvName(Player holder, Inventory inv, String name) {
         if (inv == null) {return null;}
-        Inventory temp = Bukkit.createInventory(holder, 54, holder.getName() + " : " + name);
+        Inventory temp = Bukkit.createInventory(holder, 54, holder.getUniqueId() + " : " + name);
         ItemStack[] slots = inv.getContents();
         temp.setContents(slots);
         return temp;
@@ -251,6 +367,8 @@ public class InvSaveMgr implements Listener {
 
     @EventHandler
     public void onReload(ReloadEvent e) {
-
+        CustomData inv_data = e.getData(CDID.INV_DATA);
+        cooldown_value = inv_data.getD(0);
+        restore_enabled = inv_data.getB(0);
     }
 }

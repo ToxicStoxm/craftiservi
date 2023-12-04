@@ -5,6 +5,7 @@ import com.x_tornado10.features.inv_saves.InvSaveMgr;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.message_sys.OpMessages;
 import com.x_tornado10.message_sys.PlayerMessages;
+import com.x_tornado10.utils.custom_data.inv_request.RestoreRequest;
 import com.x_tornado10.utils.statics.PERMISSION;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -22,6 +23,7 @@ public class InventorySavePointCommand implements CommandExecutor {
     private OpMessages opmsg;
     private Logger logger;
     private InvSaveMgr invSaveMgr;
+    private List<RestoreRequest> restoreRequests;
     private final List<String> illegal_chars = new ArrayList<>();
     public InventorySavePointCommand() {
         plugin = craftiservi.getInstance();
@@ -29,24 +31,31 @@ public class InventorySavePointCommand implements CommandExecutor {
         opmsg = plugin.getOpmsg();
         logger = plugin.getCustomLogger();
         invSaveMgr = plugin.getInvSaveMgr();
-            illegal_chars.add("\\");
-            illegal_chars.add("\"");
-            illegal_chars.add(".");
-            illegal_chars.add("*");
+
+        illegal_chars.add("\\");
+        illegal_chars.add("\"");
+        illegal_chars.add(".");
+        illegal_chars.add("*");
+        illegal_chars.add("$");
+
+        restoreRequests = plugin.getApprovedRequests();
     }
 
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (!enabled) {return true;}
-        if (!(sender instanceof Player p)) {
-            logger.info("This command can only be executed by a player!");
+        Player p;
+        if (!(sender instanceof Player)) {
+            logger.info("Coming Soon: This command is not yet supported for console!");
             return true;
         } else {
+            p = (Player) sender;
             if (!plugin.hasPermission(p, PERMISSION.COMMAND_INVSAVE)) {
                 noPerms(p);
                 return true;
             }
+
             UUID pid = p.getUniqueId();
 
             switch (args.length) {
@@ -75,7 +84,7 @@ public class InventorySavePointCommand implements CommandExecutor {
                                 plmsg.msg(p,"Name contains Illegal or Invalid Characters! " + ArrayToStringList((ArrayList<String>) illegal_chars, "|"));
                                 break;
                             }
-                            if (invSaveMgr.exists(pid,args[1])) {
+                            if (invSaveMgr.exists(pid, args[1])) {
                                 plmsg.msg(p, "'" + args[1] + "' does already exist! If you want to rename it do /invsave rename " + args[1] + " <NewInvName>");
                                 break;
                             }
@@ -95,7 +104,7 @@ public class InventorySavePointCommand implements CommandExecutor {
                             }
                         }
                         case "remove" -> {
-                            if (notFound(p,args[1]) && !args[1].equals("*")) break;
+                            if (!invSaveMgr.exists(p.getUniqueId(),args[1]) && !args[1].equals("*")) break;
                             if (invSaveMgr.remove(pid, args[1])) {
                                 if (args[1].equals("*")) {
                                     plmsg.msg(p, "Successfully deleted all InventorySavePoints!");
@@ -113,9 +122,13 @@ public class InventorySavePointCommand implements CommandExecutor {
                         }
                         case "restore" -> {
                            if (notFound(p,args[1])) break;
-                           if (invSaveMgr.requestRestore(pid,args[1])) {
-                               plmsg.msg(p,"Successfully requested to restore " + args[1] + "!");
-                           } else plmsg.msg(p,"Request failed! Please try again!");
+                           if (restoreRequests.contains(new RestoreRequest(pid,args[1]))) {
+                               plmsg.msg(p,"Request failed! Another request is already pending!");
+                               return true;
+                           }
+                            if (invSaveMgr.requestRestore(pid, args[1])) {
+                                restoreRequests.add(new RestoreRequest(pid,args[1]));
+                            }
                         }
                         default -> playerSendUsage(p);
                     }

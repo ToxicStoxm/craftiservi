@@ -10,10 +10,9 @@ import com.x_tornado10.commands.xp_save_zone_command.XpSaveZoneCommandTabComplet
 import com.x_tornado10.craftiservi;
 import com.x_tornado10.events.listeners.afk_checking.AFKListener;
 import com.x_tornado10.events.listeners.inventory.InventoryListener;
-import com.x_tornado10.events.listeners.inventory.InventoryOpenListener;
 import com.x_tornado10.features.afk_protection.AFKChecker;
-import com.x_tornado10.utils.custom_data.CustomData;
-import com.x_tornado10.utils.custom_data.CustomDataWrapper;
+import com.x_tornado10.utils.custom_data.reload.CustomData;
+import com.x_tornado10.utils.custom_data.reload.CustomDataWrapper;
 import com.x_tornado10.utils.Paths;
 import com.x_tornado10.utils.data.convert.TextFormatting;
 import org.bukkit.configuration.Configuration;
@@ -73,6 +72,12 @@ public class ConfigManager {
     }
     public boolean getCommands_invsave_enabled() {
         return config.getBoolean(paths.getCommands_invsave_enabled());
+    }
+    public boolean getCommands_invsave_restore_requests() {
+        return config.getBoolean(paths.get_invsave_restore_requests());
+    }
+    public double getCommands_invsave_restore_requests_cooldown() {
+        return config.getDouble(paths.get_invsave_restore_requests_cooldown());
     }
     public boolean getCommands_xparea_enabled() {
         return config.getBoolean(paths.getCommands_xparea_enabled());
@@ -163,6 +168,7 @@ public class ConfigManager {
         customDataList.add(constructCFilterData());
         customDataList.add(constructAFKLData());
         customDataList.add(constructOpmsgData());
+        customDataList.add(constructInvData());
 
         return new CustomDataWrapper(customDataList);
     }
@@ -299,6 +305,14 @@ public class ConfigManager {
 
         return new CustomData(s, b, null, d, lS);
     }
+    private CustomData constructInvData() {
+        List<Boolean> b = new ArrayList<>();
+        List<Double> d = new ArrayList<>();
+
+        d.add(getCommands_invsave_restore_requests_cooldown());
+        b.add(getCommands_invsave_restore_requests());
+        return new CustomData(null, b, null, d, null);
+    }
 
     public boolean resetConfig() {
         if (backupConfig() && fm.deleteConfig()) {
@@ -326,7 +340,6 @@ public class ConfigManager {
             InventorySavePointCommand.enabled = invs_enabled;
             InventorySavePointCommandTabCompletion.enabled = invs_enabled;
             InventoryListener.enabled = invs_enabled;
-            InventoryOpenListener.enabled = invs_enabled;
             OpenGUICommand.enabled = invs_enabled;
             //
             XpSaveZoneCommand.enabled = xps_enabled;

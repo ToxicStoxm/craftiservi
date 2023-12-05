@@ -10,6 +10,34 @@ depend: [ LuckPerms ]
 loadbefore:
   - craftiservi-discord
   - Server-Restart
+permissions:
+  craftiservi.admin:
+    description: Access to everything the plugin has to offer
+    default: op
+  craftiservi.command.firstjoin:
+    description: Access to the firstjoin command
+    default: true
+  craftiservi.command.xparea:
+    description: Access to the xparea command
+    default: op
+  craftiservi.command.invsave:
+    description: Access to the invsave command an features
+    default: true
+    children: [craftiservi.command.invsave.bypass.cooldown]
+  craftiservi.command.invsave.bypass.cooldown:
+    description: Lets you bypass the invsave restore request cooldown
+    default: op
+  craftiservi.command.opengui:
+    description: Moderation for invsave feature
+    default: op
+  craftiservi.command.main:
+    description: Access to the main plugin command
+    default: op
+  craftiservi.command.adminchat:
+    description: Send and receive admin chat messages
+    default: op
+
+
 commands:
   firstjoin:
     description: returns date when a player first joined

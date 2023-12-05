@@ -8,6 +8,7 @@ import com.x_tornado10.message_sys.PlayerMessages;
 import com.x_tornado10.utils.custom_data.inv_request.RestoreRequest;
 import com.x_tornado10.utils.custom_data.reload.CustomData;
 import com.x_tornado10.utils.statics.CDID;
+import com.x_tornado10.utils.statics.PERMISSION;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;;
@@ -18,6 +19,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -33,7 +37,7 @@ public class InvSaveMgr implements Listener {
     private double cooldown_value;
     private boolean restore_enabled;
     private final List<RestoreRequest> restoreRequests;
-    private final Logger logger;
+    //private final Logger logger;
     public static HashMap<UUID, Long> cooldown;
     public InvSaveMgr() {
         plugin = craftiservi.getInstance();
@@ -42,7 +46,7 @@ public class InvSaveMgr implements Listener {
         opmsg = plugin.getOpmsg();
         cooldown = new HashMap<>();
         restoreRequests = plugin.getApprovedRequests();
-        logger = plugin.getCustomLogger();
+        //logger = plugin.getCustomLogger();
     }
 
     public boolean add(UUID pid, String name) {
@@ -81,16 +85,25 @@ public class InvSaveMgr implements Listener {
         return false;
     }
     public boolean rename(UUID pid, String name, String new_name) {
-        if (!exists(pid, name)) {return false;}
-            HashMap<String,Inventory> temp = inv_saves.get(pid);
-            Inventory inv = temp.get(name);
-            Player p = Bukkit.getPlayer(pid);
-            if (p == null) {return false;}
-            Inventory inv2 = changeInvName(p, inv, new_name);
-            if (inv2 == null) {return false;}
-            temp.remove(name);
-            temp.put(new_name, inv2);
-            return true;
+        if (!exists(pid, name)) {
+            return false;
+        }
+        RestoreRequest rR = new RestoreRequest(pid,name);
+        HashMap<String, Inventory> temp = inv_saves.get(pid);
+        Inventory inv = temp.get(name);
+        Player p = Bukkit.getPlayer(pid);
+        if (p == null) {return false;}
+        Inventory inv2 = changeInvName(p, inv, new_name);
+        if (inv2 == null) {return false;}
+        temp.remove(name);
+        temp.put(new_name, inv2);
+        if (restoreRequests.contains(rR)) {
+            RestoreRequest rR0 = restoreRequests.get(restoreRequests.indexOf(rR));
+            rR0.setReviewed(true);
+            rR0.setApproved(false);
+            restore(rR0);
+        }
+        return true;
     }
     public boolean view(UUID pid, String name) {
         if (exists(pid,name)) {
@@ -138,12 +151,19 @@ public class InvSaveMgr implements Listener {
             } else {
                 //logger.severe("InvSaveMgr -> restore rR - uuids.contains(requester) && rR.isReviewed() - !is Approved");
                 String reviewerName;
-                Player pl = Bukkit.getPlayer(reviewer);
-                if (pl != null) reviewerName = pl.getName();
-                else reviewerName = Bukkit.getOfflinePlayer(reviewer).getName();
-                plmsg.msg(Objects.requireNonNull(p), ChatColor.RED + (reviewerName == null ? "An Admin" : reviewerName) + " denied your restore request!");
-                opmsg.send((reviewerName == null ? p.getName() + "s Inventory restore request was denied!" : reviewerName + " denied " + p.getName() + "s Inventory restore request!"));
-                p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+                if (reviewer != null) {
+                    Player pl = Bukkit.getPlayer(reviewer);
+                    if (pl != null) reviewerName = pl.getName();
+                    else reviewerName = Bukkit.getOfflinePlayer(reviewer).getName();
+                    plmsg.msg(Objects.requireNonNull(p), ChatColor.RED + (reviewerName == null ? "An Admin" : reviewerName) + " denied your restore request!");
+                    opmsg.send((reviewerName == null ? p.getName() + "s Inventory restore request was denied!" : reviewerName + " denied " + p.getName() + "s Inventory restore request!"));
+                    p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+                } else {
+                    plmsg.msg(Objects.requireNonNull(p), ChatColor.RED + "Your restore request was auto-denied!");
+                    plmsg.msg(Objects.requireNonNull(p), ChatColor.RED + "Probable cause: Renamed InventorySavePoint");
+                    opmsg.send(p.getName() + "s Inventory restore request was denied!");
+                    p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
+                }
             }
             restoreRequests.remove(rR);
             return true;
@@ -224,7 +244,32 @@ public class InvSaveMgr implements Listener {
             p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
             return true;
         }
-        if (!cooldown.containsKey(pid)) {
+        if (opmsg.isAdmin(pid)) {
+            plmsg.msg(p,"Successfully requested to restore " + name + "!");
+            p.closeInventory();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    RestoreRequest rR = new RestoreRequest(pid,name);
+                    if (restoreRequests.contains(rR)) {
+                        RestoreRequest rR0 = restoreRequests.get(restoreRequests.indexOf(rR));
+                        restoreRequests.remove(rR0);
+                    }
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            restore(pid,name);
+                            p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 99999999999999999999999999999999999999f, 1f);
+                            plmsg.msg(p,"§aAuto approved your restore request because of admin privileges!");
+                            plmsg.msg(p,"Restoring " + name + "...");
+                        }
+                    }.runTask(plugin);
+                }
+            }.runTaskLaterAsynchronously(plugin,10);
+            return true;
+        }
+
+        if (!cooldown.containsKey(pid)|| plugin.hasPermission(p, PERMISSION.COMMAND_INVSAVE_BYPASSCOOLDOWN)) {
             //logger.severe("... -> - restore req received - cooldown !contains pid");
             cooldown.put(pid, System.currentTimeMillis());
         } else {

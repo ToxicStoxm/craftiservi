@@ -6,6 +6,7 @@ import com.x_tornado10.logger.Logger;
 import com.x_tornado10.utils.statics.CDID;
 import com.x_tornado10.utils.custom_data.reload.CustomData;
 import com.x_tornado10.utils.statics.GROUP;
+import com.x_tornado10.utils.statics.PERMISSION;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -109,7 +110,7 @@ public class OpMessages implements Listener {
                 new ComponentBuilder()
                         .append(prefix + line + "\n" + prefix + ChatColor.GRAY + "Restore request -> " + Bukkit.getOfflinePlayer(pid).getName() + " - ")
                         .append(String.valueOf(ChatColor.BOLD) + ChatColor.AQUA + ChatColor.UNDERLINE + name + ChatColor.RESET)
-                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/opengui GUI_" + pid + ":" + name))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/opengui GUI$" + pid + ":" + name))
                         .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GRAY + "Click to open Inventory. GUI_" + name)))
                         .append("\n" + prefix + line)
                         .create();
@@ -186,6 +187,9 @@ public class OpMessages implements Listener {
             }
         }.runTaskTimerAsynchronously(plugin,20,20);
     }
+    public boolean isAdmin(UUID pid) {
+        return online_admins.contains(pid);
+    }
     private void queueAdd(List<Object> temp) {
         for (Object s : temp) {
             queue.put(System.currentTimeMillis(), s);
@@ -257,7 +261,7 @@ public class OpMessages implements Listener {
         if (auto_assign) {
             Set<OfflinePlayer> ops = Bukkit.getOperators();
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (ops.contains(p) || plugin.isPlayerInGroup(p.getUniqueId(), GROUP.ADMIN)) {
+                if (ops.contains(p) || plugin.isPlayerInGroup(p.getUniqueId(), GROUP.ADMIN) || plugin.hasPermission(p, PERMISSION.CRAFTISERVI_ADMIN)) {
                     online_admins.add(p.getUniqueId());
                 }
             }

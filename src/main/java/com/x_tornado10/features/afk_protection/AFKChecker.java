@@ -10,6 +10,7 @@ import com.x_tornado10.utils.data.compare.ObjectCompare;
 import com.x_tornado10.utils.data.convert.TextFormatting;
 import com.x_tornado10.utils.statics.CDID;
 import com.x_tornado10.utils.statics.GROUP;
+import com.x_tornado10.utils.statics.PLACEHOLDER;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
@@ -139,8 +140,8 @@ public class AFKChecker implements Listener {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yy HH:mm:ss");
                     Date date = new Date(getAFKTime(pid));
                     String temp = AFKsuffix;
-                    if (temp.contains("%AFK-TIME%")) {
-                        temp = temp.replace("%AFK-TIME%", dateFormat.format(date));
+                    if (temp.contains(PLACEHOLDER.AFK_TIME)) {
+                        temp = temp.replace(PLACEHOLDER.AFK_TIME, dateFormat.format(date));
                     }
                     if (!plugin.addSuffixToPlayer(pid, temp)) {
                         logger.severe("Error occurred!");

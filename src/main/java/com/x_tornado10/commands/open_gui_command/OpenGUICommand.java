@@ -55,7 +55,7 @@ public class OpenGUICommand implements CommandExecutor {
         if (args.length == 1) {
 
             String args0 = args[0];
-            String[] parts0 = args0.split("_");
+            String[] parts0 = args0.split("\\$");
             String key = parts0[0].trim();
             String[] parts = parts0[1].trim().split(":");
             UUID id0 = UUID.fromString(parts[0].trim());
@@ -78,7 +78,7 @@ public class OpenGUICommand implements CommandExecutor {
 
             if (key.equals("GUI")) {
                 if (!invSaveMgr.exists(id0,id1)) {
-                    plmsg.msg(p, "Invalid GUI_ID! (GUI_" + parts0[1] + ")");
+                    plmsg.msg(p, "Invalid GUI_ID! (GUI$" + parts0[1] + ")");
                     return true;
                 }
                 Inventory temp = plugin.getInv_saves().get(id0).get(id1);

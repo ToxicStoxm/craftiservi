@@ -51,6 +51,8 @@ public class Paths {
     public String getCommands_invsave_enabled() {return "Craftiservi.Commands-Features.InvSave.Enabled";}
     public String get_invsave_restore_requests() {return "Craftiservi.Commands-Features.InvSave.Restore-Requests.Enabled";}
     public String get_invsave_restore_requests_cooldown() {return "Craftiservi.Commands-Features.InvSave.Restore-Requests.Restore-Cooldown";}
+    public String get_invsave_autoInvSave() {return "Craftiservi.Commands-Features.InvSave.Auto-InvSave-Death.Enabled";}
+    public String get_invsave_autoInvSave_format() {return "Craftiservi.Commands-Features.InvSave.Auto-InvSave-Death.Inv-Name-Format";}
     public String getCommands_xparea_enabled() {return "Craftiservi.Commands-Features.XpArea.Enabled";}
     public String getCommands_firstjoin_enabled() {return "Craftiservi.Commands-Features.FirstJoin.Enabled";}
     public String getAfk_checker_enabled() {return "Craftiservi.Commands-Features.Afk-Checker.Enabled";}

@@ -1,17 +1,20 @@
 package com.x_tornado10.events.listeners.inventory;
 
 import com.x_tornado10.craftiservi;
+import com.x_tornado10.events.custom.ReloadEvent;
 import com.x_tornado10.features.inv_saves.InvSaveMgr;
 import com.x_tornado10.logger.Logger;
 import com.x_tornado10.message_sys.PlayerMessages;
 import com.x_tornado10.utils.custom_data.inv_request.RestoreRequest;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
+import com.x_tornado10.utils.custom_data.reload.CustomData;
+import com.x_tornado10.utils.statics.CDID;
+import com.x_tornado10.utils.statics.PLACEHOLDER;
+import org.bukkit.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -21,7 +24,12 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class InventoryListener implements Listener {
@@ -29,6 +37,8 @@ public class InventoryListener implements Listener {
     private final craftiservi plugin;
     //private final Logger logger;
     private final PlayerMessages plmsg;
+    private boolean autoInvReqOnDeath;
+    private String autoInvReqOnDeath_format;
     private List<RestoreRequest> restoreRequests;
     private InvSaveMgr invSaveMgr;
     public static boolean enabled;
@@ -102,8 +112,9 @@ public class InventoryListener implements Listener {
             //logger.severe("InvClickEvent -> approve button - 1");
             RestoreRequest rR = new RestoreRequest(uuid, parts[1].trim());
             if (restoreRequests.contains(rR)) {
+                RestoreRequest rR0 = restoreRequests.get(restoreRequests.indexOf(rR));
                 //logger.severe("InvClickEvent -> approve button - restoreRequest contains");
-                if (restoreRequests.get(restoreRequests.indexOf(rR)).isReviewed()) {
+                if (rR0.isReviewed()) {
                     //logger.severe("InvClickEvent -> approve button - restoreRequest contains - is reviewed");
                     plmsg.msg(p,"This request has already been reviewed!");
                     p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
@@ -111,7 +122,6 @@ public class InventoryListener implements Listener {
                     return;
                 } else {
                     //logger.severe("InvClickEvent -> approve button - restoreRequest contains - !is reviewed");
-                    RestoreRequest rR0 = restoreRequests.get(restoreRequests.indexOf(rR));
                     rR0.setApproved(true);
                     rR0.setReviewed(true);
                     rR0.setReviewer(pid);
@@ -139,7 +149,7 @@ public class InventoryListener implements Listener {
             if (restoreRequests.contains(rR)) {
                 //logger.severe("InvClickEvent -> deny button -  restoreRequest contains");
                 RestoreRequest rR0 = restoreRequests.get(restoreRequests.indexOf(rR));
-                if (rR.isReviewed()) {
+                if (rR0.isReviewed()) {
                     //logger.severe("InvClickEvent -> deny button -  restoreRequest contains - is reviewed");
                     plmsg.msg(p,"This request has already been reviewed!");
                     p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
@@ -169,6 +179,7 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
+        if (!enabled) return;
         invSaveMgr.restoreAll(restoreRequests);
     }
 
@@ -260,5 +271,63 @@ public class InventoryListener implements Listener {
             uuid = UUID.fromString(item0_lore.get(0).split(":")[1].trim());
         }
         return uuid;
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        if (autoInvReqOnDeath && enabled) {
+            Player p = e.getEntity();
+            invSaveMgr.add(p.getUniqueId(), formatInvName(autoInvReqOnDeath_format,p));
+        }
+    }
+
+    private String formatInvName(@NotNull String inv_name, @NotNull Player p) {
+        String result = inv_name;
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        if (inv_name.contains(PLACEHOLDER.DATE)) {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            String formattedDate = currentDateTime.format(dateFormatter);
+            result = result.replace(PLACEHOLDER.DATE, formattedDate);
+        }
+        if (inv_name.contains(PLACEHOLDER.TIME)) {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("HH-mm-ss");
+            String formattedDate = currentDateTime.format(dateFormatter);
+            result = result.replace(PLACEHOLDER.TIME, formattedDate);
+
+        }
+        if (inv_name.contains(PLACEHOLDER.COORDINATES)) {
+            String formattedCoordinates = getString(p);
+            result = result.replace(PLACEHOLDER.COORDINATES, formattedCoordinates);
+        }
+        if (inv_name.contains(PLACEHOLDER.WORLD)) {
+            World world = p.getWorld();
+            String world_name = world.getName();
+            result = result.replace(PLACEHOLDER.WORLD, world_name);
+        }
+        result = result.replace(" ", "");
+        result = result.replace(".", "");
+        return result;
+    }
+
+    @NotNull
+    private static String getString(@NotNull Player p) {
+        Location loc = p.getLocation();
+        double X = loc.getX();
+        double Y = loc.getY();
+        double Z = loc.getZ();
+        X = (double) Math.round(X * 100.0) /100.0;
+        Y = (double) Math.round(Y * 100.0) /100.0;
+        Z = (double) Math.round(Z * 100.0) /100.0;
+        String sX = String.valueOf(X).replace(".",",");
+        String sY = String.valueOf(Y).replace(".",",");
+        String sZ = String.valueOf(Z).replace(".",",");
+        return "X:" + sX + "/-Y:" + sY + "/-Z:" + sZ;
+    }
+
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+        CustomData invData = e.getData(CDID.INV_DATA);
+        autoInvReqOnDeath = invData.getB(1);
+        autoInvReqOnDeath_format = invData.getS(0);
     }
 }

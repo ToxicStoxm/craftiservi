@@ -346,7 +346,11 @@ public class FileManager {
 
                 try {
 
-                    invs.put(childKey, fromBase64((String) player_inv_saves.getConfigurationSection(mainKey).get(childKey)));
+                    if (player_inv_saves.getConfigurationSection(mainKey).get(childKey) instanceof String) {
+                        invs.put(childKey, fromBase64((String) player_inv_saves.getConfigurationSection(mainKey).get(childKey)));
+                    } else {
+                        setupLogger.info(player_inv_saves.getConfigurationSection(mainKey).get(childKey).toString());
+                    }
 
 
                 } catch (Exception e) {

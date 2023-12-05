@@ -24,13 +24,16 @@ public class InventorySavePointCommand implements CommandExecutor {
     private Logger logger;
     private InvSaveMgr invSaveMgr;
     private List<RestoreRequest> restoreRequests;
-    private final List<String> illegal_chars = new ArrayList<>();
+    private final List<String> illegal_chars;
+    private List<UUID> confirm_list;
     public InventorySavePointCommand() {
         plugin = craftiservi.getInstance();
         plmsg = plugin.getPlayerMessages();
         opmsg = plugin.getOpmsg();
         logger = plugin.getCustomLogger();
         invSaveMgr = plugin.getInvSaveMgr();
+        illegal_chars = new ArrayList<>();
+        confirm_list = new ArrayList<>();
 
         illegal_chars.add("\\");
         illegal_chars.add("\"");
@@ -143,6 +146,16 @@ public class InventorySavePointCommand implements CommandExecutor {
                         if (invSaveMgr.exists(pid,args[2])) {
                             plmsg.msg(p,"'" + args[2] + "' already exists! Please choose another name!");
                             break;
+                        }
+                        RestoreRequest rR = new RestoreRequest(pid,args[1]);
+                        if (restoreRequests.contains(rR)) {
+                            if (!confirm_list.contains(pid)) {
+                                plmsg.msg(p, "§cRenaming '" + args[1] + "' to '" + args[2] + "' will cancel your pending restore request!");
+                                plmsg.msg(p, "If you want to proceed anyways, execute the same command again");
+                                confirm_list.add(pid);
+                                return true;
+                            }
+                            confirm_list.remove(pid);
                         }
                         if (invSaveMgr.rename(pid,args[1],args[2])) {
                             plmsg.msg(p, "Successfully renamed '" + args[1] + "' to '" + args[2] + "'!");

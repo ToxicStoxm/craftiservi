@@ -73,12 +73,10 @@ public class ConfigManager {
     public boolean getCommands_invsave_enabled() {
         return config.getBoolean(paths.getCommands_invsave_enabled());
     }
-    public boolean getCommands_invsave_restore_requests() {
-        return config.getBoolean(paths.get_invsave_restore_requests());
-    }
-    public double getCommands_invsave_restore_requests_cooldown() {
-        return config.getDouble(paths.get_invsave_restore_requests_cooldown());
-    }
+    public boolean getCommands_invsave_restore_requests() {return config.getBoolean(paths.get_invsave_restore_requests());}
+    public double getCommands_invsave_restore_requests_cooldown() {return config.getDouble(paths.get_invsave_restore_requests_cooldown());}
+    public boolean getCommands_invsave_auto_inv_save() {return config.getBoolean(paths.get_invsave_autoInvSave());}
+    public String getCommands_invsave_auto_inv_save_format() {return config.getString(paths.get_invsave_autoInvSave_format());}
     public boolean getCommands_xparea_enabled() {
         return config.getBoolean(paths.getCommands_xparea_enabled());
     }
@@ -89,9 +87,7 @@ public class ConfigManager {
     public int getAfkChecker_afk_time() {return config.getInt(paths.getAfk_checker_afk_time());}
     public boolean getAfkChecker_allow_afk_chat() {return config.getBoolean(paths.getAfk_checker_allow_afk_chat());}
     public boolean getAfkChecker_exclude_enabled() {return config.getBoolean(paths.getAfk_checker_exclude_enabled());}
-    public List<String> getAfkChecker_exclude() {
-        return new ArrayList<>(getAfkChecker_exclude_enabled() ? config.getStringList(paths.getAfk_checker_exclude()) : new ArrayList<>());
-    }
+    public List<String> getAfkChecker_exclude() {return new ArrayList<>(getAfkChecker_exclude_enabled() ? config.getStringList(paths.getAfk_checker_exclude()) : new ArrayList<>());}
     public boolean getAFKChecker_broadcastAFK() {return config.getBoolean(paths.getAfk_checker_broadcastAFK_enabled());}
     public boolean getAFKChecker_broadcastTime() {return  config.getBoolean(paths.getAfk_checker_broadcastTime_enabled());}
     public boolean getAFKChecker_display_personalTime() {return config.getBoolean(paths.getAfk_checker_personal_time_enabled());}
@@ -308,10 +304,13 @@ public class ConfigManager {
     private CustomData constructInvData() {
         List<Boolean> b = new ArrayList<>();
         List<Double> d = new ArrayList<>();
+        List<String> s = new ArrayList<>();
 
         d.add(getCommands_invsave_restore_requests_cooldown());
         b.add(getCommands_invsave_restore_requests());
-        return new CustomData(null, b, null, d, null);
+        b.add(getCommands_invsave_auto_inv_save());
+        s.add(getCommands_invsave_auto_inv_save_format());
+        return new CustomData(s, b, null, d, null);
     }
 
     public boolean resetConfig() {

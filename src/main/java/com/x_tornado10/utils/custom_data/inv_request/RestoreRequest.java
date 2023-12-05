@@ -7,7 +7,7 @@ public class RestoreRequest {
 
     private final UUID Requester;
     private UUID Reviewer;
-    private final String InvName;
+    private String InvName;
     boolean approved = false;
     boolean reviewed = false;
 
@@ -31,6 +31,7 @@ public class RestoreRequest {
     }
     public boolean isReviewed() {return reviewed;}
     public void setReviewed(boolean reviewed) {this.reviewed = reviewed;}
+    public void setInvName(String invName) {InvName = invName;}
 
     @Override
     public boolean equals(Object o) {

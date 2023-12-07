@@ -1,14 +1,7 @@
 ![Craftiservi](https://www.crafti-servi.com/plugin-resources/craftiservi/CSP.png)
-[![Github All Releases](https://img.shields.io/github/downloads/toxicstoxm/craftiservi/total.svg)]()  
-Useful AdminTools combined with a few neat Features that improve the game experience.
 
-### Plugin includes:
-*-useful tools for Server admins  
--console/log filter you can configure in config.yml   
--Xp saving for specific areas in world  
--InventorySavePoints that can be reviewed and restored  
--gadgets like grappling-hook and jump-pads  
--and much more*
+[![Github All Releases](https://img.shields.io/github/downloads/toxicstoxm/craftiservi/total.svg)]()  
+#### Craftiservi is a Bukkit/Spigot Plugin for your Minecraft survival server. It adds several features such as...
 
 ## Commands:
 

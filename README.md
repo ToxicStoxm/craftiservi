@@ -1,5 +1,6 @@
-![Craftiservi](https://www.crafti-servi.com/plugin-resources/craftiservi/Plugin-Logo/CSP.png)
+![](https://www.crafti-servi.com/plugin-resources/craftiservi/Plugin-Logo/CSP.png)
 
+# Craftiservi
 [![Github All Releases](https://img.shields.io/github/downloads/toxicstoxm/craftiservi/total.svg)]()  
 #### Craftiservi is a Bukkit/Spigot Plugin for your Minecraft survival server. It adds several features such as...
 

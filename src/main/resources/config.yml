@@ -1,197 +1,255 @@
-#################################################################
-#                                                               #
-#                     Config by x_Tornado10                     #
-#                             v.1.0                             #
-#                                                               #
-#################################################################
+#########################################################################
+#       _____               __  _    _                          _       #
+#      / ____|             / _|| |  (_)                        (_)      #
+#     | |      _ __  __ _ | |_ | |_  _  ___   ___  _ __ __   __ _       #
+#     | |     | '__|/ _` ||  _|| __|| |/ __| / _ \| '__|\ \ / /| |      #
+#     | |____ | |  | (_| || |  | |_ | |\__ \|  __/| |    \ V / | |      #
+#      \_____||_|   \__,_||_|   \__||_||___/ \___||_|     \_/  |_|      #
+#                                                                       #
+#                   https://plugin.crafti-servi.com                     #
+#                                                                       #
+#  WIKI:          https://github.com/ToxicStoxm/craftiservi/wiki        #
+#  BUG REPORTS:   https://github.com/ToxicStoxm/craftiservi/issues      #
+#                                                                       #
+#########################################################################
+
+#########################################################################
+#                            INFORMATION                                #
+#########################################################################
+
+# More detailed information about the plugin's settings and functionalities can be found on the plugin's GitHub page.
+# (https://github.com/ToxicStoxm/craftiservi)
+
+# You can use an online YAML syntax verification tool if you're unsure about the syntax of this config file.
+# (https://www.yamllint.com)
+
+# In case of any issues or errors, consider using the plugin's built-in command '/craftiservi resetconfig' to reset settings.
+
+#########################################################################
+#                       GENERAL PLUGIN SETTINGS                         #
+#########################################################################
 
 Craftiservi:
   Plugin-Version: 0.0.0
-  #If the plugin prefix 'Craftiservi' should be shortened to 'CS'
-  #DEFAULT: true
+  # Should the plugin prefix 'Craftiservi' be shortened to 'CS'? (DEFAULT: true)
   short-Prefix: true
-  #If you would like to use your own prefix instead of the built-in prefix
-  #Warning: [Overwrites 'short-prefix' setting]
-  #DEFAULT: false
+  # Would you like to use your custom prefix instead of the built-in prefix? (DEFAULT: false)
   use-custom-Prefix: false
-  #Provide your custom prefix
-  #Note: For colors, use '§'+ [ 0->black | 1->dark_blue | 2->dark_green | 3->dark_aqua | 4->dark_red | 5->dark_purple | 6->gold | 7->gray | 8->dark_gray | 9->blue ]
-  #                          [ a->green | b->aqua | c->red | d->light_purple | e->yellow | f->white | g->dark_yellow ]
-  #Note: For text-formatting use '§'+[ u->underline | l->bold | o->italic | m->strikethrough | k->obfuscated | r->reset-format/color ]
-  #Warning: [Colors and Text-Formatting only works in the ingame-chat. In console the plain prefix-text is displayed]
-  #IMPORTANT: [Please do not use '&'-prefix for color-codes or text-formatting-codes as it can cause errors with the logger!]
-  #Examples: "[MyPlugin] " | "§0§l[§aMyPlugin§0§l]§r " | "§k§a2§r§0§l[§a§u§1MyPlugin§0§l]§8>§r "
-  #DEFAULT: "[MyPlugin] "
+  # Provide your custom prefix, including colors and text-formatting (https://minecraft.tools/en/color-code.php). (DEFAULT: "[MyPlugin] ")
   custom-Prefix: "[MyPlugin] "
-  #INFO: Only if discord extension for crafti-servi is installed!
-  #DEFAULT: "[MyPlugin-Discord] "
-  custom-discord-Prefix: "[MyPlugin-Discord] "
-
-#################################################################
-
   Console/Log:
-    #if the console should display additional debug information
-    #DEFAULT: false
-    display-debug: false
-    #disbale the plugin logger
-    #Warning [Try setting this to false if you have trouble]
-    #Warning [This only disables the plugins custom logger, some information is still going to be displayed by the server itself]
-    #DEFAULT: false
+    # Disables the plugin logger. (DEFAULT: false)
     disable-logger: false
+    # Display additional debug information in the console? (DEFAULT: false)
+    display-debug: false
 
-#################################################################
+#########################################################################
+#                              CHAT SETTINGS                            #
+#########################################################################
 
-  #Settings for the ingame chat
   Chat:
     Filter:
-      #DEFAULT: true
+      # Enable chat filtering from console and logs. (DEFAULT: true)
       Enabled: true
-      #Strings to block/filter from console and logs
+      # Strings to block/filter from console and logs.
       BlockedStrings:
         - /msg
         - /tell
         - /tellraw
         - /teammsg
+    # Admin chat feature (coming soon).
+    Admin-Chat:
+      # Enable the plugin's admin-chat feature. (DEFAULT: true)
+      Enabled: true
+      # Automatically detect and add admins to the admin chat? (DEFAULT: true)
+      Auto-Assign: true
+      # List of players to add to the admin chat
+      Admins:
+        - 37c807ea-c060-4547-b28a-fa59e1359207
+        - x_Tornado10
+      # Use the built-in short Prefix for the AdminChat? (DEFAULT: true)
+      short-Prefix: true
+      # Define a custom admin chat prefix. (DEFAULT: "[AdminChat] ")
+      use-custom-Prefix: false
+      # Provide your custom prefix, including colors and text-formatting (https://minecraft.tools/en/color-code.php). (DEFAULT: "[AdminChat] ")
+      custom-Prefix: "[AdminChat] "
+      Queue:
+        # Enable the admin chat message queue feature. (DEFAULT: true)
+        Enabled: true
+        # Time (in minutes) admin chat messages are queued. (DEFAULT: 86400)
+        Queue-Time: 86400
+        # Maximum messages in admin chat queue. Set to -1 to disable limit. (DEFAULT: -1)
+        Queue-Message-Limit: -1
 
-#################################################################
 
-  #Ingame Gadgets like jump-pads and grappling-hook
+#########################################################################
+#                       FEATURE/COMMAND SETTINGS                        #
+#########################################################################
+
+  Commands-Features:
+    # Defaults and settings for various plugin commands.
+
+#########################################################################
+#                           PLUGIN MODULES                              #
+#########################################################################
+
+    InvSave:
+      # Enable Inventory Saving feature. (DEFAULT: true)
+      Enabled: true
+      Auto-InvSave-Death:
+        # Automatically creates an inventory save point before player death. (DEFAULT: true)
+        Enabled: true
+        # Inv-Name-Format: Customize the format for the saved inventory name. (DEFAULT: "AutoGeneratedInvSave_%DATE%_%TIME%")
+        #   - %DATE%: Date of the save
+        #   - %TIME%: Time of the save
+        #   - %COORDINATES-OF-DEATH%: Location coordinates of the player's death
+        #   - %WORLD-OF-DEATH%: Name of the world where the player died
+        # Caution: Spaces and . are not allowed in the custom name format.
+        Inv-Name-Format: "AutoGeneratedInvSave_%DATE%_%TIME%"
+      Restore-Requests:
+        # Enable or disable Inventory restore requests. (DEFAULT: true)
+        # Caution: Inventory restore requests require admin chat and its queue to be enabled.
+        Enabled: true
+        # Cooldown time between Inventory restore requests (in milliseconds). (DEFAULT: 120000)
+        Restore-Cooldown: 120000
+
+    XpArea:
+      # Enable XP Area feature. (DEFAULT: false)
+      Enabled: false
+
+    FirstJoin:
+      # Enable First Join feature. (DEFAULT: true)
+      Enabled: true
+
+    AfkCommand:
+      # Coming soon. (DEFAULT: false)
+      Enabled: false
+
+    Afk-Checker:
+      # Enable AFK player checking. (DEFAULT: false)
+      Enabled: false
+      # Time in seconds before a player is marked as afk after their last activity. (DEFAULT: 180)
+      Afk-Time: 180
+      # Player remains marked as AFK when writing something in chat (DEFAULT: true)
+      allow-afk-chat: true
+      # AFK player is able to hit mobs without being removed from AFK (DEFAULT: true)
+      allow-hit-mobs: true
+      # AFK player is able to hit players without being removed from AFK (DEFAULT: false)
+      allow-hit-players: false
+      # AFK player is able to place blocks without being removed from AFK (DEFAULT: true)
+      allow-place-blocks: true
+      # AFK player is able to break blocks without being removed from AFK (DEFAULT: true)
+      allow-break-blocks: true
+      # Stop creepers from targeting an AFK player (DEFAULT: true)
+      stop-creeper-target: true
+      # Kill creepers trying to target an AFK player (DEFAULT: false)
+      kill-creeper-on-target: false
+      # Use the exclude list (DEFAULT: false)
+      enable-exclude: false
+      # List of players exempt from being marked as AFK (use UUIDs instead of player names)
+      Exclude:
+        - 37c807ea-c060-4547-b28a-fa59e1359207
+        - x_Tornado10
+      # Send AFK messages as global messages (DEFAULT: true)
+      BroadcastAFK: true
+      # Include AFK time in global AFK messages (ignored when 'BroadcastAFK' is false) (DEFAULT: false)
+      BroadcastAFK-Time: false
+      # Display the player's AFK time in the message sent to them (Does NOT overwrite BroadcastAFK-Time!) (DEFAULT: true)
+      Display-Personal-Time: true
+      # Apply effects to AFK players
+      Afk-Effects:
+        # Enable various effects for AFK players (DEFAULT: true)
+        Enabled: true
+        Effects:
+          # Players are completely invincible and can't take any damage (DEFAULT: false)
+          Invincible:
+            Enabled: false
+          # Players are invincible to any 'natural' damage such as monsters, but can still be damaged by players (DEFAULT: true)
+          Invincible-2:
+            Enabled: true
+          # Customizable invincibility settings for specific damage types (DEFAULT: false)
+          Invincible-Custom:
+            Enabled: false
+            # Damage types with descriptions available at [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html]
+            Damage-types:
+              - BLOCK_EXPLOSION
+              - CONTACT
+              - CRAMMING
+              - CUSTOM
+              - DRAGON_BREATH
+              - DROWNING
+              - ENTITY_ATTACK
+              - ENTITY_EXPLOSION
+              - ENTITY_SWEEP_ATTACK
+              - FALL
+              - FALLING_BLOCK
+              - FIRE
+              - FIRE_TICK
+              - FLY_INTO_WALL
+              - FREEZE
+              - HOT_FLOOR
+              - KILL
+              - LAVA
+              - LIGHTNING
+              - MAGIC
+              - POISON
+              - PROJECTILE
+              - SONIC_BOOM
+              - STARVATION
+              - SUFFOCATION
+              - SUICIDE
+              - THORNS
+              - VOID
+              - WITHER
+              - WORLD_BORDER
+          # AFK players are invisible to other players (DEFAULT: false)
+          Invisible:
+            Enabled: false
+            # Use the Invisibility potion effect instead of Bukkit.show() / Bukkit.hide() (DEFAULT: true)
+            Use-Potion-Effect: true
+            Head-Hologram:
+              # Display a hologram of the player's head instead of the skin (DEFAULT: true)
+              Enabled: true
+              # Use the same name tag as the player (with prefix and suffix) in the hologram (DEFAULT: true)
+              Hologram-FullPlayerNameTag: true
+          # Players have no collision, so they can't be pushed around by other players or entities (DEFAULT: true)
+          No-Collision:
+            Enabled: true
+          # Players have an AFK NameTag in the Tab-List and Chat (DEFAULT: true)
+          Afk-NameTag:
+            Enabled: true
+            # Default Prefix for the AFK NameTag (DEFAULT: "§7§o[AFK] ")
+            Prefix: "§7§o[AFK] "
+            # Default Suffix for the AFK NameTag (DEFAULT: " [%AFK-TIME%]")
+            Suffix: " [%AFK-TIME%]"
+
+#########################################################################
+#                             GADGET SETTINGS                            #
+#########################################################################
+
   Gadgets:
     Movement:
       Jump-Pads:
-        #DEFAULT: true
+        # Enable Jump Pads gadget. (DEFAULT: true)
         Enabled: true
-        #DEFAULT: 2.0
+        # DEFAULT: 2.0
         velocity-multiplier: 2.0
-        #DEFAULT: 1.2
+        # DEFAULT: 1.2
         Y-velocity: 1.2
+        # Cooldown value in seconds. (DEFAULT: 5.0)
+        cooldown: 5.0
+        # DEFAULT: true
+        prevent-fall-damage: true
       Grappling-hook:
-        #DEFAULT: true
+        # Enable Grappling Hook gadget. (DEFAULT: true)
         Enabled: true
-        #DEFAULT: 1.0
+        # DEFAULT: 1.0
         Y-velocity: 1.0
+        # Cooldown value in seconds. (DEFAULT: 5.0)
+        cooldown: 5.0
+        # DEFAULT: false
+        prevent-fall-damage: false
 
-#################################################################
-
-  #Ingame Commands / Features
-  Commands:
-    InvSave:
-      #DEFAULT: true
-      Enabled: true
-    XpArea:
-      #DEFAULT: true
-      Enabled: true
-    FirstJoin:
-      #DEFAULT: true
-      Enabled: true
-
-#################################################################
-
-  Afk-Checker:
-    #DEFAULT: true
-    Enabled: false
-    #Time before a player is marked as afk after his last activity
-    #Value in Seconds
-    #DEFAULT: 180
-    Afk-Time: 180
-    #If a player should remain marked as afk when they write something in chat
-    #DEFAULT: true
-    allow-afk-chat: true
-    # If the exclude list should be used
-    #DEFAULT: false
-    enable-exclude: false
-    #List of players who won't be marked as afk at all
-    #NOTE: Player names might change, so use UUID'S instead
-    Exclude:
-      - 37c807ea-c060-4547-b28a-fa59e1359207
-      - x_Tornado10
-    #If AFK messages should be sent as global message
-    #DEFAULT: true
-    BroadcastAFK: true
-    #If global AFK messages should contain the AFK time (Ignored when 'BroadcastAFK' is false)
-    #DEFAULT: false
-    BroadcastAFK-Time: false
-    #If the message sent to the AFK player should contain his AFK time (Does NOT overwrite BroadcastAFK-Time!)
-    #DEFAULT: true
-    Display-Personal-Time: true
-    #Effects that are applied to AFK players
-    Afk-Effects:
-      #DEFAULT: true
-      Enabled: true
-      Effects:
-        #Players are completely invincible and can't take any damage
-        Invincible:
-          #DEFAULT: false
-          Enabled: false
-        #Players are invincible to any 'natural' Damage such as monsters, but can still be damaged by players
-        Invincible-2:
-          #DEFAULT: true
-          Enabled: true
-        Invincible-Custom:
-          #DEFAULT: false
-          Enabled: false
-          #INFO: DAMAGE-TYPES with Description [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html]
-          Damage-types:
-            - BLOCK_EXPLOSION
-            - CONTACT
-            - CRAMMING
-            - CUSTOM
-            - DRAGON_BREATH
-            - DROWNING
-            - ENTITY_ATTACK
-            - ENTITY_EXPLOSION
-            - ENTITY_SWEEP_ATTACK
-            - FALL
-            - FALLING_BLOCK
-            - FIRE
-            - FIRE_TICK
-            - FLY_INTO_WALL
-            - FREEZE
-            - HOT_FLOOR
-            - KILL
-            - LAVA
-            - LIGHTNING
-            - MAGIC
-            - POISON
-            - PROJECTILE
-            - SONIC_BOOM
-            - STARVATION
-            - SUFFOCATION
-            - SUICIDE
-            - THORNS
-            - VOID
-            - WITHER
-            - WORLD_BORDER
-        #Players are invisible to other Players
-        Invisible:
-          #DEFAULT: false
-          Enabled: false
-        #Players have no collision, so they can't be pushed around by other players or entities
-        No-Collision:
-          #DEFAULT: true
-          Enabled: true
-        #Players have a Gray Name-Tag in the Tab-List
-        Gray-Name-Tag:
-          #DEFAULT: true
-          Enabled: true
-        #Players have an AFK prefix in the Tab-List and Chat
-        Afk-Prefix:
-          #DEFAULT: true
-          Enabled: true
-          #DEFAULT: "[AFK] "
-          Prefix: "[AFK] "
-
-#################################################################
-
-Config:
-  Credits:
-
-#################################################################
-
-    x_Tornado10:
-      GitHub: https://github.com/ToxicStoxm
-      YouTube: https://www.youtube.com/@x_tornado10/
-      Website: https://www.crafti-servi.com/
-      Reddit: https://www.reddit.com/user/x_Tornado10
-
-#################################################################
+#########################################################################
+#                     YOU'VE REACHED THE END!                           #
+#########################################################################

@@ -235,6 +235,7 @@ public final class craftiservi extends JavaPlugin {
         afkPlayers = new ConcurrentHashMap<>();
         playersToCheck = new ConcurrentHashMap<>();
         pm = Bukkit.getPluginManager();
+        msgFilter = new MsgFilter();
 
         configManager.setVersion(getDescription().getVersion());
         Logger.setDebug(configManager.getDisplay_debug());
@@ -357,9 +358,6 @@ public final class craftiservi extends JavaPlugin {
         logger.debug("");
 
         logger.debug("Configuring filters...");
-        msgFilter = new MsgFilter();
-        logger.debug("MsgFilter...§adone");
-        logger.debug("");
         logger.debug("Applying filters to logger...");
         msgFilter.registerFilter();
         logger.debug("MsgFilter...§adone");

@@ -1,4 +1,4 @@
-# Crafti-Servi
+![Craftiservi](https://www.crafti-servi.com/plugin-resources/craftiservi/CSP.png)
 [![Github All Releases](https://img.shields.io/github/downloads/toxicstoxm/craftiservi/total.svg)]()  
 Useful AdminTools combined with a few neat Features that improve the game experience.
 

@@ -34,5 +34,5 @@
 
 ## Support
 #### Youtube: *https://www.youtube.com/@x_tornado10/*
-#### Spigot: *https://www.spigotmc.org/resources/crafti-servi.108546/*
+#### Spigot: *https://plugin.crafti-servi.com/*
 #### Website: *https://www.crafti-servi.com/*

@@ -111,3 +111,8 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+# Temp files
+src/main/resources/config_old.yml
+src/main/resources/ToDo
+

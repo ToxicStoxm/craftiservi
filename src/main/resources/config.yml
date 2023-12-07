@@ -37,8 +37,6 @@ Craftiservi:
   use-custom-Prefix: false
   # Provide your custom prefix, including colors and text-formatting (https://minecraft.tools/en/color-code.php). (DEFAULT: "[MyPlugin] ")
   custom-Prefix: "[MyPlugin] "
-  # For Discord extension, ignore if not applicable. (DEFAULT: "[MyPlugin-Discord] ")
-  custom-discord-Prefix: "[MyPlugin-Discord] "
   Console/Log:
     # Disables the plugin logger. (DEFAULT: false)
     disable-logger: false

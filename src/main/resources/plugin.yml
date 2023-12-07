@@ -1,10 +1,10 @@
-name: Craftiservi
+name: craftiservi
 version: '${project.version}'
-main: com.x_tornado10.craftiservi
+main: com.x_tornado10.craftiservi.craftiservi
 api-version: 1.19
 authors: [ x_Tornado10 ]
 website: https://www.spigotmc.org/resources/crafti-servi.108546/
-prefix: "Craftiservi"
+prefix: "craftiservi"
 description: This Plugin provides a few useful tools alongside a basic server infrastructure
 depend: [ LuckPerms ]
 loadbefore:
@@ -37,7 +37,6 @@ permissions:
     description: Send and receive admin chat messages
     default: op
 
-
 commands:
   firstjoin:
     description: returns date when a player first joined
@@ -66,7 +65,8 @@ commands:
     permission: craftiservi.command.main
     aliases:
       - cs
-    usage: "Usage: /craftiservi <reloadconfig-resetconfig-help>"
+    usage: "Usage: /craftiservi <reloadconfig-resetconfig-restoreconfig-help>"
+
   adminchat:
     description: chat to communicate with other admins
     permission: craftiservi.command.adminchat

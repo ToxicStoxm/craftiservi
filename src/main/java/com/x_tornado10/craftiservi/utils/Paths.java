@@ -17,7 +17,7 @@ public class Paths {
     public String getPlayersinsaveareabackup() {return plpath + "/backups/players_in_save_area_backup.yml";}
     public String getPlayer_inv_saves() {return plpath + "/player_inv_saves.yml";}
     public String getPlayer_inv_saves_backup() {return plpath + "/backups/player_inv_saves_backup.yml";}
-    public String getAfk_players() {return "/afkPlayers.yml";}
+    public String getAfk_players() {return plpath + "/afkPlayers.yml";}
     public String getRestoreRequests() {return plpath + "/restoreRequests.yml";}
     public String getConfig() {return plpath + "/config.yml";}
     public String getBackup_config() {return plpath + "/backups/Backup_config.yml";}

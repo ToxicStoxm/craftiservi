@@ -1,5 +1,6 @@
 ![Craftiservi Logo](https://www.crafti-servi.com/plugin-resources/craftiservi/Plugin-Logo/CSP.png)
 
+
 # Craftiservi
 [![Spigot Version](https://img.shields.io/spiget/version/108546?logo=spigotmc&label=release&color=%2365bfdd&logoColor=%23ffffff)](https://plugin.crafti-servi.com/)
 [![Spigot Downloads](https://img.shields.io/spiget/downloads/108546?logo=spigotmc&color=%2365bfdd&logoColor=%23ffffff)]()
@@ -26,6 +27,8 @@
 * ### /invsave
     - **Usage:** `/invsave <new-remove-rename-view> <InvName> <NewInvName>`  
       Allows you to create, remove, rename and restore InventorySavePoints. InventorySavePoints are snapshots of your Inventory
+## Dependencies
+ - **LuckPerms** [`Luckperms.net`](https://luckperms.net)
 
 ## Statistics (powered by [`BStats`](https://github.com/Bastian/bStats))
 [![Bukkit Stats](https://bstats.org/signatures/bukkit/craftiservi.svg)]()

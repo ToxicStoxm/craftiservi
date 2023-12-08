@@ -44,7 +44,19 @@ public class InventorySavePointCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-        if (!enabled) {return true;}
+        if (!enabled) {
+
+            if (sender instanceof Player) {
+
+                plmsg.msg((Player) sender, "This command is disabled.");
+
+            } else {
+
+                logger.info("This command is disabled.");
+
+            }
+            return true;
+        }
         Player p;
         if (!(sender instanceof Player)) {
             logger.info("Coming Soon: This command is not yet supported for console!");
@@ -104,7 +116,10 @@ public class InventorySavePointCommand implements CommandExecutor {
                             }
                         }
                         case "remove" -> {
-                            if (!invSaveMgr.exists(p.getUniqueId(),args[1]) && !args[1].equals("*")) break;
+                            if (!invSaveMgr.exists(p.getUniqueId(),args[1]) && !args[1].equals("*")) {
+                                plmsg.msg(p,"No InventorySavePoint found for the specified name!");
+                                break;
+                            }
                             if (invSaveMgr.remove(pid, args[1])) {
                                 if (args[1].equals("*")) {
                                     plmsg.msg(p, "Successfully deleted all InventorySavePoints!");

@@ -26,6 +26,8 @@
 * ### /invsave
     - **Usage:** `/invsave <new-remove-rename-view> <InvName> <NewInvName>`  
       Allows you to create, remove, rename and restore InventorySavePoints. InventorySavePoints are snapshots of your Inventory
+## Dependencies
+ - **LuckPerms** [`Luckperms.net`](https://luckperms.net)
 
 ## Statistics (powered by [`BStats`](https://github.com/Bastian/bStats))
 [![Bukkit Stats](https://bstats.org/signatures/bukkit/craftiservi.svg)]()

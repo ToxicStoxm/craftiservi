@@ -1,5 +1,6 @@
 package com.x_tornado10.craftiservi.managers;
 
+import com.x_tornado10.craftiservi.commands.admin_chat_command.AdminChatCommand;
 import com.x_tornado10.craftiservi.commands.first_join_command.FirstJoinedCommand;
 import com.x_tornado10.craftiservi.commands.first_join_command.FirstJoinedCommandTabCompletion;
 import com.x_tornado10.craftiservi.commands.inv_save_point.InventorySavePointCommand;
@@ -11,6 +12,7 @@ import com.x_tornado10.craftiservi.craftiservi;
 import com.x_tornado10.craftiservi.events.listeners.afk_checking.AFKListener;
 import com.x_tornado10.craftiservi.events.listeners.inventory.InventoryListener;
 import com.x_tornado10.craftiservi.features.afk_protection.AFKChecker;
+import com.x_tornado10.craftiservi.message_sys.OpMessages;
 import com.x_tornado10.craftiservi.utils.custom_data.reload.CustomData;
 import com.x_tornado10.craftiservi.utils.custom_data.reload.CustomDataWrapper;
 import com.x_tornado10.craftiservi.utils.Paths;
@@ -331,6 +333,7 @@ public class ConfigManager {
             boolean invs_enabled = getCommands_invsave_enabled();
             boolean xps_enabled = getCommands_xparea_enabled();
             boolean afkc_enabled = getAfkChecker_enabled();
+            boolean ac_enabled = getAdminChat();
             //
             FirstJoinedCommand.enabled = fj_enabled;
             FirstJoinedCommandTabCompletion.enabled = fj_enabled;
@@ -345,6 +348,8 @@ public class ConfigManager {
             //
             AFKChecker.enabled = afkc_enabled;
             AFKListener.enabled = afkc_enabled;
+            //
+            AdminChatCommand.enabled = ac_enabled;
             //
             return false;
         } catch (Exception e) {

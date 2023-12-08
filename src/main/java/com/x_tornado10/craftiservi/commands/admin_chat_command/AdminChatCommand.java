@@ -1,6 +1,7 @@
 package com.x_tornado10.craftiservi.commands.admin_chat_command;
 
 import com.x_tornado10.craftiservi.craftiservi;
+import com.x_tornado10.craftiservi.logger.Logger;
 import com.x_tornado10.craftiservi.message_sys.OpMessages;
 import com.x_tornado10.craftiservi.message_sys.PlayerMessages;
 import com.x_tornado10.craftiservi.utils.statics.PERMISSION;
@@ -14,13 +15,29 @@ public class AdminChatCommand implements CommandExecutor {
     private final OpMessages opmsg;
     private final PlayerMessages plmsg;
     private final craftiservi plugin;
+    private final Logger logger;
+    public static boolean enabled;
     public AdminChatCommand() {
         plugin = craftiservi.getInstance();
         opmsg = plugin.getOpmsg();
+        logger = plugin.getCustomLogger();
         plmsg = plugin.getPlayerMessages();
     }
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!enabled) {
+
+            if (sender instanceof Player) {
+
+                plmsg.msg((Player) sender, "This command is disabled.");
+
+            } else {
+
+                logger.info("This command is disabled.");
+
+            }
+            return true;
+        }
         if (sender instanceof Player p) {
             if (!plugin.hasPermission(p, PERMISSION.COMMAND_ADMINCHAT)) {
                 noPerms(p);

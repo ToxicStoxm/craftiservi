@@ -52,7 +52,7 @@ public class OpMessages implements Listener {
         admins = new ArrayList<>();
         online_admins = new ArrayList<>();
         def_prefix = "§c§l[Admin-Chat]§r ";
-        def_short_prefix = "§c§l[OC]§r ";
+        def_short_prefix = "§c§l[AC]§r ";
         prefix = def_prefix;
         logger = plugin.getCustomLogger();
         queue = new ConcurrentHashMap<>();
@@ -136,12 +136,9 @@ public class OpMessages implements Listener {
         }.runTaskTimerAsynchronously(plugin,20,40);
     }
     private void queueOutput(List<Object> queue) {
-        logger.severe("queueOutput");
-        logger.severe(String.valueOf(getPeriod(queue.size())));
         new BukkitRunnable() {
             @Override
             public void run() {
-                logger.severe(String.valueOf(queue.size()));
                 if (!enabled) {queueOutput = false; return; }
                 if (queue.isEmpty()) {cancel();queueOutput = false;return;}
                 if (online_admins.isEmpty()) {

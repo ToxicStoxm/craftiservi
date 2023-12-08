@@ -21,7 +21,7 @@ permissions:
     description: Access to the xparea command
     default: op
   craftiservi.command.invsave:
-    description: Access to the invsave command an features
+    description: Access to the invsave command and features
     default: true
     children: [craftiservi.command.invsave.bypass.cooldown]
   craftiservi.command.invsave.bypass.cooldown:

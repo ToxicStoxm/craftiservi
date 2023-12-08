@@ -34,6 +34,5 @@
 [![Github All Releases](https://bstats.org/signatures/bukkit/craftiservi.svg)]()
 
 ## Support
-#### Youtube: *https://www.youtube.com/@x_tornado10/*
+#### Discord: *https://discord.crafti-servi.com/*
 #### Spigot: *https://plugin.crafti-servi.com/*
-#### Website: *https://www.crafti-servi.com/*

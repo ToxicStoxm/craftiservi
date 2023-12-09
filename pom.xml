@@ -29,8 +29,8 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <excludes>
-                        <exclude>**/com/x_tornado10/craftiservi/events/listeners/grapling_hook/*.java</exclude>
-                        <exclude>**/com/x_tornado10/craftiservi/events/listeners/jpads/*.java</exclude>
+                        <exclude>com/x_tornado10/craftiservi/events/listeners/grapling_hook/*</exclude>
+                        <exclude>com/x_tornado10/craftiservi/events/listeners/jpads/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -52,7 +52,6 @@
                 </configuration>
                 <executions>
                     <execution>
-
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>

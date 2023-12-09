@@ -280,7 +280,7 @@ public class InventoryListener implements Listener {
         String result = inv_name;
         LocalDateTime currentDateTime = LocalDateTime.now();
         if (inv_name.contains(PLACEHOLDER.DATE)) {
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yy");
             String formattedDate = currentDateTime.format(dateFormatter);
             result = result.replace(PLACEHOLDER.DATE, formattedDate);
         }

@@ -17,10 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static com.x_tornado10.craftiservi.craftiservi.FLYING_TIMEOUT;
+//import static com.x_tornado10.craftiservi.craftiservi.FLYING_TIMEOUT;
 
 public class JumpPads implements Listener {
-
+    /*
     private final HashMap<UUID, Long> cooldown = new HashMap<>();
 
     private double Y_velocity;
@@ -56,7 +56,7 @@ public class JumpPads implements Listener {
                 p.playSound(p.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 2f, 1F);
 
                 if (prevent_falldmg) {
-                    FLYING_TIMEOUT.put(p.getUniqueId(), System.currentTimeMillis() + (flyingTimeout * 1000L));
+                    //FLYING_TIMEOUT.put(p.getUniqueId(), System.currentTimeMillis() + (flyingTimeout * 1000L));
                 }
 
             } else {
@@ -106,5 +106,6 @@ public class JumpPads implements Listener {
         cooldown_value = d.get(2);
 
     }
+     */
 
 }

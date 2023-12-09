@@ -22,10 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import static com.x_tornado10.craftiservi.craftiservi.FLYING_TIMEOUT;
+//import static com.x_tornado10.craftiservi.craftiservi.FLYING_TIMEOUT;
+
 
 public class GraplingHookListener implements Listener {
-
+/*
     private static final HashMap<UUID, Long> cooldown = new HashMap<>();
     private double cooldown_value = 500;
     private final craftiservi plugin = craftiservi.getInstance();
@@ -133,5 +134,5 @@ public class GraplingHookListener implements Listener {
         Y_velocity = d.get(0);
         cooldown_value = d.get(1);
     }
-
+*/
 }

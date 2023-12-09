@@ -19,6 +19,7 @@
     <url>https://github.com/ToxicStoxm</url>
 
     <build>
+        <finalName>${project.artifactId}-Bukkit-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -27,6 +28,10 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <excludes>
+                        <exclude>**/com/x_tornado10/craftiservi/events/listeners/grapling_hook/*.java</exclude>
+                        <exclude>**/com/x_tornado10/craftiservi/events/listeners/jpads/*.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -47,10 +52,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>E:\Minecraft-Test-Servers\1.20 test-server\plugins\${project.artifactId}-Bukkit-${project.version}.jar</outputFile>
-                        </configuration>
+
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>

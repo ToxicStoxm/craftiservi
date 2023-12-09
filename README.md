@@ -63,7 +63,7 @@
   Required for AFK-checking, admin-chat, and other plugin features.
 
 
-## Additional Info
+## Additional Info:
 - **Issues and Bugs:**  
   For issues, join the [`Discord Server`](https://discord.crafti-servi.com/) or open an issue on this Repository.
 - **Feedback and Feature Requests**  

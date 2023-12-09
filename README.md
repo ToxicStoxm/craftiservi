@@ -69,6 +69,25 @@
 - **Feedback and Feature Requests**  
   Provide feedback or request features on the [`Discord Server`](https://discord.crafti-servi.com/).
 
+## Building
+Craftiservi uses Maven to handle dependencies & building.
+
+#### Requirements
+* Java 17 JDK or newer
+* Apache Maven 3.0 or higher
+* Git
+
+#### Compiling from source
+```sh
+git clone https://github.com/ToxicStoxm/craftiservi.git
+cd craftiservi/
+mvn clean install
+```
+You can find the output jars in the `target` directory.
+
+## Contributing:  
+If you'd like to contribute to this project, please fork the repository, make your changes, and submit a pull request.
+
 ## Statistics (powered by [`BStats`](https://github.com/Bastian/bStats))
 [![Bukkit Stats](https://bstats.org/signatures/bukkit/craftiservi.svg)]()
 

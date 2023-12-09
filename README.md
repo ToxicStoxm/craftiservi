@@ -58,7 +58,7 @@
       Automatically checks for updates on server reloads/restarts and alerts admins about new versions.
 
 
-## Dependencies
+## Dependencies:
 - **LuckPerms** [`Luckperms.net`](https://luckperms.net)  
   Required for AFK-checking, admin-chat, and other plugin features.
 

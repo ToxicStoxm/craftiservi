@@ -215,7 +215,6 @@ public final class craftiservi extends JavaPlugin {
         handlerList.unregister(invSaveMgr);
     }
 
-
     private void setup() {
         FileConfiguration config = getConfig();
         paths = new Paths();

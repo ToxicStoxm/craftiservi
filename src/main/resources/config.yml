@@ -199,32 +199,5 @@ Craftiservi:
             Suffix: " [%AFK-TIME%]"
 
 #########################################################################
-#                (DISABLED)   GADGET SETTINGS  (DISABLED)               #
-#########################################################################
-
-  Gadgets:
-    Movement:
-      Jump-Pads:
-        # Enable Jump Pads gadget. (DEFAULT: false)
-        Enabled: false
-        # DEFAULT: 2.0
-        velocity-multiplier: 2.0
-        # DEFAULT: 1.2
-        Y-velocity: 1.2
-        # Cooldown value in seconds. (DEFAULT: 5.0)
-        cooldown: 5.0
-        # DEFAULT: true
-        prevent-fall-damage: true
-      Grappling-hook:
-        # Enable Grappling Hook gadget. (DEFAULT: false)
-        Enabled: false
-        # DEFAULT: 1.0
-        Y-velocity: 1.0
-        # Cooldown value in seconds. (DEFAULT: 5.0)
-        cooldown: 5.0
-        # DEFAULT: false
-        prevent-fall-damage: false
-
-#########################################################################
 #                     YOU'VE REACHED THE END!                           #
 #########################################################################

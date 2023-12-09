@@ -23,12 +23,7 @@ public class Paths {
     public String getBackup_config() {return plpath + "/backups/Backup_config.yml";}
 
     //Config Paths
-    public String getJPads_prevent_falldmg() {return "Craftiservi.Gadgets.Movement.Jump-Pads.prevent-fall-damage";}
-    public String getJPads_cooldown() {return "Craftiservi.Gadgets.Movement.Jump-Pads.cooldown";}
     public String getBlockedStrings() {return "Craftiservi.Chat.Filter.BlockedStrings";}
-    public String getVelocity_multiplier() {return "Craftiservi.Gadgets.Movement.Jump-Pads.velocity-multiplier";}
-    public String getY_velocity() {return "Craftiservi.Gadgets.Movement.Jump-Pads.Y-velocity";}
-    public String getY_velocity_g() {return "Craftiservi.Gadgets.Movement.Grappling-hook.Y-velocity";}
     public String getVersion() {return "Craftiservi.Plugin-Version";}
     public String getDisplay_debug() {return "Craftiservi.Console/Log.display-debug";}
     public String getDisable_logger() {return "Craftiservi.Console/Log.disable-logger";}
@@ -46,8 +41,6 @@ public class Paths {
     public String getAdmin_Chat_queueLimit() {return "Craftiservi.Chat.Admin-Chat.Queue.Queue-Message-Limit";}
     public String getCustom_dc_Prefix() {return "Craftiservi.custom-discord-Prefix";}
     public String getChat_filter_enabled() {return "Craftiservi.Chat.Filter.Enabled";}
-    public String getJump_pads_enabled() {return "Craftiservi.Gadgets.Movement.Jump-Pads.Enabled";}
-    public String getGrappling_hook_enabled() {return "Craftiservi.Gadgets.Movement.Grappling-hook.Enabled";}
     public String getCommands_invsave_enabled() {return "Craftiservi.Commands-Features.InvSave.Enabled";}
     public String get_invsave_restore_requests() {return "Craftiservi.Commands-Features.InvSave.Restore-Requests.Enabled";}
     public String get_invsave_restore_requests_cooldown() {return "Craftiservi.Commands-Features.InvSave.Restore-Requests.Restore-Cooldown";}
@@ -72,8 +65,6 @@ public class Paths {
     public String getAfk_checker_effects_noCollision() {return "Craftiservi.Commands-Features.Afk-Checker.Afk-Effects.Effects.No-Collision.Enabled";}
     public String getAfk_checker_effects_AfkNameTag() {return "Craftiservi.Commands-Features.Afk-Checker.Afk-Effects.Effects.Afk-NameTag.Enabled";}
     public String getAfk_checker_effects_AfkNameTag_prefix() {return "Craftiservi.Commands-Features.Afk-Checker.Afk-Effects.Effects.Afk-NameTag.Prefix";}
-    public String getGrappling_hook_cooldown() {return "Craftiservi.Gadgets.Movement.Grappling-hook.cooldown";}
-    public String getGrappling_hook_prevent_falldmg() {return "Craftiservi.Gadgets.Movement.Grappling-hook.prevent-fall-damage";}
     public String getAfk_checker_effects_invisible_hholo() {return "Craftiservi.Commands-Features.Afk-Checker.Afk-Effects.Effects.Invisible.Head-Hologram.Enabled";}
     public String getAfk_checker_effects_invisible_hholo_fullTag() {return "Craftiservi.Commands-Features.Afk-Checker.Afk-Effects.Effects.Invisible.Head-Hologram.Hologram-FullPlayerNameTag";}
     public String getAfk_checker_effects_AfkNameTag_suffix() {return "Craftiservi.Commands-Features.Afk-Checker.Afk-Effects.Effects.Afk-NameTag.Suffix";}

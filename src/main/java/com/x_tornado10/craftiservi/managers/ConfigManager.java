@@ -47,15 +47,6 @@ public class ConfigManager {
         return new ArrayList<>(config.getStringList(paths.getBlockedStrings()));
 
     }
-    public double getVelocity_multiplier() {
-        return config.getDouble(paths.getVelocity_multiplier());
-    }
-    public double getY_velocity() {
-        return config.getDouble(paths.getY_velocity());
-    }
-    public double getY_velocity_g() {
-        return config.getDouble(paths.getY_velocity_g());
-    }
     public boolean getDisplay_debug() {return config.getBoolean(paths.getDisplay_debug());}
     public boolean getShort_prefix() {return config.getBoolean(paths.getShort_prefix());}
     public boolean getDisable_logger() {return !config.getBoolean(paths.getDisable_logger());}
@@ -64,12 +55,6 @@ public class ConfigManager {
     public void setVersion(String version) {config.set(paths.getVersion(), version);}
     public boolean getChatFilterEnabled() {
         return config.getBoolean(paths.getChat_filter_enabled());
-    }
-    public boolean getJump_pads_enabled() {
-        return config.getBoolean(paths.getJump_pads_enabled());
-    }
-    public boolean getGrappling_hook_enabled() {
-        return config.getBoolean(paths.getGrappling_hook_enabled());
     }
     public boolean getCommands_invsave_enabled() {
         return config.getBoolean(paths.getCommands_invsave_enabled());
@@ -111,10 +96,6 @@ public class ConfigManager {
     public boolean getAFKChecker_allowPlaceBlock() {return config.getBoolean(paths.getAfk_checker_allow_place_block());}
     public boolean getAFKChecker_stopCreeperTarget() {return config.getBoolean(paths.getAfk_checker_stop_creeper_target());}
     public boolean getAFKChecker_killCreeperOnTarget() {return config.getBoolean(paths.getAfk_checker_kill_creeper_on_target());}
-    public double getGrappling_hook_cooldown() {return config.getDouble(paths.getGrappling_hook_cooldown()) * 1000;}
-    public boolean getGrappling_hook_prevent_falldmg() {return config.getBoolean(paths.getGrappling_hook_prevent_falldmg());}
-    public double getJPads_cooldown() {return config.getDouble(paths.getJPads_cooldown()) * 1000;}
-    public boolean getJPads_prevent_falldmg() {return config.getBoolean(paths.getJPads_prevent_falldmg());}
     public boolean getAdminChat() {return config.getBoolean(paths.getAdmin_Chat());}
     public List<String> getAdminChat_Admins() {return config.getStringList(paths.getAdmin_Chat_Admins());}
     public boolean getAdminChat_AutoAssign() {return config.getBoolean(paths.getAdmin_Chat_Auto_Assign());}
@@ -160,8 +141,6 @@ public class ConfigManager {
         customDataList.add(constructLoggerData());
         customDataList.add(constructPlmsgData());
         customDataList.add(constructAfkCData());
-        customDataList.add(constructJpData());
-        customDataList.add(constructGhData());
         customDataList.add(constructCFilterData());
         customDataList.add(constructAFKLData());
         customDataList.add(constructOpmsgData());
@@ -230,29 +209,6 @@ public class ConfigManager {
         i.add(getAfkChecker_afk_time());
 
         return new CustomData(s, b, i, null, lS);
-    }
-    private CustomData constructJpData() {
-        List<Double> d = new ArrayList<>();
-        List<Boolean> b = new ArrayList<>();
-
-        b.add(getJump_pads_enabled());
-        b.add(getJPads_prevent_falldmg());
-        d.add(getY_velocity());
-        d.add(getVelocity_multiplier());
-        d.add(getJPads_cooldown());
-
-        return new CustomData(null, b, null, d, null);
-    }
-    private CustomData constructGhData() {
-        List<Boolean> b = new ArrayList<>();
-        List<Double> d = new ArrayList<>();
-
-        b.add(getGrappling_hook_enabled());
-        b.add(getGrappling_hook_prevent_falldmg());
-        d.add(getY_velocity_g());
-        d.add(getGrappling_hook_cooldown());
-
-        return new CustomData(null, b, null, d, null);
     }
     private CustomData constructCFilterData() {
         List<Boolean> b = new ArrayList<>();

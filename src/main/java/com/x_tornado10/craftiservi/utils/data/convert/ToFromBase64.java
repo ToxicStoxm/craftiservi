@@ -1,6 +1,8 @@
 package com.x_tornado10.craftiservi.utils.data.convert;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +40,12 @@ public class ToFromBase64 {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
             int size = dataInput.readInt();
-            InventoryHolder holder = (InventoryHolder) dataInput.readObject();
+            InventoryHolder holder;
+            try {
+                holder = (InventoryHolder) dataInput.readObject();
+            } catch (ClassCastException | ClassNotFoundException e) {
+                holder = null;
+            }
             Inventory inventory = Bukkit.getServer().createInventory(holder, size);
 
             for (int i = 0; i < inventory.getSize(); i++) {

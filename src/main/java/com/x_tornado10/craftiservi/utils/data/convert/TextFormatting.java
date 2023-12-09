@@ -1,5 +1,10 @@
 package com.x_tornado10.craftiservi.utils.data.convert;
 
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+
+import java.util.Arrays;
+
 public class TextFormatting {
 
     public String stripColorCodes(String s) {

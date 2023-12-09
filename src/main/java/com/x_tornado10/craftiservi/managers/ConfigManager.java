@@ -373,7 +373,7 @@ public class ConfigManager {
 
     public boolean BackupConfigExists() {
         File file = new File(paths.getBackup_config());
-        return !file.exists();
+        return file.exists();
     }
 
     public boolean restoreConfig() {

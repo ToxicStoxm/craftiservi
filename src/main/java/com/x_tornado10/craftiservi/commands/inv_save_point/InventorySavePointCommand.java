@@ -6,6 +6,7 @@ import com.x_tornado10.craftiservi.logger.Logger;
 import com.x_tornado10.craftiservi.message_sys.PlayerMessages;
 import com.x_tornado10.craftiservi.utils.custom_data.inv_request.RestoreRequest;
 import com.x_tornado10.craftiservi.utils.statics.PERMISSION;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -45,21 +46,16 @@ public class InventorySavePointCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (!enabled) {
-
             if (sender instanceof Player) {
-
                 plmsg.msg((Player) sender, "This command is disabled.");
-
             } else {
-
                 logger.info("This command is disabled.");
-
             }
             return true;
         }
         Player p;
         if (!(sender instanceof Player)) {
-            logger.info("Coming Soon: This command is not yet supported for console!");
+            logger.info("Coming Soon: This command is not yet supported on console!");
             return true;
         } else {
             p = (Player) sender;
@@ -71,6 +67,7 @@ public class InventorySavePointCommand implements CommandExecutor {
             UUID pid = p.getUniqueId();
 
             switch (args.length) {
+                case 0 -> playerSendUsage(p);
                 case 1 -> {
                     switch (args[0].toLowerCase()) {
                         case "new" -> plmsg.msg(p, "Please provide a name for this InventorySavePoint!");
@@ -152,18 +149,18 @@ public class InventorySavePointCommand implements CommandExecutor {
                     if (args[0].equals("rename")) {
                         if (notFound(p,args[1])) break;
                         if (isInvalid(args[2])) {
-                            plmsg.msg(p,"Name contains Illegal or Invalid Characters! " + ArrayToStringList((ArrayList<String>) illegal_chars,"|"));
+                            plmsg.msg(p, ChatColor.RED + "Name contains illegal or invalid characters! " + ArrayToStringList((ArrayList<String>) illegal_chars, "|"));
                             break;
                         }
                         if (invSaveMgr.exists(pid,args[2])) {
-                            plmsg.msg(p,"'" + args[2] + "' already exists! Please choose another name!");
+                            plmsg.msg(p, ChatColor.RED + "'" + args[2] + "' already exists! Please choose another name!");
                             break;
                         }
                         RestoreRequest rR = new RestoreRequest(pid,args[1]);
                         if (restoreRequests.contains(rR)) {
                             if (!confirm_list.contains(pid)) {
-                                plmsg.msg(p, "§cRenaming '" + args[1] + "' to '" + args[2] + "' will cancel your pending restore request!");
-                                plmsg.msg(p, "If you want to proceed anyways, execute the same command again");
+                                plmsg.msg(p, ChatColor.RED + "Renaming '" + args[1] + "' to '" + args[2] + "' will cancel your pending restore request!");
+                                plmsg.msg(p, ChatColor.RED + "If you want to proceed anyways, execute the same command again");
                                 confirm_list.add(pid);
                                 return true;
                             }
@@ -172,11 +169,11 @@ public class InventorySavePointCommand implements CommandExecutor {
                         if (invSaveMgr.rename(pid,args[1],args[2])) {
                             plmsg.msg(p, "Successfully renamed '" + args[1] + "' to '" + args[2] + "'!");
                             logger.info(p.getName() + " renamed InventorySavePoint '" + args[1] + "' to '" + args[2] + "'!");
-                        } else plmsg.msg(p,"Renaming failed! Please try again!");
+                        } else plmsg.msg(p, ChatColor.RED + "Renaming failed! Please try again!");
                     }
                     else playerSendUsage(p);
                 }
-                default -> plmsg.msg(p,"You provided too many arguments!");
+                default -> plmsg.msg(p, ChatColor.RED + "You provided too many arguments!");
             }
 
         }
@@ -198,11 +195,11 @@ public class InventorySavePointCommand implements CommandExecutor {
     }
 
     private void playerSendUsage(Player p) {
-        plmsg.msg(p,"Usage: /invsave <new-remove-rename-restore> <InvName> <NewInvName>");
+        plmsg.msg(p, ChatColor.RED + "Usage: /invsave <new-remove-rename-restore> <InvName> <NewInvName>");
     }
 
     private void noPerms(Player p) {
-        plmsg.msg(p,"You don't have the permission to execute this command!");
+        plmsg.msg(p, ChatColor.RED + "You don't have permission to execute this command!");
     }
     private boolean isInvalid(String s) {
         for (String st : illegal_chars) {
@@ -212,7 +209,7 @@ public class InventorySavePointCommand implements CommandExecutor {
     }
     private boolean notFound(Player p, String name) {
         if (!invSaveMgr.exists(p.getUniqueId(),name)) {
-            plmsg.msg(p,"No InventorySavePoint found for the specified name!");
+            plmsg.msg(p, ChatColor.RED + "No InventorySavePoint found for the specified name!");
             return true;
         }
         return false;

@@ -28,13 +28,9 @@ public class AdminChatCommand implements CommandExecutor {
         if (!enabled) {
 
             if (sender instanceof Player) {
-
                 plmsg.msg((Player) sender, "This command is disabled.");
-
             } else {
-
                 logger.info("This command is disabled.");
-
             }
             return true;
         }

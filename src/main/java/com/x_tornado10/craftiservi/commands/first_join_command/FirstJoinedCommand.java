@@ -36,38 +36,24 @@ public class FirstJoinedCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
 
         if (!enabled) {
-
             if (sender instanceof Player) {
-
                 plmsg.msg((Player) sender, "This command is disabled.");
-
             } else {
-
                 logger.info("This command is disabled.");
-
             }
             return true;
         }
 
 
         if (!(sender instanceof Player p)) {
-
             if (args.length == 1) {
-
                 if (getUser(args[0])) {
-
                     logger.info("'" + args[0] + "' first joined on " + playerlist.get(Bukkit.getOfflinePlayer(args[0]).getUniqueId()));
-
                 } else {
-
                     logger.info("'" + args[0] + "' never joined or does not exist!");
-
                 }
-
             } else {
-
                 sendUsage();
-
             }
             return true;
         }
@@ -79,39 +65,26 @@ public class FirstJoinedCommand implements CommandExecutor {
             case 1 -> {
 
                 if (getUser(args[0])) {
-
                     if (playerlist.get(Bukkit.getOfflinePlayer(args[0]).getUniqueId()) == null) {
-
                         plmsg.msg(p,"§7" + args[0] + "§r never joined or does not exist!");
-
                     } else {
-
                         plmsg.msg(p,"§7" + args[0] + "§r first joined on " + playerlist.get(Bukkit.getOfflinePlayer(args[0]).getUniqueId()));
-
                     }
-
                 } else {
-
                     plmsg.msg(p,"§7" + args[0] + "§r never joined or does not exist!");
-
                 }
             }
-
             default -> playerSendUsage(p);
         }
         return true;
     }
 
     private void sendUsage() {
-
         logger.info("Usage: /firstjoin <Player>");
-
     }
 
     private void playerSendUsage(Player p) {
-
         plmsg.msg(p,"Usage: /firstjoin <Player>");
-
     }
 
 

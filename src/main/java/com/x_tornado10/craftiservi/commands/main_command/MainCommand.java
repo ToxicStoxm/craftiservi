@@ -5,6 +5,14 @@ import com.x_tornado10.craftiservi.managers.ConfigManager;
 import com.x_tornado10.craftiservi.logger.Logger;
 import com.x_tornado10.craftiservi.message_sys.PlayerMessages;
 import com.x_tornado10.craftiservi.utils.data.convert.TextFormatting;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Content;
+import net.md_5.bungee.api.chat.hover.content.Text;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,29 +32,6 @@ public class MainCommand implements CommandExecutor {
     private final TextFormatting tf;
     private final List<UUID> confirm_deletion;
 
-    private final String helpmessage =
-                            """
-                            \n§0##########################§r
-                            §8-/craftiservi
-                            §7#displays current plugin-version and authors§r
-                            
-                            
-                            §8-/craftiservi help
-                            §7#display this menu§r
-                            
-                            
-                            §8-/craftiservi reloadconfig
-                            §7#reloads all config-values/variables§r
-                            
-                            
-                            §8-/craftiservi resetconfig
-                            §7#resets the config to default-settings/values§r
-                            
-                            
-                            §8-/craftiservi restoreconfig
-                            §7#restores the values of a previously reset config§r
-                            §0##########################§r
-                            """;
 
     public MainCommand() {
 
@@ -63,33 +48,27 @@ public class MainCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
 
         if (sender instanceof Player p) {
-
             UUID pid = p.getUniqueId();
-
             switch (args.length) {
-
                 case 0 -> {
-
-                    plmsg.msg(p,"craftiservi-" + plugin.getDescription().getVersion() + " by " + plugin.getDescription().getAuthors());
-                    plmsg.msg(p,"[ /craftiservi help ] for more Information");
-
+                    plmsg.msg(p, "craftiservi-" + plugin.getDescription().getVersion() + " by " + plugin.getDescription().getAuthors());
+                    plmsg.msg(p, "[ /craftiservi help ] for more Information");
                 }
 
                 case 1 -> {
 
                     switch (args[0].toLowerCase()) {
 
-                        case "help" -> plmsg.msg(p, helpmessage);
+                        case "help" -> plmsg.sendHelp(p);
 
                         case "reloadconfig" -> {
                             plmsg.msg(p, "Reloading Config...");
-
                             if (configManager.reloadConfig(false)) {
-                                plmsg.msg(p, "§cNote: Restart the server if any errors occur!§r");
+                                plmsg.msg(p,ChatColor.RED + "Restart the server if any errors occur!");
                                 plmsg.msg(p, "Successfully reloaded config!");
                                 logger.info(p.getName() + " reloaded the config");
                             } else {
-                                plmsg.msg(p, "§cPlease wait 5s before using this command again!§r");
+                                plmsg.msg(p, ChatColor.RED + "Please wait 5s before using this command again!");
                             }
                         }
 
@@ -125,8 +104,8 @@ public class MainCommand implements CommandExecutor {
                                 plmsg.msg(p, "Successfully restored values/variables from the backup config!");
                                 logger.info("Values from backup config were successfully restored!");
                             } else {
-                                plmsg.msg(p, "§cAn error occurred trying to restore values from the backup config!");
-                                plmsg.msg(p, "§cPlease restart the server to avoid any further issues!");
+                                plmsg.msg(p, ChatColor.RED + "An error occurred trying to restore values from the backup config!");
+                                plmsg.msg(p, ChatColor.RED + "Please restart the server to avoid any further issues!");
                                 logger.severe("An error occurred trying to restore values from the backup config!");
                                 logger.warning("Please restart the server to avoid any issues!");
                             }
@@ -146,10 +125,10 @@ public class MainCommand implements CommandExecutor {
                 }
                 case 1 -> {
                     switch (args[0].toLowerCase()) {
-                        case "help" -> logger.info(tf.stripColorAndFormattingCodes(helpmessage));
+                        case "help" -> logger.sendHelp();
                         case "reloadconfig" -> {
                             logger.info("Reloading Config...");
-                            logger.info("§cNote: Stop the server if any errors/issues occur!§r");
+                            logger.info(ChatColor.RED + "Restart the server if any errors occur!");
                             configManager.reloadConfig(true);
                             logger.info("Successfully reloaded config!");
 
@@ -164,7 +143,7 @@ public class MainCommand implements CommandExecutor {
                             }
                         }
                         case "restoreconfig" -> {
-                            if (configManager.BackupConfigExists()) {
+                            if (!configManager.BackupConfigExists()) {
                                 logger.warning("Config restore failed! Backup config file not found!");
                                 logger.warning("This is normal if this is the first time running the plugin!");
                                 return true;
@@ -177,17 +156,21 @@ public class MainCommand implements CommandExecutor {
                                 logger.warning("Please restart the server to avoid any issues!");
                             }
                         }
-                        default -> sendUsage();
+                        default -> sendUsage(sender);
                     }
                 }
-                default -> sendUsage();
+                default -> sendUsage(sender);
             }
         }
         return true;
     }
 
-    private void sendUsage() {
-        logger.info("Usage: /craftiservi <reloadconfig-resetconfig-help>");
+    private void sendUsage(CommandSender sender) {
+        if (sender instanceof Player) {
+            plmsg.msg((Player) sender, ChatColor.RED + "Usage: /craftiservi <reloadconfig-resetconfig-help>");
+        } else {
+            logger.info("Usage: /craftiservi <reloadconfig-resetconfig-help>");
+        }
     }
 
     private void playerSendUsage(Player p) {

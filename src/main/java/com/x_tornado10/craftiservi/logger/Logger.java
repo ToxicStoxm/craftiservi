@@ -24,20 +24,18 @@ public class Logger implements Listener {
     private final TextFormatting textFormatting;
     private static boolean debug = false;
     private static boolean enabled = true;
+    private final String logger_helpmessage;
 
     public Logger() {
-
         plugin = craftiservi.getInstance();
         commandSender = Bukkit.getConsoleSender();
         textFormatting = plugin.getTxtformatting();
         prefix = plugin.getPrefix();
-
+        logger_helpmessage = "Please visit https://github.com/ToxicStoxm/craftiservi/blob/main/README.md for extended documentation.";
     }
 
     public void info(String message) {
-
         if (enabled) {
-            //logger.info(prefix + message);
             commandSender.sendMessage(prefix + message);
         }
 
@@ -46,10 +44,7 @@ public class Logger implements Listener {
     public void warning(String message) {
 
         if (enabled) {
-
-            //logger.warning(prefix + "§6" + message + "§r");
             commandSender.sendMessage(prefix + "§6" + message + "§r");
-
         }
 
     }
@@ -57,11 +52,7 @@ public class Logger implements Listener {
     public void severe(String message) {
 
         if (enabled) {
-
-
-            //logger.severe(prefix + "§4" + message + "§r");
             commandSender.sendMessage(prefix + "§4" + message + "§r");
-
         }
 
     }
@@ -95,6 +86,7 @@ public class Logger implements Listener {
         }
 
     }
+    public void sendHelp() {info(logger_helpmessage);}
 
     public static void setDebug(boolean debug) {
         Logger.debug = debug;

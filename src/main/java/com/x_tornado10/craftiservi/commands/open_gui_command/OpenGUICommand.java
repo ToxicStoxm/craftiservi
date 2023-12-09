@@ -6,6 +6,7 @@ import com.x_tornado10.craftiservi.logger.Logger;
 import com.x_tornado10.craftiservi.message_sys.PlayerMessages;
 import com.x_tornado10.craftiservi.utils.custom_data.inv_request.RestoreRequest;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -62,23 +63,20 @@ public class OpenGUICommand implements CommandExecutor {
             String id1 = parts[1].trim();
             RestoreRequest aR = new RestoreRequest(id0, id1);
             if (restoreRequests.contains(aR)) {
-                //logger.severe("Open_GUI_Command -> restoreRequests contains");
                 RestoreRequest aR0 = restoreRequests.get(restoreRequests.indexOf(aR));
                 if (aR0.isReviewed()) {
-                    //logger.severe("Open_GUI_Command -> restoreRequests contains - is reviewed");
-                    plmsg.msg(p,"This request has already been reviewed!");
+                    plmsg.msg(p, ChatColor.RED + "This request has already been reviewed!");
                     return true;
                 }
             } else {
-                //logger.severe("Open_GUI_Command -> restoreRequests !contains");
-                plmsg.msg(p,"This request has already been reviewed!");
+                plmsg.msg(p,ChatColor.RED + "This request has already been reviewed!");
                 p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 99999999999999999999999999999999999999f, 1f);
                 return true;
             }
 
             if (key.equals("GUI")) {
                 if (!invSaveMgr.exists(id0,id1)) {
-                    plmsg.msg(p, "Invalid GUI_ID! (GUI$" + parts0[1] + ")");
+                    plmsg.msg(p, ChatColor.RED + "Invalid GUI_ID! (GUI$" + parts0[1] + ")");
                     return true;
                 }
                 Inventory temp = plugin.getInv_saves().get(id0).get(id1);

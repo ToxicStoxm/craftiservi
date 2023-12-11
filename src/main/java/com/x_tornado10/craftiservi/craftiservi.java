@@ -505,13 +505,13 @@ public final class craftiservi extends JavaPlugin {
         StringBuilder message = new StringBuilder("You are ");
 
         if (majorVersionsDifference > 0) {
-            message.append(majorVersionsDifference).append(" major version").append(majorVersionsDifference > 1 ? "s" : "").append(" ");
+            message.append(majorVersionsDifference).append(" major version").append(majorVersionsDifference > 1 ? "s" : "").append(" behind");
         } else if (majorVersionsDifference < 0) {
-            message.append(Math.abs(majorVersionsDifference)).append(" major version").append(majorVersionsDifference < -1 ? "s" : "").append(" ahead ");
+            message.append(Math.abs(majorVersionsDifference)).append(" major version").append(majorVersionsDifference < -1 ? "s" : "").append(" ahead");
         }
 
-        if (minorVersionsDifference != 0) {
-            message.append("and ").append(Math.abs(minorVersionsDifference)).append(" minor version").append(minorVersionsDifference != 1 ? "s" : "").append(minorVersionsDifference > 0 ? " behind" : " ahead");
+        if (minorVersionsDifference != 0 && majorVersionsDifference == 0) {
+            message.append(Math.abs(minorVersionsDifference)).append(" minor version").append(minorVersionsDifference > 1 ? "s" : "").append(minorVersionsDifference > 0 ? " behind" : " ahead");
         }
 
         message.append("!");

@@ -511,7 +511,7 @@ public final class craftiservi extends JavaPlugin {
         }
 
         if (minorVersionsDifference != 0 && majorVersionsDifference == 0) {
-            message.append(Math.abs(minorVersionsDifference)).append(" minor version").append(minorVersionsDifference > 1 ? "s" : "").append(minorVersionsDifference > 0 ? " behind" : " ahead");
+            message.append(Math.abs(minorVersionsDifference)).append(" minor version").append(Math.abs(minorVersionsDifference) > 1 ? "s" : "").append(minorVersionsDifference > 0 ? " behind" : " ahead");
         }
 
         message.append("!");

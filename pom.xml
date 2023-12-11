@@ -6,7 +6,7 @@
 
     <groupId>com.x_tornado10</groupId>
     <artifactId>craftiservi</artifactId>
-    <version>1.7.0</version>
+    <version>1.7</version>
     <packaging>jar</packaging>
 
     <name>craftiservi</name>

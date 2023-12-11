@@ -13,26 +13,32 @@
 
 * ### /craftiservi
     - **Usage:** `/craftiservi <help-reloadconfig-resetconfig-restoreconfig>`  
+    - **Permission:** `craftiservi.command.main`  | `craftiservi.admin`  
       This is the main plugin command, used to reload, reset, and restore the plugin config without server reloads.
 
 * ### /firstjoin
-    - **Usage:** `/firstjoin <Player>`  
+    - **Usage:** `/firstjoin <Player>`
+    - **Permission:** `craftiservi.command.firstjoin`  
       Displays the date and time a player first joined the server.
 
 * ### /xparea
-    - **Usage:** `/xparea add-remove-edit-help <AreaName> <WorldName> <Location> <Location>`  
+    - **Usage:** `/xparea add-remove-edit-help <AreaName> <WorldName> <Location> <Location>`
+    - **Permission:** `craftiservi.command.xparea`   
       Create XP areas; when players enter, their XP level is saved and restored when they exit. Useful for PvP arenas.
 
 * ### /invsave
-    - **Usage:** `/invsave <new-remove-rename-view-list-restore> <InvName> <NewInvName>`  
+    - **Usage:** `/invsave <new-remove-rename-view-list-restore> <InvName> <NewInvName>`
+    - **Permission:** `craftiservi.command.invsave` | `craftiservi.command.invsave.bypass.cooldown`   
       Handles InventorySavePoints, snapshots of player inventories. Create, rename, remove, view, list, and restore snapshots. Includes a restore system where admin review is required.
 
 * ### /adminchat
-    - **Usage:** `/adminchat <Message>`  
+    - **Usage:** `/adminchat <Message>`
+    -  **Permission:** `craftiservi.command.adminchat`  
       Sends messages in the built-in Admin Chat, also used for /invsave restore requests.
 
 * ### /opengui
-    - **Usage:** `/opengui <GUI_ID>`  
+    - **Usage:** `/opengui <GUI_ID>`
+    - **Permission:** `craftiservi.command.opengui`  
       Internal command used by the plugin for handling reviews. Only for debugging.
 
 ## Other Features:

@@ -138,13 +138,11 @@ public final class craftiservi extends JavaPlugin {
 
         luckPermsSetup();
 
-        long finish = System.currentTimeMillis();
-        if (finish -start>20000) {
-
-            logger.info("Successfully enabled! (took §c" + (finish - start) + "ms§r)");
-
+        long timeElapsed = System.currentTimeMillis() - start;
+        if (timeElapsed > 20000) {
+            logger.info("Successfully enabled (took §c" + timeElapsed / 1000 + "." + timeElapsed % 1000 + "s§r)");
         } else {
-            logger.info("Successfully enabled! (took §a" + (finish - start) + "ms§r)");
+            logger.info("Successfully enabled (took §a" + timeElapsed / 1000 + "." + timeElapsed % 1000 + "s§r)");
         }
     }
 

@@ -19,19 +19,14 @@
     <url>https://github.com/ToxicStoxm</url>
 
     <build>
-        <finalName>${project.artifactId}-Bukkit-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <excludes>
-                        <exclude>com/x_tornado10/craftiservi/events/listeners/grapling_hook/*</exclude>
-                        <exclude>com/x_tornado10/craftiservi/events/listeners/jpads/*</exclude>
-                    </excludes>
+                    <source>16</source>
+                    <target>16</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -43,21 +38,35 @@
                         <filter>
                             <artifact>*:*</artifact>
                             <excludes>
-                                <exclude>META-INF/*</exclude>
+                                <exclude>META-INF/MANIFEST.MF</exclude>
                             </excludes>
                         </filter>
                     </filters>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <finalName>${project.artifactId}-Bukkit-${project.version}</finalName>
+                    <artifactSet>
+                        <includes>
+                            <include>com.tchristofferson:ConfigUpdater</include>
+                            <include>org.apache.logging.log4j:log4j*</include>
+                            <include>org.bstats:bstats*</include>
+                            <include>de.tr7zw:item-nbt-api*</include>
+                        </includes>
+                    </artifactSet>
                     <relocations>
                         <relocation>
+                            <pattern>com.tchristofferson.configupdater</pattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.utils</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.apache.logging.log4j</pattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.utils</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>com.x_tornado10.craftiservi.shaded.bstats</shadedPattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.utils</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>de.tr7zw.changeme.nbtapi</pattern>
-                            <shadedPattern>com.x_tornado10.craftiservi.shaded.nbtapi</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>com.tchristofferson.configupdater</pattern>
                             <shadedPattern>${project.groupId}.${project.artifactId}.utils</shadedPattern>
                         </relocation>
                     </relocations>
@@ -102,10 +111,6 @@
             <url>https://repo.codemc.io/repository/maven-public/</url>
             <layout>default</layout>
         </repository>
-        <repository>
-            <id>papermc</id>
-            <url>https://repo.papermc.io/repository/maven-public/</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -118,11 +123,6 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.20.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
             <version>2.20.0</version>
         </dependency>
         <dependency>
@@ -146,12 +146,6 @@
             <groupId>de.tr7zw</groupId>
             <artifactId>item-nbt-api</artifactId>
             <version>2.12.1</version>
-        </dependency>
-        <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.20.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

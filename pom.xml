@@ -47,7 +47,7 @@
                     <artifactSet>
                         <includes>
                             <include>com.tchristofferson:ConfigUpdater</include>
-                            <include>org.apache.logging.log4j:log4j*</include>
+                            <include>org.apache.logging.log4j:log4j-core*</include>
                             <include>org.bstats:bstats*</include>
                             <include>de.tr7zw:item-nbt-api*</include>
                         </includes>
@@ -55,19 +55,15 @@
                     <relocations>
                         <relocation>
                             <pattern>com.tchristofferson.configupdater</pattern>
-                            <shadedPattern>${project.groupId}.${project.artifactId}.utils</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.apache.logging.log4j</pattern>
-                            <shadedPattern>${project.groupId}.${project.artifactId}.utils</shadedPattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.utils.configupdater</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>${project.groupId}.${project.artifactId}.utils</shadedPattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.utils.bstats</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>de.tr7zw.changeme.nbtapi</pattern>
-                            <shadedPattern>${project.groupId}.${project.artifactId}.utils</shadedPattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.utils.nbtapi</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -122,7 +118,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
+            <artifactId>log4j-core</artifactId>
             <version>2.20.0</version>
         </dependency>
         <dependency>
@@ -148,5 +144,4 @@
             <version>2.12.1</version>
         </dependency>
     </dependencies>
-
 </project>

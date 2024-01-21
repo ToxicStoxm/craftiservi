@@ -116,6 +116,10 @@ Craftiservi:
     XpArea:
       # Enable XP Area feature. (DEFAULT: false)
       Enabled: false
+      LimitGroups:
+        default: 0
+        cs+: 1
+        csp: 5
 
     FirstJoin:
       # Enable First Join feature. (DEFAULT: true)

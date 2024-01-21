@@ -9,5 +9,6 @@ public class PERMISSION {
     public static final String COMMAND_OPENGUI = "craftiservi.command.opengui";
     public static final String COMMAND_MAIN = "craftiservi.command.main";
     public static final String COMMAND_ADMINCHAT = "craftiservi.command.adminchat";
+    public static String COMMAND_XPAREA_LIMIT = "craftiservi.command.xparea.";
 
 }

@@ -18,6 +18,7 @@ import com.x_tornado10.craftiservi.utils.custom_data.reload.CustomDataWrapper;
 import com.x_tornado10.craftiservi.utils.Paths;
 import com.x_tornado10.craftiservi.utils.data.convert.TextFormatting;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -25,6 +26,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ConfigManager {
@@ -105,6 +107,15 @@ public class ConfigManager {
     public boolean getAdminChat_queue() {return config.getBoolean(paths.getAdmin_Chat_queue());}
     public double getAdminChat_queueTime() {return config.getDouble(paths.getAdmin_Chat_queueTime());}
     public double getAdminChat_queueLimit() {return config.getDouble(paths.getAdmin_Chat_queueLimit()) == -1 ? -1 : Math.round(config.getDouble(paths.getAdmin_Chat_queueLimit()));}
+    public HashMap<String, Integer> getXpAreaLimitGroups() {
+        HashMap<String, Integer> result = new HashMap<>();
+        ConfigurationSection sec = config.getConfigurationSection(paths.getXpArea_LimitGroups());
+        if (sec == null) return null;
+        for (String s : sec.getKeys(false)) {
+            if (sec.getInt(s) != -1) result.put(s, sec.getInt(s));
+        }
+        return result;
+    }
 
     public boolean reloadConfig(boolean force) {
 
@@ -145,6 +156,7 @@ public class ConfigManager {
         customDataList.add(constructAFKLData());
         customDataList.add(constructOpmsgData());
         customDataList.add(constructInvData());
+        customDataList.add(constructXpAreaData());
 
         return new CustomDataWrapper(customDataList);
     }
@@ -268,6 +280,9 @@ public class ConfigManager {
         b.add(getCommands_invsave_auto_inv_save());
         s.add(getCommands_invsave_auto_inv_save_format());
         return new CustomData(s, b, null, d, null);
+    }
+    private CustomData constructXpAreaData() {
+        return new CustomData(null, null, null, null, null, getXpAreaLimitGroups());
     }
 
     public boolean resetConfig() {

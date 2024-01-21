@@ -39,6 +39,14 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
@@ -47,6 +55,10 @@
                         <relocation>
                             <pattern>de.tr7zw.changeme.nbtapi</pattern>
                             <shadedPattern>com.x_tornado10.craftiservi.shaded.nbtapi</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.tchristofferson.configupdater</pattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.utils</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

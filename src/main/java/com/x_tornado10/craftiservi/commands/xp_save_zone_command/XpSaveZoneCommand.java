@@ -1,8 +1,17 @@
 package com.x_tornado10.craftiservi.commands.xp_save_zone_command;
 
 import com.x_tornado10.craftiservi.craftiservi;
+import com.x_tornado10.craftiservi.events.custom.ReloadEvent;
 import com.x_tornado10.craftiservi.logger.Logger;
 import com.x_tornado10.craftiservi.message_sys.PlayerMessages;
+import com.x_tornado10.craftiservi.utils.custom_data.reload.CustomData;
+import com.x_tornado10.craftiservi.utils.statics.CDID;
+import com.x_tornado10.craftiservi.utils.statics.PERMISSION;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.model.user.UserManager;
+import net.luckperms.api.node.NodeType;
+import net.luckperms.api.node.types.PermissionNode;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -16,18 +25,22 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 
-public class XpSaveZoneCommand implements CommandExecutor {
-
-    private final craftiservi plugin;
+public class XpSaveZoneCommand implements CommandExecutor, Listener {
 
     private final HashMap<String, List<Location>> xpsaveareas;
-
     private final Logger logger;
     private final PlayerMessages plmsg;
+    private HashMap<String, Integer> limits;
+    private final craftiservi plugin;
+    private HashMap<UUID, Integer> xpAreas;
 
     private final HashMap<UUID, List<Float>> playersinsavearea;
     public static boolean enabled;
@@ -37,6 +50,8 @@ public class XpSaveZoneCommand implements CommandExecutor {
         logger = plugin.getCustomLogger();
         plmsg = plugin.getPlayerMessages();
         playersinsavearea = plugin.getPlayersinsavearea();
+        limits = new HashMap<>();
+        xpAreas = new HashMap<>();
     }
 
     @Override
@@ -157,6 +172,7 @@ public class XpSaveZoneCommand implements CommandExecutor {
                         locs.add(loc1);
                         locs.add(loc2);
                         xpsaveareas.put(args[1], locs);
+                        xpAreas.put(p.getUniqueId(), xpAreas.containsKey(p.getUniqueId()) ? xpAreas.get(p.getUniqueId()) + 1 : 1);
                         plmsg.msg(p, "Successfully created new XpSaveArea '" + args[1] + "' at " + loc1.getX() + " " + loc1.getY() + " " + loc1.getZ() + " | " + loc2.getX() + " " + loc2.getY() + " " + loc2.getZ() + "!");
                     }
                     case "edit" -> {
@@ -206,6 +222,7 @@ public class XpSaveZoneCommand implements CommandExecutor {
                             }
                         }
                         xpsaveareas.remove(args[1]);
+                        xpAreas.put(p.getUniqueId(), xpAreas.containsKey(p.getUniqueId()) ? xpAreas.get(p.getUniqueId()) - 1 : 0);
                         plmsg.msg(p,"Successfully removed Area '" + args[1] + "'");
                     } else {
                         plmsg.msg(p,"Area '" + args[1] + "' does not exist! Please enter a valid AreaName!");
@@ -336,6 +353,40 @@ public class XpSaveZoneCommand implements CommandExecutor {
 
         return z;
 
+    }
+    private boolean checkLimit(Player p) {
+        int limit = getLimit(p);
+        if (limit == 0) return false;
+        UUID pid = p.getUniqueId();
+        return !xpAreas.containsKey(pid) || xpAreas.get(pid) < limit;
+    }
+    @NotNull
+    private Integer getLimit(@NotNull Player p) {
+        LuckPerms lpAPI = plugin.getLpAPI();
+        if (lpAPI == null) return 0;
+        UserManager userMgr = lpAPI.getUserManager();
+        User user = userMgr.getUser(p.getUniqueId());
+        if (user == null) return 0;
+        Collection<PermissionNode> nodes = user.getNodes(NodeType.PERMISSION);
+        for (PermissionNode node : nodes) {
+            String perm = node.getPermission();
+            if (perm.contains(PERMISSION.COMMAND_XPAREA_LIMIT)) {
+                String[] parts = node.getPermission().split("\\.");
+                String key = parts[parts.length - 1];
+                if (limits.containsKey(key)) {
+                    return limits.get(key);
+                } else {
+                    return limits.get("default");
+                }
+            }
+        }
+        return limits.get("default");
+    }
+
+    @EventHandler
+    public void onReload(ReloadEvent e) {
+        CustomData xpArea_Data = e.getData(CDID.XPAREA_DATA);
+        limits = xpArea_Data.getHashMap();
     }
 
 }

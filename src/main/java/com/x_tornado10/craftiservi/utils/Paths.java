@@ -75,5 +75,6 @@ public class Paths {
     public String getAfk_checker_allow_place_block() {return "Craftiservi.Commands-Features.Afk-Checker.allow-place-blocks";}
     public String getAfk_checker_stop_creeper_target() {return "Craftiservi.Commands-Features.Afk-Checker.stop-creeper-target";}
     public String getAfk_checker_kill_creeper_on_target() {return "Craftiservi.Commands-Features.Afk-Checker.kill-creeper-on-target";}
+    public String getXpArea_LimitGroups() {return "Craftiservi.Commands-Features.XpArea.LimitGroups";}
 
 }

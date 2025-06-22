@@ -1,4 +1,5 @@
-![Craftiservi Logo](https://www.crafti-servi.com/plugin-resources/craftiservi/Plugin-Logo/CSP.png)
+![Craftiservi Logo](https://crafti-servi.com/plugin-resources/craftiservi/Plugin-Logo/Full_New_Banner.png)
+
 
 # Craftiservi
 [![Spigot Version](https://img.shields.io/spiget/version/108546?logo=spigotmc&label=release&color=%2365bfdd&logoColor=%23ffffff)](https://plugin.crafti-servi.com/)
